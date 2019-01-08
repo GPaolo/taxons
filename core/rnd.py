@@ -85,11 +85,11 @@ class RND(object):
 if __name__ == '__main__':
   device = torch.device('cpu')
   rnd = RND(6, 2, device)
-  x = torch.ones(6)
 
-  for _ in range(100):
+  for _ in range(1000):
+    x = torch.rand([1, 6])
     print(rnd.training_step(x))
 
-  x = torch.tensor([0.5, 2, 5, 0.2, 3, 1])
+  x = torch.Tensor([0.2, 0.4, 0.557, 0.36, 0, 1.5])
   print(rnd(x))
 
