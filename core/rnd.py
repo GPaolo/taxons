@@ -7,6 +7,7 @@ import torch.optim as optim
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# TODO put the net in a different file, so you can create different kind of nets (each one with its own class), without having to change the tests and anything
 class Net(nn.Module):
   '''
   This class defines the networks used for the RND
@@ -57,7 +58,7 @@ class RND(object):
     '''
     This function calculates the surprise given by the input
     :param x: Network input. Needs to be a torch tensor.
-    :return: Surprise
+    :return: surprise as a 1 dimensional torch tensor
     '''
     target = self.target_model(x)
     prediction = self.predictor_model(x)
@@ -71,7 +72,7 @@ class RND(object):
     '''
     This function performs the training step.
     :param x: Network input. Needs to be a torch tensor.
-    :return:
+    :return: surprise as a 1 dimensional torch tensor
     '''
     self.optimizer.zero_grad()
     surprise = self._get_surprise(x)
