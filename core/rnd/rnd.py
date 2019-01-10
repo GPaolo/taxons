@@ -7,7 +7,8 @@ import torch.optim as optim
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# TODO put the net in a different file, so you can create different kind of nets (each one with its own class), without having to change the tests and anything
+# TODO put the net in a different file, so you can create different kind of nets (each one with its own class),
+#  without having to change the tests and anything
 class Net(nn.Module):
   '''
   This class defines the networks used for the RND
