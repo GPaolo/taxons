@@ -14,8 +14,8 @@ class BaseAgent(object):
       # Define normal distr with sigma and mu
       self.sigma = 0.2
       self.mu = 0
-      def normal(d0, d1):
-        return self.sigma * np.random.randn(d0, d1) + self.mu
+      def normal(*args):
+        return self.sigma * np.random.randn(*args) + self.mu
 
       self.mutation_operator = normal
     else:
@@ -67,6 +67,10 @@ class NeuralAgent(BaseAgent):
     return self.evaluate(x)
 
   def mutate(self):
+    '''
+    Mutates the genome of the agent. It does not return anything. The mutation is internal.
+    :return:
+    '''
     for l in self.genome:
       l.w = l.w + self.mutation_operator(l.w.shape[0], l.w.shape[1])
       l.bias = l.bias + self.mutation_operator(l.bias.shape[0], l.bias.shape[1])

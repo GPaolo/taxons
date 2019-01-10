@@ -10,14 +10,13 @@ class Population(object):
   '''
   def __init__(self, agent=BaseAgent, pop_size=10, mutation_rate=0.9, *args, **kargs):
     self.size = pop_size
-    self.pop = {'agents': [], 'values': [], 'best': []}
+    self.pop = []
     self.agent_class = agent
     self.mutation_rate = mutation_rate
 
     for i in range(self.size):
-      self.pop['agents'].append(self.agent_class(kargs))
-      self.pop['values'].append(None)
-      self.pop['best'].append(False)
+      agent = {'agent':self.agent_class(kargs), 'reward':None, 'best':False, 'surprise':None}
+      self.pop.append(agent)
 
   # def new_generation(self):
   #   # Get best elements copies and mutate them
