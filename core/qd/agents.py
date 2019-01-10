@@ -24,7 +24,7 @@ class BaseAgent(object):
     self.genome = None
 
   @abstractmethod
-  def evaluate(self):
+  def evaluate(self, x):
     pass
 
   def get_genome(self):
@@ -76,6 +76,6 @@ class NeuralAgent(BaseAgent):
       l.bias = l.bias + self.mutation_operator(l.bias.shape[0], l.bias.shape[1])
 
 if __name__ == '__main__':
-  net = NeuralAgent(input_shape=2, output_shape=3)
+  net = NeuralAgent({'input_shape':2, 'output_shape':3})
   net.fc1.show
 
