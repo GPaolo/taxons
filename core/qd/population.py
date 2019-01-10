@@ -45,7 +45,7 @@ class Population(object):
     if agent is not None:
       self._append(agent)
     else:
-      agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': True}
+      agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': False}
       self.pop.append(agent)
 
   def show(self):

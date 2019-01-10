@@ -13,9 +13,13 @@ class Net(nn.Module):
   '''
   This class defines the networks used for the RND
   '''
-  def __init__(self, input_shape, output_shape, device, fixed=False):
+  def __init__(self, input_shape, output_shape, device=None, fixed=False):
     super(Net, self).__init__()
-    self.device = device
+    if device is not None:
+      self.device = device
+    else:
+      self.device = torch.device("cpu")
+
     self.input_shape = input_shape
     self.output_shape = output_shape
     self.fixed = fixed
@@ -42,7 +46,7 @@ class RND(object):
   '''
   Class that instantiates the RND component
   '''
-  def __init__(self, input_shape, encoding_shape, device):
+  def __init__(self, input_shape, encoding_shape, device=None):
     self.input_shape = input_shape
     self.encoding_shape = encoding_shape
     self.device = device

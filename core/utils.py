@@ -15,7 +15,7 @@ class FCLayer(object):
     return self.forward(x)
 
   def forward(self, x):
-    assert np.shape(x)[0] == 1, 'Wrong input shape. Needs to be [1, n]'
+    assert np.shape(x)[0] == 1, 'Wrong input shape. Needs to be [1, n]. Is {}'.format(np.shape(x))
     return np.matmul(x, self.w) + self.bias
 
   @property

@@ -50,7 +50,9 @@ class BaseOptimizer(object):
 
 
 class SimpleOptimizer(BaseOptimizer):
-
+  # TODO The evaluation of the agent maybe is better outside of the optimizer. Here is better to do just the step.
+  #  This way we don't have to give the env to the optimizer and we are not tied to OpenAiGYm
+  #  Also we can decide outside how to normalize the inputs, and what to give to the metric
   def evaluate_agent(self, agent):
     done = False
     total_reward = 0
@@ -58,7 +60,12 @@ class SimpleOptimizer(BaseOptimizer):
 
     obs = self.env.reset()
     while not done:
-      action = agent['agent'](obs)
+      action = agent['agent'](np.array([obs]))
+      if action[0][0] >0:
+        action = 1
+      else:
+        action = 0
+
       obs, reward, done, info = self.env.step(action)
       surprise = self.metric(obs)
 
