@@ -3,8 +3,9 @@ from core.rnd import rnd
 from core.qd import population, agents
 from core import optimizer
 import gym, torch
+import multiprocessing as mp
 
-env_tag = 'MountainCarContinuous-v0'
+env_tag = 'CartPole-v1'
 
 class RndQD(object):
 
@@ -19,7 +20,10 @@ class RndQD(object):
 #The evaluation of the agent is better outside of the optimizer. The optimizer should receive the pop already evaluated.
 #This way we don't have to give the env to the optimizer and we are not tied to OpenAiGYm
 #Also we can decide outside how to normalize the inputs, and what to give to the metric
-def evaluate_agent(agent, env, metric):
+def evaluate_agent(agent, env_tag, metric):
+  # TODO have to find a way to run this in parallel
+  env = gym.make(env_tag)
+
   done = False
   total_reward = 0
   total_surprise = 0
@@ -34,7 +38,8 @@ def evaluate_agent(agent, env, metric):
 
     obs, reward, done, info = env.step(action)
     state = torch.Tensor([obs])
-    surprise = metric(state)
+    # TODO add whitening of inputs to the metric (see RND paper sec 2.4)
+    surprise = metric.training_step(state)
 
     total_reward += reward
     total_surprise += surprise.cpu().item()
@@ -43,17 +48,21 @@ def evaluate_agent(agent, env, metric):
   agent['reward'] = total_reward
 
 if __name__ == '__main__':
-  env = gym.make('CartPole-v1')
   pop = population.Population(agent=agents.FFNeuralAgent, output_shape=1, input_shape=4)
   metric = rnd.RND(input_shape=4, encoding_shape=3)
+  env = gym.make(env_tag)
 
   opt = optimizer.SimpleOptimizer(pop)
-  for _ in range(100000):
-    if _ % 1000 == 0:
-      print('Step {}'.format(_))
-    for a in pop:
-      evaluate_agent(a, env, metric)
-    opt.step()
+  try:
+    for _ in range(100000):
+      if _ % 1000 == 0:
+        print('Step {}'.format(_))
+      for a in pop:
+        evaluate_agent(a, env_tag, metric)
+      opt.step()
+  except KeyboardInterrupt:
+    print('User interruption')
+
 
   print('Testing best reward')
   obs = env.reset()
@@ -62,6 +71,7 @@ if __name__ == '__main__':
     if a['reward'] > best['reward']:
       best = a
 
+  print('Best reward {}'.format(best['reward']))
   for _ in range(1000):
     env.render()
     action = np.squeeze(best['agent'](np.array([obs])))
@@ -81,6 +91,7 @@ if __name__ == '__main__':
     if a['surprise'] > best['surprise']:
       best = a
 
+  print('Best surprise {}'.format(best['surprise']))
   for _ in range(1000):
     env.render()
     action = np.squeeze(best['agent'](np.array([obs])))

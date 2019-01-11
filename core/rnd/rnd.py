@@ -2,42 +2,9 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from core.rnd.net import TargetNet, PredictorNet
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# TODO put the net in a different file, so you can create different kind of nets (each one with its own class),
-#  without having to change the tests and anything
-class Net(nn.Module):
-  '''
-  This class defines the networks used for the RND
-  '''
-  def __init__(self, input_shape, output_shape, device=None, fixed=False):
-    super(Net, self).__init__()
-    if device is not None:
-      self.device = device
-    else:
-      self.device = torch.device("cpu")
-
-    self.input_shape = input_shape
-    self.output_shape = output_shape
-    self.fixed = fixed
-
-    self.fc1 = nn.Linear(self.input_shape, 64)
-    self.fc2 = nn.Linear(64, 32)
-    self.fc3 = nn.Linear(32, 16)
-    self.fc4 = nn.Linear(16, self.output_shape)
-
-    self.to(device)
-    for l in self.parameters():
-      l.requires_grad = not self.fixed
-    self.zero_grad()
-
-  def forward(self, x):
-    x = torch.tanh(self.fc1(x))
-    x = torch.tanh(self.fc2(x))
-    x = torch.tanh(self.fc3(x))
-    x = torch.tanh(self.fc4(x))
-    return x
 
 
 class RND(object):
@@ -49,8 +16,8 @@ class RND(object):
     self.encoding_shape = encoding_shape
     self.device = device
     # Nets
-    self.target_model = Net(self.input_shape, self.encoding_shape, self.device, fixed=True)
-    self.predictor_model = Net(self.input_shape, self.encoding_shape, self.device, fixed=False)
+    self.target_model = TargetNet(self.input_shape, self.encoding_shape, self.device, fixed=True)
+    self.predictor_model = PredictorNet(self.input_shape, self.encoding_shape, self.device, fixed=False)
     # Loss
     self.criterion = nn.MSELoss()
     # Optimizer
