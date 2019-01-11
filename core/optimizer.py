@@ -1,45 +1,36 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod  # This is to force implementation of child class methods
-from copy import deepcopy
 import random
 
-class BaseOptimizer(object):
-  def __init__(self, env, pop, metric, mutation_rate=.9, sync_update=True):
-    self.env = env
+class BaseOptimizer(metaclass=ABCMeta):
+  def __init__(self, pop, mutation_rate=.9, sync_update=True):
     self.pop = pop
-    self.metric = metric
     self.mutation_rate = mutation_rate
     self.sync_update = sync_update
 
-  def _get_pareto_front(self, costs):
+  def _get_pareto_front(self, costs, direction='max'):
     '''
     This function calculates the agents in the pareto front. Is taken from:
     https://stackoverflow.com/questions/32791911/fast-calculation-of-pareto-front-in-python
     :param: costs: list of costs along which calculate the front. Shape [pop_len, num_of_pareto_dim]
+    :param: direction: can be either 'min' or 'max'. Defines The way we calculate the front.
     :return: The boolean mask of the pareto efficient elements.
     '''
-    is_pareto_mask = np.zeros(len(costs), dtype=bool)
+    assert direction in ['min', 'max'], 'Direction can be either min or max. Is {}'.format(direction)
     is_pareto = np.arange(len(costs))
 
     i = 0
     while i < len(costs):
-      nondominated_point_mask = np.any(costs < costs[i], axis=1)
+      if direction == 'max':
+        nondominated_point_mask = np.any(costs > costs[i], axis=1)
+      elif direction == 'min':
+        nondominated_point_mask = np.any(costs < costs[i], axis=1)
       nondominated_point_mask[i] = True
       is_pareto = is_pareto[nondominated_point_mask]
       costs = costs[nondominated_point_mask]
       i = np.sum(nondominated_point_mask[:i]) + 1
 
-    is_pareto_mask[is_pareto] = True
-    return is_pareto_mask
-
-  @abstractmethod
-  def evaluate_agent(self, agent):
-    '''
-    Function to evaluate single agent
-    :param agent:
-    :return:
-    '''
-    pass
+    return is_pareto
 
   @abstractmethod
   def step(self):
@@ -50,58 +41,32 @@ class BaseOptimizer(object):
 
 
 class SimpleOptimizer(BaseOptimizer):
-  # TODO The evaluation of the agent maybe is better outside of the optimizer. Here is better to do just the step.
-  #  This way we don't have to give the env to the optimizer and we are not tied to OpenAiGYm
-  #  Also we can decide outside how to normalize the inputs, and what to give to the metric
-  def evaluate_agent(self, agent):
-    done = False
-    total_reward = 0
-    total_surprise =  0
-
-    obs = self.env.reset()
-    while not done:
-      action = agent['agent'](np.array([obs]))
-      if action[0][0] >0:
-        action = 1
-      else:
-        action = 0
-
-      obs, reward, done, info = self.env.step(action)
-      surprise = self.metric(obs)
-
-      total_reward += reward
-      total_surprise += surprise
-
-    agent['surprise'] = total_surprise
-    agent['reward'] = total_reward
 
   def step(self):
     """
-    This function performs an optimization step. This consist in generating the new generation of the population.
-    It does so by, for each member of the population, running a simulation in the env, and then assigning a value to it.
-    Then it finds the best ones, copies them in random places of the pop and mutates all the pop.
+    This function performs an optimization step.
+    Once the agents have been evaluated, it calculates the pareto front of the agents and decides who and how is
+    going to reproduce. It also mutates the agents.
     :return:
     """
-    for agent in self.pop:
-      self.evaluate_agent(agent)
-
     # Find best agents
     costs = np.array([np.array([a['surprise'], a['reward']]) for a in self.pop])
-    pareto_mask = self._get_pareto_front(costs)
+    is_pareto = self._get_pareto_front(costs)
 
     # Create new gen by substituting random agents with copies of the best ones. (Also the best ones can be subst, effectively
     # reducing the amount of dead agents)
-    new_gen = deepcopy(self.pop[pareto_mask])
-    for a in self.pop[pareto_mask]:
-      a['best'] = True
-    dead = random.sample(range(self.pop.size+1), len(new_gen))
+    new_gen = [self.pop[i].copy() for i in is_pareto]
+
+    for i in is_pareto:
+      self.pop[i]['best'] = True
+    dead = random.sample(range(self.pop.size), len(new_gen))
     for i, new_agent in zip(dead, new_gen):
       self.pop[i] = new_agent
 
     # Mutate pop that are not pareto optima
     for a in self.pop:
       if np.random.random() <= self.mutation_rate and not a['best']:
-        a.mutate()
+        a['agent'].mutate()
 
 
 

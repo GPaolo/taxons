@@ -1,7 +1,5 @@
 from rnd_qd.core.rnd import rnd
 import torch
-import torch.nn as nn
-import numpy as np
 
 torch.manual_seed(7)
 

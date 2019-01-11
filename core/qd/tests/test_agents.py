@@ -12,7 +12,7 @@ def test_base_agent():
 
 def test_neural_agent():
   shapes = {'input_shape': 3, 'output_shape':2}
-  agent = agents.NeuralAgent(shapes)
+  agent = agents.FFNeuralAgent(shapes)
 
   assert len(agent.genome) == 4, 'Wrong genome len.'
 
