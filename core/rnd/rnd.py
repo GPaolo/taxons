@@ -19,9 +19,9 @@ class RND(object):
     self.target_model = TargetNet(self.input_shape, self.encoding_shape, self.device, fixed=True)
     self.predictor_model = PredictorNet(self.input_shape, self.encoding_shape, self.device, fixed=False)
     # Loss
-    self.criterion = nn.MSELoss()
+    self.criterion = nn.MSELoss(reduction='sum')
     # Optimizer
-    self.learning_rate = 0.01
+    self.learning_rate = 0.0001
     self.optimizer = optim.Adam(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x):

@@ -26,25 +26,27 @@ def evaluate_agent(agent, env_tag, metric):
 
   done = False
   total_reward = 0
-  total_surprise = 0
 
   obs = env.reset()
+  state = np.array([obs])
+  obs = np.array([obs])
   while not done:
-    action = np.squeeze(agent['agent'](np.array([obs])))
+    action = np.squeeze(agent['agent'](obs))
     if action > 0:
       action = 1
     else:
       action = 0
 
     obs, reward, done, info = env.step(action)
-    state = torch.Tensor([obs])
-    # TODO add whitening of inputs to the metric (see RND paper sec 2.4)
-    surprise = metric.training_step(state)
+    obs = np.array([obs])
+    state = np.append(state, obs, axis=0)
 
     total_reward += reward
-    total_surprise += surprise.cpu().item()
 
-  agent['surprise'] = total_surprise
+  # TODO add whitening of inputs to the metric (see RND paper sec 2.4)
+  surprise = metric.training_step(torch.Tensor(state)) #TODO TRAINING HAS TO BE DONE AT THE END OF EACH GENERATION NOT AT THE END OF EACH AGENT EVAL
+
+  agent['surprise'] = surprise.cpu().item()
   agent['reward'] = total_reward
 
 if __name__ == '__main__':

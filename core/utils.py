@@ -2,14 +2,11 @@ import numpy as np
 
 
 class FCLayer(object):
-  def __init__(self, input, output, name=None):
+  def __init__(self, input, output, name='fc'):
     super().__init__()
     self.w = np.random.randn(input, output) * 0.1
     self.bias = np.random.randn(1, output)
-    if name is None:
-      self.name = 'fc'
-    else:
-      self.name = name
+    self.name = name
 
   def __call__(self, x):
     return self.forward(x)
