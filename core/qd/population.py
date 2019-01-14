@@ -7,11 +7,12 @@ class Population(object):
   Basic Population class. The new generation is just the mutation of the best elements that substitutes the worst.
   The criteria for the best is given by the metric, and is calculated outside.
   '''
-  def __init__(self, agent=BaseAgent, pop_size=10, *args, **kargs):
+  def __init__(self, agent=BaseAgent, pop_size=10, max_len=None, *args, **kargs):
     self.size = pop_size
     self.pop = []
     self.agent_class = agent
     self.kargs = kargs
+    self.max_len = max_len
 
     for i in range(self.size):
       self.add()
@@ -46,6 +47,10 @@ class Population(object):
     else:
       agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': False}
       self.pop.append(agent)
+
+    if self.max_len is not None:
+      while len(self.pop) > self.max_len:
+        del self.pop[self.max_len]
 
   def show(self):
     print(self.pop)

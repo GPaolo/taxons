@@ -56,7 +56,7 @@ class PredictorNet(nn.Module):
 
     self.fc1 = nn.Linear(self.input_shape, 16)
     self.fc2 = nn.Linear(16, 32)
-    self.fc3 = nn.Linear(32, 32)
+    # self.fc3 = nn.Linear(32, 32)
     self.fc4 = nn.Linear(32, 16)
     self.fc5 = nn.Linear(16, self.output_shape)
 
@@ -68,7 +68,7 @@ class PredictorNet(nn.Module):
   def forward(self, x):
     x = torch.tanh(self.fc1(x))
     x = torch.tanh(self.fc2(x))
-    x = torch.tanh(self.fc3(x))
+    # x = torch.tanh(self.fc3(x))
     x = torch.tanh(self.fc4(x))
     x = torch.tanh(self.fc5(x))
     # x = torch.tanh(self.fc6(x))

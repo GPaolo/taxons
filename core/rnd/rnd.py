@@ -20,11 +20,12 @@ class RND(object):
     self.predictor_model = PredictorNet(self.input_shape, self.encoding_shape, self.device, fixed=False)
     # Loss
     self.criterion = nn.MSELoss(reduction='sum')
+    self.training_criterion = nn.MSELoss()
     # Optimizer
-    self.learning_rate = 0.0001
-    self.optimizer = optim.Adam(self.predictor_model.parameters(), self.learning_rate)
+    self.learning_rate = 0.00001
+    self.optimizer = optim.SGD(self.predictor_model.parameters(), self.learning_rate)
 
-  def _get_surprise(self, x):
+  def _get_surprise(self, x, train=False):
     '''
     This function calculates the surprise given by the input
     :param x: Network input. Needs to be a torch tensor.
@@ -32,8 +33,10 @@ class RND(object):
     '''
     target = self.target_model(x)
     prediction = self.predictor_model(x)
-    surprise = self.criterion(prediction, target)
-    return surprise
+    if not train:
+      return self.criterion(prediction, target)
+    else:
+      return self.criterion(prediction, target)/10
 
   def __call__(self, x):
     return self._get_surprise(x)
@@ -45,7 +48,7 @@ class RND(object):
     :return: surprise as a 1 dimensional torch tensor
     '''
     self.optimizer.zero_grad()
-    surprise = self._get_surprise(x)
+    surprise = self._get_surprise(x, train=True)
     surprise.backward()
     self.optimizer.step()
     return surprise

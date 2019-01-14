@@ -45,7 +45,8 @@ class FFNeuralAgent(BaseAgent):
 
   def __init__(self, shapes, mutation_distr=None):
     '''
-    This agent embeds an NN. Not using pytorch cause it does not give any advantage (cannot parallelize on one GPU)    :param mutation_distr: distribution used for mutation
+    This agent embeds an NN. Not using pytorch cause it does not give any advantage (cannot parallelize on one GPU)
+    :param mutation_distr: distribution used for mutation
     :param shapes: Dict that has to contain
               input_shape: shape of network input
               output_shape: shape of network output

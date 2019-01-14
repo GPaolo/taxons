@@ -3,10 +3,11 @@ from abc import ABCMeta, abstractmethod  # This is to force implementation of ch
 import random
 
 class BaseOptimizer(metaclass=ABCMeta):
-  def __init__(self, pop, mutation_rate=.9, sync_update=True):
+  def __init__(self, pop, mutation_rate=.9, sync_update=True, archive=None):
     self.pop = pop
     self.mutation_rate = mutation_rate
     self.sync_update = sync_update
+    self.archive = archive
 
   def _get_pareto_front(self, costs, direction='max'):
     '''
