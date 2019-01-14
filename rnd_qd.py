@@ -22,7 +22,7 @@ class RndQD(object):
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=8)
-    self.opt = optimizer.SimpleOptimizer(self.population)
+    self.opt = optimizer.NoveltyOptimizer(self.population)
     self.cumulated_state = []
 
   # TODO make this run in parallel

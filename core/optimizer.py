@@ -41,7 +41,7 @@ class BaseOptimizer(metaclass=ABCMeta):
     pass
 
 
-class SimpleOptimizer(BaseOptimizer):
+class ParetoOptimizer(BaseOptimizer):
 
   def step(self):
     """
@@ -68,6 +68,31 @@ class SimpleOptimizer(BaseOptimizer):
     for a in self.pop:
       if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
+
+
+class NoveltyOptimizer(BaseOptimizer):
+  def step(self):
+    '''
+    This function performs an optimization step by taking the most novel agents
+    :return:
+    '''
+    novel = np.array([(idx, a['surprise']) for idx, a in enumerate(self.pop)],
+                     dtype=[('x', int), ('y', float)])
+
+    novel.sort(order='y')
+    new_gen = [self.pop[i[0]].copy() for i in novel[:3]] # Get first 3 most novel agents
+    for i in range(3):
+      self.pop[i]['best'] = True
+
+    dead = novel[-4:]
+    for i, new_agent in zip(dead, new_gen):
+      self.pop[i[0]] = new_agent
+
+    # Mutate pop that are not novel
+    for a in self.pop:
+      if np.random.random() <= self.mutation_rate and not a['best']:
+        a['agent'].mutate()
+
 
 
 
