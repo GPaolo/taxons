@@ -52,11 +52,10 @@ class RndQD(object):
       cumulated_reward += reward
 
     state = torch.Tensor(state)
-    # TODO add whitening of inputs to the metric (see RND paper sec 2.4)
-    surprise = self.metric(state)
+    surprise = self.metric.training_step(state)
     agent['surprise'] = surprise.cpu().item()
     agent['reward'] = cumulated_reward
-    self.cumulated_state.append(state)
+    # self.cumulated_state.append(state)
 
   def update_rnd(self):
     '''
@@ -74,15 +73,17 @@ class RndQD(object):
     :return:
     '''
     for i in range(50000):
+      cs = 0
       for a in self.population:
         self.evaluate_agent(a)
+        cs += a['surprise']
 
-      cs = self.update_rnd()
+      # cs = self.update_rnd()
+      self.opt.step()
       if i % 1000 == 0:
         print('Generation {}'.format(i))
-        print('Cumulated surprise {}'.format(cs))
+        print('Cumulated surprise {}'.format(cs/10))
         print()
-      self.opt.step()
 
 
 if __name__ == '__main__':

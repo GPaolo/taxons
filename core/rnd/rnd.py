@@ -36,7 +36,7 @@ class RND(object):
     if not train:
       return self.criterion(prediction, target)
     else:
-      return self.criterion(prediction, target)/10
+      return self.criterion(prediction, target)/len(x)
 
   def __call__(self, x):
     return self._get_surprise(x)

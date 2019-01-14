@@ -17,10 +17,11 @@ class TargetNet(nn.Module):
     self.output_shape = output_shape
     self.fixed = fixed
 
+    self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
     self.fc1 = nn.Linear(self.input_shape, 32)
     self.fc2 = nn.Linear(32, 64)
-    self.fc3 = nn.Linear(64, 32)
-    self.fc4 = nn.Linear(32, 32)
+    self.fc3 = nn.Linear(64, 128)
+    self.fc4 = nn.Linear(128, 32)
     self.fc5 = nn.Linear(32, 16)
     self.fc6 = nn.Linear(16, self.output_shape)
 
@@ -30,6 +31,7 @@ class TargetNet(nn.Module):
     self.zero_grad()
 
   def forward(self, x):
+    x = self.bn(x)
     x = torch.tanh(self.fc1(x))
     x = torch.tanh(self.fc2(x))
     x = torch.tanh(self.fc3(x))
@@ -54,6 +56,7 @@ class PredictorNet(nn.Module):
     self.output_shape = output_shape
     self.fixed = fixed
 
+    self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
     self.fc1 = nn.Linear(self.input_shape, 16)
     self.fc2 = nn.Linear(16, 32)
     # self.fc3 = nn.Linear(32, 32)
@@ -66,6 +69,7 @@ class PredictorNet(nn.Module):
     self.zero_grad()
 
   def forward(self, x):
+    x = self.bn(x)
     x = torch.tanh(self.fc1(x))
     x = torch.tanh(self.fc2(x))
     # x = torch.tanh(self.fc3(x))
