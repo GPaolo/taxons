@@ -21,7 +21,7 @@ class RndQD(object):
                                          pop_size=0)
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=8)
+    self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=8, pop_size=10)
     self.opt = optimizer.NoveltyOptimizer(self.population)
     self.cumulated_state = []
 
@@ -52,17 +52,28 @@ class RndQD(object):
       cumulated_reward += reward
 
     state = torch.Tensor(state)
-    surprise = self.metric.training_step(state)
-    agent['surprise'] = surprise.cpu().item()
+    surprise = self.metric(state.unsqueeze(0)) # Input Dimensions need to be [1, traj_len, obs_space]
+    agent['surprise'] = surprise[0]
     agent['reward'] = cumulated_reward
-    # self.cumulated_state.append(state)
+    self.cumulated_state.append(state) # Append here all the states
 
   def update_rnd(self):
     '''
     This function uses the cumulated state to update the rnd nets and then empties the cumulated_state
     :return:
     '''
-    self.cumulated_state = torch.cat(self.cumulated_state)
+    # Find max trajectory length
+    max_t_len = 0
+    for k in self.cumulated_state:
+      if k.size()[0] > max_t_len:
+        max_t_len = k.size()[0]
+    # Pad trajectories
+    for idx, k in enumerate(self.cumulated_state):
+      while k.size()[0] < max_t_len:
+        k = torch.cat((k, torch.zeros_like(k[:1])))
+      self.cumulated_state[idx] = k
+
+    self.cumulated_state = torch.stack(self.cumulated_state)
     cum_surprise = self.metric.training_step(self.cumulated_state)
     self.cumulated_state = []
     return cum_surprise
@@ -77,8 +88,7 @@ class RndQD(object):
       for a in self.population:
         self.evaluate_agent(a)
         cs += a['surprise']
-
-      # cs = self.update_rnd()
+      self.update_rnd()
       self.opt.step()
       if i % 1000 == 0:
         print('Generation {}'.format(i))
