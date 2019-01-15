@@ -4,7 +4,8 @@ import numpy as np
 class FCLayer(object):
   def __init__(self, input, output, name='fc'):
     super().__init__()
-    self.w = np.random.randn(input, output) * 0.1
+    std = np.random.uniform()
+    self.w = np.random.randn(input, output) * std
     self.bias = np.random.randn(1, output)
     self.name = name
 

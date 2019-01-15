@@ -45,7 +45,7 @@ class Population(object):
     if agent is not None:
       self._append(agent)
     else:
-      agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': False}
+      agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': False, 'bs':None}
       self.pop.append(agent)
 
     if self.max_len is not None:

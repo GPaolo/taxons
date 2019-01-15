@@ -41,6 +41,10 @@ class RND(object):
     else:         #This one returns the average of all the dimesions (single scalar)
       return self.training_criterion(prediction, target)
 
+  def get_bs_point(self, x):
+    target = self.target_model(x, train=False)
+    return target
+
   def __call__(self, x):
     return self._get_surprise(x)
 

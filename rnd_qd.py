@@ -29,7 +29,7 @@ class RndQD(object):
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=10)
-    self.opt = optimizer.NoveltyOptimizer(self.population)
+    self.opt = optimizer.ParetoOptimizer(self.population)
     self.cumulated_state = []
 
   # TODO make this run in parallel
@@ -60,6 +60,8 @@ class RndQD(object):
 
     state = torch.Tensor(state)
     surprise = self.metric(state.unsqueeze(0)) # Input Dimensions need to be [1, traj_len, obs_space]
+    bs_point = self.metric.get_bs_point(state.unsqueeze(0))
+    agent['bs'] = bs_point.cpu().data.numpy()
     agent['surprise'] = surprise[0]
     agent['reward'] = cumulated_reward
     self.cumulated_state.append(state) # Append here all the states
@@ -92,14 +94,18 @@ class RndQD(object):
     '''
     for i in range(steps):
       cs = 0
+      max_rew = 0
       for a in self.population:
         self.evaluate_agent(a)
         cs += a['surprise']
+        if max_rew < a['reward']:
+          max_rew = a['reward']
       self.update_rnd()
       self.opt.step()
       if i % 1000 == 0:
         print('Generation {}'.format(i))
-        print('Cumulated surprise {}'.format(cs/10))
+        print('Average surprise {}'.format(cs/10))
+        print('Max reward {}'.format(max_rew))
         print()
 
 

@@ -26,7 +26,7 @@ class TargetNet(nn.Module):
                                 nn.Linear(64, 128), nn.Tanh(),
                                 nn.Linear(128, 32), nn.Tanh(),
                                 nn.Linear(32,16), nn.Tanh(),
-                                nn.Linear(16, self.output_shape), nn.Tanh())
+                                nn.Linear(16, self.output_shape))
 
     self.linear.apply(self.init_layers)
     self.lstm.apply(self.init_layers)
@@ -39,27 +39,28 @@ class TargetNet(nn.Module):
   def init_layers(self, m):
     '''
     Initializes layer m with uniform distribution
-    :param m:
+    :param m: layer to initialize
     :return:
     '''
     if type(m) == nn.Linear:
-      nn.init.uniform_(m.weight)
-    if type(m) == nn.LSTM:
-      nn.init.uniform(m.weight_ih_l0)
-      nn.init.uniform(m.weight_hh_l0)
+      nn.init.normal_(m.weight)
+    elif type(m) == nn.LSTM:
+      nn.init.normal_(m.weight_ih_l0)
+      nn.init.normal_(m.weight_hh_l0)
 
   def init_hidden(self, train=False):
     # The axes semantics are (num_layers, minibatch_size, hidden_dim)
+    # For the target we init the hidden layers as zeros cause every run with the same inputs has to give the same result
     if not train:
-      return (torch.rand(1, 1, self.hidden_dim),
-            torch.rand(1, 1, self.hidden_dim))
+      return (torch.zeros(1, 1, self.hidden_dim),
+            torch.zeros(1, 1, self.hidden_dim))
     else:
-      return (torch.rand(1, self.batch_dim, self.hidden_dim),
-              torch.rand(1, self.batch_dim, self.hidden_dim))
+      return (torch.zeros(1, self.batch_dim, self.hidden_dim),
+              torch.zeros(1, self.batch_dim, self.hidden_dim))
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
-    x = self.bn(x)
+    # x = self.bn(x)
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
     x = self.linear(x[-1])
@@ -105,7 +106,7 @@ class PredictorNet(nn.Module):
     '''
     if type(m) == nn.Linear:
       nn.init.normal_(m.weight, mean=0, std=10)
-    if type(m) == nn.LSTM:
+    elif type(m) == nn.LSTM:
       nn.init.normal_(m.weight_ih_l0, mean=0, std=10)
       nn.init.normal_(m.weight_hh_l0, mean=0, std=10)
 
@@ -118,11 +119,12 @@ class PredictorNet(nn.Module):
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
-    x = self.bn(x)
+    # x = self.bn(x)
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
     x = self.linear(x[-1])
     return x
+
 
 if __name__ == '__main__':
   net = PredictorNet(4, 3, pop_size=10)
