@@ -9,7 +9,14 @@ env_tag = 'CartPole-v1'
 
 class RndQD(object):
 
-  def __init__(self, env, action_shape, obs_shape):
+  def __init__(self, env, action_shape, obs_shape, bs_shape):
+    '''
+
+    :param env: Environment in which we act
+    :param action_shape: dimension of the action space
+    :param obs_shape: dimension of the observation space
+    :param bs_shape: dimension of the behavious space
+    '''
     self.parameters = None
     self.env = env
     self.population = population.Population(agents.FFNeuralAgent,
@@ -21,7 +28,7 @@ class RndQD(object):
                                          pop_size=0)
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=8, pop_size=10)
+    self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=10)
     self.opt = optimizer.NoveltyOptimizer(self.population)
     self.cumulated_state = []
 
@@ -78,12 +85,12 @@ class RndQD(object):
     self.cumulated_state = []
     return cum_surprise
 
-  def train(self):
+  def train(self, steps=50000):
     '''
     This function trains the agents and the RND
     :return:
     '''
-    for i in range(50000):
+    for i in range(steps):
       cs = 0
       for a in self.population:
         self.evaluate_agent(a)
@@ -98,7 +105,7 @@ class RndQD(object):
 
 if __name__ == '__main__':
   env = gym.make(env_tag)
-  main = RndQD(env, action_shape=1, obs_shape=4)
+  main = RndQD(env, action_shape=1, obs_shape=4, bs_shape=2)
   try:
     main.train()
   except KeyboardInterrupt:

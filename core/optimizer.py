@@ -54,8 +54,8 @@ class ParetoOptimizer(BaseOptimizer):
     costs = np.array([np.array([a['surprise'], a['reward']]) for a in self.pop])
     is_pareto = self._get_pareto_front(costs)
 
-    # Create new gen by substituting random agents with copies of the best ones. (Also the best ones can be subst, effectively
-    # reducing the amount of dead agents)
+    # Create new gen by substituting random agents with copies of the best ones.
+    # (Also the best ones can be subst, effectively reducing the amount of dead agents)
     new_gen = [self.pop[i].copy() for i in is_pareto]
 
     for i in is_pareto:

@@ -24,7 +24,7 @@ class RND(object):
     self.criterion = nn.MSELoss(reduction='none')
     self.training_criterion = nn.MSELoss()
     # Optimizer
-    self.learning_rate = 0.0000001
+    self.learning_rate = 0.000001
     self.optimizer = optim.SGD(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x, train=False):
@@ -35,12 +35,11 @@ class RND(object):
     '''
     target = self.target_model(x, train)
     prediction = self.predictor_model(x, train)
-    if not train:
+    if not train: # Here we return an array of the same dimension as the pop. After summing along the BS space axis
       surprise = self.criterion(prediction, target).cpu().data.numpy()
-      return np.sum(surprise, axis=1) # Here we return an array of the same dimension as the pop. After summing along the BS space axis
-
-    else:
-      return self.training_criterion(prediction, target) #This one returns the average of all the dimesions (single scalar)
+      return np.sum(surprise, axis=1)
+    else:         #This one returns the average of all the dimesions (single scalar)
+      return self.training_criterion(prediction, target)
 
   def __call__(self, x):
     return self._get_surprise(x)

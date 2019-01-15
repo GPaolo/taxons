@@ -21,17 +21,32 @@ class TargetNet(nn.Module):
 
     self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
     self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
-    self.fc1 = nn.Linear(self.hidden_dim, 32)
-    self.fc2 = nn.Linear(32, 64)
-    self.fc3 = nn.Linear(64, 128)
-    self.fc4 = nn.Linear(128, 32)
-    self.fc5 = nn.Linear(32, 16)
-    self.fc6 = nn.Linear(16, self.output_shape)
+    self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 32), nn.Tanh(),
+                                nn.Linear(32, 64), nn.Tanh(),
+                                nn.Linear(64, 128), nn.Tanh(),
+                                nn.Linear(128, 32), nn.Tanh(),
+                                nn.Linear(32,16), nn.Tanh(),
+                                nn.Linear(16, self.output_shape), nn.Tanh())
+
+    self.linear.apply(self.init_layers)
+    self.lstm.apply(self.init_layers)
 
     self.to(device)
     for l in self.parameters():
       l.requires_grad = not self.fixed
     self.zero_grad()
+
+  def init_layers(self, m):
+    '''
+    Initializes layer m with uniform distribution
+    :param m:
+    :return:
+    '''
+    if type(m) == nn.Linear:
+      nn.init.uniform_(m.weight)
+    if type(m) == nn.LSTM:
+      nn.init.uniform(m.weight_ih_l0)
+      nn.init.uniform(m.weight_hh_l0)
 
   def init_hidden(self, train=False):
     # The axes semantics are (num_layers, minibatch_size, hidden_dim)
@@ -44,17 +59,10 @@ class TargetNet(nn.Module):
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
-
     x = self.bn(x)
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
-
-    x = torch.tanh(self.fc1(x[-1]))
-    x = torch.tanh(self.fc2(x))
-    x = torch.tanh(self.fc3(x))
-    x = torch.tanh(self.fc4(x))
-    x = torch.tanh(self.fc5(x))
-    x = torch.tanh(self.fc6(x))
+    x = self.linear(x[-1])
     return x
 
 
@@ -77,36 +85,43 @@ class PredictorNet(nn.Module):
 
     self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
     self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
-    self.fc1 = nn.Linear(self.hidden_dim, 16)
-    self.fc2 = nn.Linear(16, 32)
-    self.fc3 = nn.Linear(32, 16)
-    self.fc4 = nn.Linear(16, self.output_shape)
+    self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 16), nn.Tanh(),
+                                nn.Linear(16, 32), nn.Tanh(),
+                                nn.Linear(32, 16), nn.Tanh(),
+                                nn.Linear(16, self.output_shape))
+    self.linear.apply(self.init_layers)
+    self.lstm.apply(self.init_layers)
 
     self.to(device)
     for l in self.parameters():
       l.requires_grad = not self.fixed
     self.zero_grad()
 
+  def init_layers(self, m):
+    '''
+    Initializes layer m with uniform distribution
+    :param m:
+    :return:
+    '''
+    if type(m) == nn.Linear:
+      nn.init.normal_(m.weight, mean=0, std=10)
+    if type(m) == nn.LSTM:
+      nn.init.normal_(m.weight_ih_l0, mean=0, std=10)
+      nn.init.normal_(m.weight_hh_l0, mean=0, std=10)
+
   def init_hidden(self, train=False):
     # The axes semantics are (num_layers, minibatch_size, hidden_dim)
     if not train:
-      return (torch.rand(1, 1, self.hidden_dim),
-            torch.rand(1, 1, self.hidden_dim))
+      return (torch.rand(1, 1, self.hidden_dim), torch.rand(1, 1, self.hidden_dim))
     else:
-      return (torch.rand(1, self.batch_dim, self.hidden_dim),
-              torch.rand(1, self.batch_dim, self.hidden_dim))
+      return (torch.rand(1, self.batch_dim, self.hidden_dim), torch.rand(1, self.batch_dim, self.hidden_dim))
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
-
     x = self.bn(x)
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
-
-    x = torch.tanh(self.fc1(x[-1]))
-    x = torch.tanh(self.fc2(x))
-    x = torch.tanh(self.fc3(x))
-    x = self.fc4(x)
+    x = self.linear(x[-1])
     return x
 
 if __name__ == '__main__':
