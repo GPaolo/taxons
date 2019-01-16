@@ -46,7 +46,7 @@ def test_backward():
   for name, l in target.named_parameters():
     assert l.grad is None, 'Layer {} grad is not None'.format(name)
   x = torch.ones(5, 4, 6)
-  x = target(x)
+  x = target(x, train=True)
   criterion = nn.MSELoss()
 
   loss = criterion(x, torch.ones_like(x))
