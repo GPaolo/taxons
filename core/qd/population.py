@@ -32,6 +32,9 @@ class Population(object):
     assert set(self.pop[0]) == set(value), 'Wrong agent dict keys.'
     return self.pop.__setitem__(key, value)
 
+  def __len__(self):
+    return len(self.pop)
+
   def _append(self, item):
     assert set(self.pop[0]) == set(item), 'Wrong agent dict keys.'
     self.pop.append(item)

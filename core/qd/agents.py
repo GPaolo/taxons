@@ -22,16 +22,14 @@ class BaseAgent(metaclass=ABCMeta):
 
     self.genome = None
 
-  @abstractmethod
   def evaluate(self, x):
-    pass
+    raise NotImplementedError
 
   def get_genome(self):
     return self.genome
 
-  @abstractmethod
   def mutate(self):
-    pass
+    raise NotImplementedError
 
   def copy(self):
     '''

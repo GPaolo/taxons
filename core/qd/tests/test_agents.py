@@ -4,9 +4,10 @@ import numpy as np
 np.random.seed(7)
 
 def test_base_agent():
+  agent = agents.BaseAgent(mutation_distr=None)
   try:
-    agent = agents.BaseAgent(mutation_distr=None)
-  except TypeError:
+    agent.mutate()
+  except NotImplementedError:
     pass
 
 def test_neural_agent():
