@@ -34,6 +34,8 @@ class Population(object):
     return x
 
   def __getitem__(self, item):
+    if type(item) is str:
+      return self.pop[item]
     return self.pop.iloc[item]
 
   def __setitem__(self, key, value):
@@ -66,8 +68,8 @@ class Population(object):
   def copy(self, idx):
     assert idx < self.size and idx > -self.size-1, 'Index out of range'
     agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': False, 'bs': None}
-    agent = pd.DataFrame([agent], columns=agent.keys())
     agent['agent'] = deepcopy(self[idx]['agent'])
+    agent = pd.DataFrame([agent], columns=agent.keys())
     return agent.iloc[0]
 
 

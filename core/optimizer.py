@@ -45,7 +45,23 @@ class BaseOptimizer(metaclass=ABCMeta):
 class FitnessOptimizer(BaseOptimizer):
 
   def step(self, **kwargs):
-    pass
+    rewards = self.pop['reward'].sort_values(ascending=False)
+    best = rewards.iloc[:5].index.values # Get 5 best
+    worst = rewards.iloc[-5:].index.values # Get 5 worst
+
+    new_gen = []
+    for i in best:
+      new_gen.append(self.pop.copy(i))
+      self.pop[i]['best'] = True
+
+    for i, ng in zip(worst, new_gen):
+      self.pop[i] = ng
+
+    # Mutate pop that are not pareto optima
+    for a in self.pop:
+      if np.random.random() <= self.mutation_rate and not a['best']:
+        a['agent'].mutate()
+
 
 
 class NSGCOptimizer(BaseOptimizer):
@@ -87,18 +103,6 @@ class NSGCOptimizer(BaseOptimizer):
         a['agent'].mutate()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 class ParetoOptimizer(BaseOptimizer):
 
   def step(self, **kwargs):
@@ -113,7 +117,7 @@ class ParetoOptimizer(BaseOptimizer):
 
     # Create new gen by substituting random agents with copies of the best ones.
     # (Also the best ones can be subst, effectively reducing the amount of dead agents)
-    new_gen = [self.pop[i].copy() for i in is_pareto]
+    new_gen = [self.pop.copy(i) for i in is_pareto]
 
     for i in is_pareto:
       self.pop[i]['best'] = True

@@ -9,7 +9,7 @@ env_tag = 'CartPole-v1'
 
 class RndQD(object):
 
-  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size):
+  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size, use_novelty=True):
     '''
 
     :param env: Environment in which we act
@@ -18,6 +18,7 @@ class RndQD(object):
     :param bs_shape: dimension of the behavious space
     '''
     self.pop_size = pop_size
+    self.use_novelty = use_novelty
     self.parameters = None
     self.env = env
     self.population = population.Population(agents.FFNeuralAgent,
@@ -29,9 +30,11 @@ class RndQD(object):
                                          output_shape=action_shape,
                                          pop_size=0)
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=self.pop_size)
-    self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
+    if self.use_novelty:
+      self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=self.pop_size)
+    else:
+      self.metric = None
+    self.opt = optimizer.FitnessOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
   # TODO make this run in parallel
@@ -45,7 +48,7 @@ class RndQD(object):
     cumulated_reward = 0
 
     obs = self.env.reset()
-    state = np.array([obs])
+    if self.use_novelty: state = np.array([obs])
     obs = np.array([obs])
     while not done:
       action = np.squeeze(agent['agent'](obs))
@@ -56,17 +59,20 @@ class RndQD(object):
 
       obs, reward, done, info = self.env.step(action)
       obs = np.array([obs])
-      state = np.append(state, obs, axis=0)
+      if self.use_novelty: state = np.append(state, obs, axis=0)
 
       cumulated_reward += reward
 
-    state = torch.Tensor(state)
-    surprise = self.metric(state.unsqueeze(0)).cpu().data.numpy() # Input Dimensions need to be [1, traj_len, obs_space]
-    bs_point = self.metric.get_bs_point(state.unsqueeze(0))
-    agent['bs'] = bs_point.cpu().data.numpy()
+    surprise = 0
+    if self.use_novelty:
+      state = torch.Tensor(state)
+      surprise = self.metric(state.unsqueeze(0)).cpu().data.numpy() # Input Dimensions need to be [1, traj_len, obs_space]
+      bs_point = self.metric.get_bs_point(state.unsqueeze(0))
+      agent['bs'] = bs_point.cpu().data.numpy()
+      self.cumulated_state.append(state) # Append here all the states
+
     agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
-    self.cumulated_state.append(state) # Append here all the states
 
   def update_rnd(self):
     '''
@@ -102,7 +108,9 @@ class RndQD(object):
         cs += a['surprise']
         if max_rew < a['reward']:
           max_rew = a['reward']
-      self.update_rnd()
+      if self.use_novelty:
+        self.update_rnd()
+
       self.opt.step()
       if i % 1000 == 0:
         print('Generation {}'.format(i))
@@ -119,55 +127,58 @@ if __name__ == '__main__':
   np.random.seed()
   torch.initial_seed()
 
-  main = RndQD(env, action_shape=1, obs_shape=4, bs_shape=512, pop_size=25)
+  rnd_qd = RndQD(env, action_shape=1, obs_shape=4, bs_shape=512, pop_size=25, use_novelty=False)
   try:
-    main.train()
+    rnd_qd.train()
   except KeyboardInterrupt:
     print('User Interruption.')
 
   try:
     print('Testing best reward')
-    obs = main.env.reset()
-    best = main.archive[0]
-    for a in main.archive:
+    obs = rnd_qd.env.reset()
+
+    rewards = rnd_qd.population['reward'].sort_values(ascending=False)
+    best = rnd_qd.population[rewards.iloc[:1].index.values[0]]  # Get best
+
+    for a in rnd_qd.archive:
       if a['reward'] > best['reward']:
         best = a
 
     print('Best reward {}'.format(best['reward']))
     for _ in range(3000):
-      main.env.render()
+      rnd_qd.env.render()
       action = np.squeeze(best['agent'](np.array([obs])))
       if action > 0:
         action = 1
       else:
         action = 0
 
-      obs, reward, done, info = main.env.step(action)
+      obs, reward, done, info = rnd_qd.env.step(action)
       if done:
-        obs = main.env.reset()
+        obs = rnd_qd.env.reset()
   except KeyboardInterrupt:
     print('User Interruption.')
 
 
   print('Testing best surprise')
-  obs = main.env.reset()
-  best = main.archive[0]
-  for a in main.archive:
+  obs = rnd_qd.env.reset()
+  best = rnd_qd.archive[0]
+  for a in rnd_qd.archive:
     if a['surprise'] > best['surprise']:
       best = a
 
   print('Best surprise {}'.format(best['surprise']))
   for _ in range(3000):
-    main.env.render()
+    rnd_qd.env.render()
     action = np.squeeze(best['agent'](np.array([obs])))
     if action > 0:
       action = 1
     else:
       action = 0
 
-    obs, reward, done, info = main.env.step(action)
+    obs, reward, done, info = rnd_qd.env.step(action)
     if done:
-      obs = main.env.reset()
+      obs = rnd_qd.env.reset()
 
 
 
