@@ -26,7 +26,7 @@ class TargetNet(nn.Module):
                                 nn.Linear(64, 128), nn.Tanh(),
                                 nn.Linear(128, 32), nn.Tanh(),
                                 nn.Linear(32,16), nn.Tanh(),
-                                nn.Linear(16, self.output_shape))
+                                nn.Linear(16, self.output_shape), nn.Tanh())
 
     self.linear.apply(self.init_layers)
     self.lstm.apply(self.init_layers)

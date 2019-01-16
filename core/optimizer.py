@@ -1,6 +1,7 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod  # This is to force implementation of child class methods
 import random
+from copy import deepcopy
 
 class BaseOptimizer(metaclass=ABCMeta):
   def __init__(self, pop, mutation_rate=.9, sync_update=True, archive=None):
@@ -34,18 +35,74 @@ class BaseOptimizer(metaclass=ABCMeta):
     return is_pareto
 
   @abstractmethod
-  def step(self):
+  def step(self, **kwargs):
     '''
     Optimizer step
     '''
     pass
 
 
+class FitnessOptimizer(BaseOptimizer):
+
+  def step(self, **kwargs):
+    pass
+
+
+class NSGCOptimizer(BaseOptimizer):
+
+  def step(self, **kwargs):
+    '''
+    Perform optimization step according to NSGC procedure. We add to the archive only according to novelty.
+    :return:
+    '''
+    # Find best agents
+    costs = np.array([np.array([a['surprise'], a['reward']]) for a in self.pop])
+    is_pareto = self._get_pareto_front(costs)
+
+    # If archive is empty, add the whole pop to it.
+    if len(self.archive) == 0:
+      for a in self.pop:
+        self.archive.add(deepcopy(a))
+    else: # Otherwise add the novel if
+      for a in self.pop:
+        closest = np.array([np.linalg.norm(a['bs'] - arch['bs']) for arch in self.archive]).argmin()
+        if np.linalg.norm(a['bs'] - self.archive[closest]['bs']) > 0.1:
+          self.archive.add(a)
+        elif a['reward'] > self.archive[closest]['reward']:
+          self.archive[closest] = a
+
+    # Create new gen by substituting random agents with copies of the best ones.
+    # (Also the best ones can be subst, effectively reducing the amount of dead agents)
+    new_gen = [self.pop[i].copy() for i in is_pareto]
+
+    for i in is_pareto:
+      self.pop[i]['best'] = True
+    dead = random.sample(range(self.pop.size), len(new_gen))
+    for i, new_agent in zip(dead, new_gen):
+      self.pop[i] = new_agent
+
+    # Mutate pop that are not pareto optima
+    for a in self.pop:
+      if np.random.random() <= self.mutation_rate and not a['best']:
+        a['agent'].mutate()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class ParetoOptimizer(BaseOptimizer):
 
-  def step(self):
+  def step(self, **kwargs):
     """
-    This function performs an optimization step.
     Once the agents have been evaluated, it calculates the pareto front of the agents and decides who and how is
     going to reproduce. It also mutates the agents.
     :return:
@@ -71,7 +128,7 @@ class ParetoOptimizer(BaseOptimizer):
 
 
 class NoveltyOptimizer(BaseOptimizer):
-  def step(self):
+  def step(self, **kwargs):
     '''
     This function performs an optimization step by taking the most novel agents
     :return:

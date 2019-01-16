@@ -34,3 +34,6 @@ def test_mutation_operator():
   agent = agents.FFNeuralAgent(shapes, mutation_distr=np.random.randint)
   assert agent.mutation_operator(10) == 2, 'Cannot pass new mutation operator.'
 
+def test_mutation():
+  raise NotImplementedError
+

@@ -9,7 +9,7 @@ env_tag = 'CartPole-v1'
 
 class RndQD(object):
 
-  def __init__(self, env, action_shape, obs_shape, bs_shape):
+  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size):
     '''
 
     :param env: Environment in which we act
@@ -17,19 +17,21 @@ class RndQD(object):
     :param obs_shape: dimension of the observation space
     :param bs_shape: dimension of the behavious space
     '''
+    self.pop_size = pop_size
     self.parameters = None
     self.env = env
     self.population = population.Population(agents.FFNeuralAgent,
                                             input_shape=obs_shape,
-                                            output_shape=action_shape)
+                                            output_shape=action_shape,
+                                            pop_size=self.pop_size)
     self.archive = population.Population(agents.FFNeuralAgent,
                                          input_shape=obs_shape,
                                          output_shape=action_shape,
                                          pop_size=0)
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=10)
-    self.opt = optimizer.ParetoOptimizer(self.population)
+    self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=self.pop_size)
+    self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
   # TODO make this run in parallel
@@ -59,10 +61,10 @@ class RndQD(object):
       cumulated_reward += reward
 
     state = torch.Tensor(state)
-    surprise = self.metric(state.unsqueeze(0)) # Input Dimensions need to be [1, traj_len, obs_space]
+    surprise = self.metric(state.unsqueeze(0)).cpu().data.numpy() # Input Dimensions need to be [1, traj_len, obs_space]
     bs_point = self.metric.get_bs_point(state.unsqueeze(0))
     agent['bs'] = bs_point.cpu().data.numpy()
-    agent['surprise'] = surprise[0]
+    agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
     self.cumulated_state.append(state) # Append here all the states
 
@@ -104,40 +106,48 @@ class RndQD(object):
       self.opt.step()
       if i % 1000 == 0:
         print('Generation {}'.format(i))
-        print('Average surprise {}'.format(cs/10))
+        print('Average surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
         print()
 
 
 if __name__ == '__main__':
+  import time
   env = gym.make(env_tag)
-  main = RndQD(env, action_shape=1, obs_shape=4, bs_shape=2)
+
+  env.seed()
+  np.random.seed()
+  torch.initial_seed()
+
+  main = RndQD(env, action_shape=1, obs_shape=4, bs_shape=512, pop_size=25)
   try:
     main.train()
   except KeyboardInterrupt:
     print('User Interruption.')
-  main.archive = main.population
 
+  try:
+    print('Testing best reward')
+    obs = main.env.reset()
+    best = main.archive[0]
+    for a in main.archive:
+      if a['reward'] > best['reward']:
+        best = a
 
-  print('Testing best reward')
-  obs = main.env.reset()
-  best = main.archive[0]
-  for a in main.archive:
-    if a['reward'] > best['reward']:
-      best = a
+    print('Best reward {}'.format(best['reward']))
+    for _ in range(3000):
+      main.env.render()
+      action = np.squeeze(best['agent'](np.array([obs])))
+      if action > 0:
+        action = 1
+      else:
+        action = 0
 
-  print('Best reward {}'.format(best['reward']))
-  for _ in range(3000):
-    main.env.render()
-    action = np.squeeze(best['agent'](np.array([obs])))
-    if action > 0:
-      action = 1
-    else:
-      action = 0
+      obs, reward, done, info = main.env.step(action)
+      if done:
+        obs = main.env.reset()
+  except KeyboardInterrupt:
+    print('User Interruption.')
 
-    obs, reward, done, info = main.env.step(action)
-    if done:
-      obs = main.env.reset()
 
   print('Testing best surprise')
   obs = main.env.reset()

@@ -21,11 +21,10 @@ class RND(object):
     self.target_model = TargetNet(self.input_shape, self.encoding_shape, pop_size=self.pop_size, device=self.device, fixed=True)
     self.predictor_model = PredictorNet(self.input_shape, self.encoding_shape, pop_size=self.pop_size, device=self.device, fixed=False)
     # Loss
-    self.criterion = nn.MSELoss(reduction='none')
-    self.training_criterion = nn.MSELoss()
+    self.criterion = nn.MSELoss()
     # Optimizer
-    self.learning_rate = 0.000001
-    self.optimizer = optim.SGD(self.predictor_model.parameters(), self.learning_rate)
+    self.learning_rate = 0.00001
+    self.optimizer = optim.Adam(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x, train=False):
     '''
@@ -35,11 +34,7 @@ class RND(object):
     '''
     target = self.target_model(x, train)
     prediction = self.predictor_model(x, train)
-    if not train: # Here we return an array of the same dimension as the pop. After summing along the BS space axis
-      surprise = self.criterion(prediction, target).cpu().data.numpy()
-      return np.sum(surprise, axis=1)
-    else:         #This one returns the average of all the dimesions (single scalar)
-      return self.training_criterion(prediction, target)
+    return self.criterion(prediction, target)
 
   def get_bs_point(self, x):
     target = self.target_model(x, train=False)
