@@ -34,7 +34,7 @@ class RndQD(object):
       self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=self.pop_size)
     else:
       self.metric = None
-    self.opt = optimizer.FitnessOptimizer(self.population, archive=self.archive)
+    self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
   # TODO make this run in parallel
@@ -100,7 +100,8 @@ class RndQD(object):
     This function trains the agents and the RND
     :return:
     '''
-    for i in range(steps):
+    self.elapsed_gen = 0
+    for self.elapsed_gen in range(steps):
       cs = 0
       max_rew = 0
       for a in self.population:
@@ -109,11 +110,11 @@ class RndQD(object):
         if max_rew < a['reward']:
           max_rew = a['reward']
       if self.use_novelty:
-        self.update_rnd()
+        self.update_rnd() # From here we can get the cumulated surprise on the same state as cs but after training
 
       self.opt.step()
-      if i % 1000 == 0:
-        print('Generation {}'.format(i))
+      if self.elapsed_gen % 1 == 0:
+        print('Generation {}'.format(self.elapsed_gen))
         print('Average surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
         print()
@@ -127,11 +128,12 @@ if __name__ == '__main__':
   np.random.seed()
   torch.initial_seed()
 
-  rnd_qd = RndQD(env, action_shape=1, obs_shape=4, bs_shape=512, pop_size=25, use_novelty=False)
+  rnd_qd = RndQD(env, action_shape=1, obs_shape=4, bs_shape=512, pop_size=25, use_novelty=True)
   try:
     rnd_qd.train()
   except KeyboardInterrupt:
     print('User Interruption.')
+    print('Total generations: {}'.format(rnd_qd.elapsed_gen))
 
   try:
     print('Testing best reward')
@@ -139,10 +141,6 @@ if __name__ == '__main__':
 
     rewards = rnd_qd.population['reward'].sort_values(ascending=False)
     best = rnd_qd.population[rewards.iloc[:1].index.values[0]]  # Get best
-
-    for a in rnd_qd.archive:
-      if a['reward'] > best['reward']:
-        best = a
 
     print('Best reward {}'.format(best['reward']))
     for _ in range(3000):
@@ -159,26 +157,24 @@ if __name__ == '__main__':
   except KeyboardInterrupt:
     print('User Interruption.')
 
+  if rnd_qd.use_novelty:
+    print('Testing best surprise')
+    obs = rnd_qd.env.reset()
+    surprises = rnd_qd.population['surprise'].sort_values(ascending=False)
+    best = rnd_qd.population[surprises.iloc[:1].index.values[0]]  # Get best
 
-  print('Testing best surprise')
-  obs = rnd_qd.env.reset()
-  best = rnd_qd.archive[0]
-  for a in rnd_qd.archive:
-    if a['surprise'] > best['surprise']:
-      best = a
+    print('Best surprise {}'.format(best['surprise']))
+    for _ in range(3000):
+      rnd_qd.env.render()
+      action = np.squeeze(best['agent'](np.array([obs])))
+      if action > 0:
+        action = 1
+      else:
+        action = 0
 
-  print('Best surprise {}'.format(best['surprise']))
-  for _ in range(3000):
-    rnd_qd.env.render()
-    action = np.squeeze(best['agent'](np.array([obs])))
-    if action > 0:
-      action = 1
-    else:
-      action = 0
-
-    obs, reward, done, info = rnd_qd.env.step(action)
-    if done:
-      obs = rnd_qd.env.reset()
+      obs, reward, done, info = rnd_qd.env.step(action)
+      if done:
+        obs = rnd_qd.env.reset()
 
 
 

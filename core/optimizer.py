@@ -54,14 +54,13 @@ class FitnessOptimizer(BaseOptimizer):
       new_gen.append(self.pop.copy(i))
       self.pop[i]['best'] = True
 
-    for i, ng in zip(worst, new_gen):
-      self.pop[i] = ng
+    for i, new_agent in zip(worst, new_gen):
+      self.pop[i] = new_agent
 
-    # Mutate pop that are not pareto optima
+    # Mutate pop that are not best
     for a in self.pop:
       if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
-
 
 
 class NSGCOptimizer(BaseOptimizer):
@@ -112,15 +111,16 @@ class ParetoOptimizer(BaseOptimizer):
     :return:
     """
     # Find best agents
-    costs = np.array([np.array([a['surprise'], a['reward']]) for a in self.pop])
+    costs = np.array([self.pop['reward'].values, self.pop['surprise'].values]).transpose()
     is_pareto = self._get_pareto_front(costs)
 
     # Create new gen by substituting random agents with copies of the best ones.
     # (Also the best ones can be subst, effectively reducing the amount of dead agents)
-    new_gen = [self.pop.copy(i) for i in is_pareto]
-
+    new_gen = []
     for i in is_pareto:
+      new_gen.append(self.pop.copy(i))
       self.pop[i]['best'] = True
+
     dead = random.sample(range(self.pop.size), len(new_gen))
     for i, new_agent in zip(dead, new_gen):
       self.pop[i] = new_agent

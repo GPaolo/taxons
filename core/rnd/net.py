@@ -52,11 +52,11 @@ class TargetNet(nn.Module):
     # The axes semantics are (num_layers, minibatch_size, hidden_dim)
     # For the target we init the hidden layers as zeros cause every run with the same inputs has to give the same result
     if not train:
-      return (torch.zeros(1, 1, self.hidden_dim),
-            torch.zeros(1, 1, self.hidden_dim))
+      return (torch.zeros(1, 1, self.hidden_dim, device=self.device),
+            torch.zeros(1, 1, self.hidden_dim, device=self.device))
     else:
-      return (torch.zeros(1, self.batch_dim, self.hidden_dim),
-              torch.zeros(1, self.batch_dim, self.hidden_dim))
+      return (torch.zeros(1, self.batch_dim, self.hidden_dim, device=self.device),
+              torch.zeros(1, self.batch_dim, self.hidden_dim, device=self.device))
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
@@ -113,17 +113,30 @@ class PredictorNet(nn.Module):
   def init_hidden(self, train=False):
     # The axes semantics are (num_layers, minibatch_size, hidden_dim)
     if not train:
-      return (torch.rand(1, 1, self.hidden_dim), torch.rand(1, 1, self.hidden_dim))
+      return (torch.rand(1, 1, self.hidden_dim, device=self.device),
+              torch.rand(1, 1, self.hidden_dim, device=self.device))
     else:
-      return (torch.rand(1, self.batch_dim, self.hidden_dim), torch.rand(1, self.batch_dim, self.hidden_dim))
+      return (torch.rand(1, self.batch_dim, self.hidden_dim, device=self.device),
+              torch.rand(1, self.batch_dim, self.hidden_dim, device=self.device))
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
     # x = self.bn(x)
-    x = x.transpose(1, 0)
-    x, hidden = self.lstm(x, hidden)
-    x = self.linear(x[-1])
-    return x
+    y = x.transpose(1, 0)
+    y, hidden = self.lstm(y, hidden)
+    y = self.linear(y[-1])
+    for name, w in self.lstm.named_parameters():
+      print('{} {}'.format(name, w.grad))
+
+    for name, w in self.linear.named_parameters():
+      print('{} {}'.format(name, w.grad))
+
+    try:
+      assert not torch.isnan(y).any()
+    except:
+      print(y.grad)
+      raise
+    return y
 
 
 if __name__ == '__main__':

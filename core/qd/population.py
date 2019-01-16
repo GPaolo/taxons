@@ -78,6 +78,7 @@ class Population(object):
 
 
 
+
 if __name__ == '__main__':
   pop = Population(agent=FFNeuralAgent, input_shape=3, output_shape=3, pop_size=3)
 
