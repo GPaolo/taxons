@@ -4,6 +4,7 @@ from core.qd import population, agents
 from core import optimizer
 import gym, torch
 import multiprocessing as mp
+import os
 
 env_tag = 'CartPole-v1'
 
@@ -118,6 +119,16 @@ class RndQD(object):
         print('Average surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
         print()
+
+  def save(self, filepath):
+    if not os.path.exists(filepath):
+      try:
+        os.mkdir(os.path.abspath(filepath))
+      except:
+        print('Cannot create save folder.')
+    self.population.save_pop(filepath, 'pop')
+    self.archive.save_pop(filepath, 'archive')
+    self.metric.save(filepath)
 
 
 if __name__ == '__main__':

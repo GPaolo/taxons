@@ -1,6 +1,8 @@
 import numpy as np
 from core.qd.agents import *
 import pandas as pd
+import os
+import pickle as pkl
 
 class Population(object):
   '''
@@ -72,7 +74,15 @@ class Population(object):
     agent = pd.DataFrame([agent], columns=agent.keys())
     return agent.iloc[0]
 
-
+  def save_pop(self, filepath, name):
+    save_ckpt = {}
+    for i, a in enumerate(self['agent']):
+      genome = a.get_genome()
+      save_ckpt[str(i)] = [(l.params) for l in genome]
+    try:
+      pkl.dump(save_ckpt, os.path.join(filepath, 'qd_{}.pkl'.format(name)))
+    except:
+      print('Cannot Save {}.'.format(name))
 
 
 
@@ -82,11 +92,8 @@ class Population(object):
 if __name__ == '__main__':
   pop = Population(agent=FFNeuralAgent, input_shape=3, output_shape=3, pop_size=3)
 
-  a = pop.copy(-1)
-  a['best']=True
-  pop.show()
-  pop.add(a)
-  pop.show()
+  kk = pop.save_pop('a')
+  print()
 
 
 

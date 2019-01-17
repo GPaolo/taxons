@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from core.rnd.net import TargetNet, PredictorNet
-import numpy as np
+import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -55,6 +55,17 @@ class RND(object):
     # torch.nn.utils.clip_grad_norm_(self.predictor_model.parameters(), 0.1)
     self.optimizer.step()
     return surprise
+
+  def save(self, filepath):
+    save_ckpt = {
+      'target_model': self.target_model.state_dict(),
+      'predictor_model': self.predictor_model.state_dict(),
+      'optimizer': self.optimizer.state_dict()
+    }
+    try:
+      torch.save(save_ckpt, os.path.join(filepath, 'ckpt_rnd.pth'))
+    except:
+      print('Cannot save rnd networks.')
 
 
 
