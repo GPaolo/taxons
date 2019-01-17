@@ -6,7 +6,7 @@ class TargetNet(nn.Module):
   '''
   This class defines the networks used for the RND
   '''
-  def __init__(self, input_shape, output_shape, pop_size=10, device=None, fixed=True):
+  def __init__(self, input_shape, output_shape, reduced_bs_shape=2, pop_size=10, device=None, fixed=True):
     super(TargetNet, self).__init__()
     if device is not None:
       self.device = device
@@ -15,6 +15,7 @@ class TargetNet(nn.Module):
 
     self.input_shape = input_shape
     self.output_shape = output_shape
+    self.reduced_bs_shape = reduced_bs_shape
     self.hidden_dim = 16
     self.batch_dim = pop_size
     self.fixed = fixed
@@ -28,7 +29,11 @@ class TargetNet(nn.Module):
                                 nn.Linear(32,16), nn.Tanh(),
                                 nn.Linear(16, self.output_shape), nn.Tanh())
 
+    self.reduced_bs = nn.Sequential(nn.Linear(self.output_shape, 16), nn.Tanh(),
+                                    nn.Linear(16, self.reduced_bs_shape))
+
     self.linear.apply(self.init_layers)
+    self.reduced_bs.apply(self.init_layers)
     self.lstm.apply(self.init_layers)
 
     self.to(device)
@@ -64,7 +69,8 @@ class TargetNet(nn.Module):
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
     x = self.linear(x[-1])
-    return x
+    r_bs = self.reduced_bs(x)
+    return x, r_bs
 
 
 class PredictorNet(nn.Module):
@@ -97,7 +103,6 @@ class PredictorNet(nn.Module):
     for l in self.parameters():
       l.requires_grad = not self.fixed
     self.zero_grad()
-    self.prev = None
 
   def init_layers(self, m):
     '''
@@ -123,24 +128,15 @@ class PredictorNet(nn.Module):
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
     # x = self.bn(x)
-    y = x.transpose(1, 0)
-    y, hidden = self.lstm(y, hidden)
-    y = self.linear(y[-1])
-    # print()
-    # print()
-    # for name, w in self.lstm.named_parameters():
-    #   print('{} {}'.format(name, w.grad))
-    #   print(w)
-
-
+    x = x.transpose(1, 0)
+    x, hidden = self.lstm(x, hidden)
+    x = self.linear(x[-1])
     try:
-      assert not torch.isnan(y).any()
+      assert not torch.isnan(x).any()
     except:
-      print(y.grad)
+      print('Getting NAN.')
       raise
-
-    self.prev = y
-    return y
+    return x
 
 
 if __name__ == '__main__':

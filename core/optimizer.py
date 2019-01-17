@@ -4,11 +4,10 @@ import random
 from copy import deepcopy
 
 class BaseOptimizer(metaclass=ABCMeta):
-  def __init__(self, pop, mutation_rate=.9, sync_update=True, archive=None):
+  def __init__(self, pop, mutation_rate=.9, archive=None):
     self.pop = pop
-    self.mutation_rate = mutation_rate
-    self.sync_update = sync_update
     self.archive = archive
+    self.mutation_rate = mutation_rate
 
   def _get_pareto_front(self, costs, direction='max'):
     '''
@@ -137,21 +136,25 @@ class NoveltyOptimizer(BaseOptimizer):
     This function performs an optimization step by taking the most novel agents
     :return:
     '''
-    novel = np.array([(idx, a['surprise']) for idx, a in enumerate(self.pop)],
-                     dtype=[('x', int), ('y', float)])
+    if self.archive.size == 0: # First step, so copy the whole pop.
+      for idx in range(self.pop.size):
+        self.archive.add(self.pop.copy(idx, with_data=True))
+    else:
+      novel = np.stack(self.archive['surprise'].values)
+      self.archive.avg_surprise = np.mean(novel)
+      for idx in range(self.pop.size):
+        if self.pop[idx]['surprise'] >= self.archive.avg_surprise:
+          self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
 
-    novel.sort(order='y')
-    new_gen = [self.pop[i[0]].copy() for i in novel[:3]] # Get first 3 most novel agents
-    for i in range(3):
-      self.pop[i]['best'] = True
 
-    dead = novel[-4:]
-    for i, new_agent in zip(dead, new_gen):
-      self.pop[i[0]] = new_agent
+    new_gen = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to reproduce
+    dead = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to die    # new_gen = [self.pop[i[0]].copy() for i in novel[:3]] # Get first 3 most novel agents
+    for ng, d in zip(new_gen, dead):
+      self.pop[d] = self.pop.copy(ng)
 
-    # Mutate pop that are not novel
+    # Mutate pops
     for a in self.pop:
-      if np.random.random() <= self.mutation_rate and not a['best']:
+      if np.random.random() <= self.mutation_rate:
         a['agent'].mutate()
 
 

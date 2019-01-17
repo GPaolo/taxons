@@ -32,13 +32,9 @@ class RND(object):
     :param x: Network input. Needs to be a torch tensor.
     :return: surprise as a 1 dimensional torch tensor
     '''
-    target = self.target_model(x, train)
+    target, r_bs = self.target_model(x, train)
     prediction = self.predictor_model(x, train)
-    return self.criterion(prediction, target)
-
-  def get_bs_point(self, x):
-    target = self.target_model(x, train=False)
-    return target
+    return self.criterion(prediction, target), r_bs
 
   def __call__(self, x):
     return self._get_surprise(x)
@@ -50,7 +46,7 @@ class RND(object):
     :return: surprise as a 1 dimensional torch tensor
     '''
     self.optimizer.zero_grad()
-    surprise = self._get_surprise(x, train=True)
+    surprise, _ = self._get_surprise(x, train=True)
     surprise.backward()
     # torch.nn.utils.clip_grad_norm_(self.predictor_model.parameters(), 0.1)
     self.optimizer.step()
