@@ -23,7 +23,7 @@ class RND(object):
     # Loss
     self.criterion = nn.MSELoss()
     # Optimizer
-    self.learning_rate = 0.00001
+    self.learning_rate = 0.001
     self.optimizer = optim.Adam(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x, train=False):
@@ -52,6 +52,7 @@ class RND(object):
     self.optimizer.zero_grad()
     surprise = self._get_surprise(x, train=True)
     surprise.backward()
+    # torch.nn.utils.clip_grad_norm_(self.predictor_model.parameters(), 0.1)
     self.optimizer.step()
     return surprise
 

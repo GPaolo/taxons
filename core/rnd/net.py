@@ -97,6 +97,7 @@ class PredictorNet(nn.Module):
     for l in self.parameters():
       l.requires_grad = not self.fixed
     self.zero_grad()
+    self.prev = None
 
   def init_layers(self, m):
     '''
@@ -107,8 +108,8 @@ class PredictorNet(nn.Module):
     if type(m) == nn.Linear:
       nn.init.normal_(m.weight, mean=0, std=10)
     elif type(m) == nn.LSTM:
-      nn.init.normal_(m.weight_ih_l0, mean=0, std=10)
-      nn.init.normal_(m.weight_hh_l0, mean=0, std=10)
+      nn.init.normal_(m.weight_ih_l0, mean=0, std=1)
+      nn.init.normal_(m.weight_hh_l0, mean=0, std=1)
 
   def init_hidden(self, train=False):
     # The axes semantics are (num_layers, minibatch_size, hidden_dim)
@@ -125,17 +126,20 @@ class PredictorNet(nn.Module):
     y = x.transpose(1, 0)
     y, hidden = self.lstm(y, hidden)
     y = self.linear(y[-1])
-    for name, w in self.lstm.named_parameters():
-      print('{} {}'.format(name, w.grad))
+    # print()
+    # print()
+    # for name, w in self.lstm.named_parameters():
+    #   print('{} {}'.format(name, w.grad))
+    #   print(w)
 
-    for name, w in self.linear.named_parameters():
-      print('{} {}'.format(name, w.grad))
 
     try:
       assert not torch.isnan(y).any()
     except:
       print(y.grad)
       raise
+
+    self.prev = y
     return y
 
 

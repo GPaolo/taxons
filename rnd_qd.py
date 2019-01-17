@@ -143,7 +143,7 @@ if __name__ == '__main__':
     best = rnd_qd.population[rewards.iloc[:1].index.values[0]]  # Get best
 
     print('Best reward {}'.format(best['reward']))
-    for _ in range(3000):
+    for _ in range(1000):
       rnd_qd.env.render()
       action = np.squeeze(best['agent'](np.array([obs])))
       if action > 0:
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     best = rnd_qd.population[surprises.iloc[:1].index.values[0]]  # Get best
 
     print('Best surprise {}'.format(best['surprise']))
-    for _ in range(3000):
+    for _ in range(1000):
       rnd_qd.env.render()
       action = np.squeeze(best['agent'](np.array([obs])))
       if action > 0:
