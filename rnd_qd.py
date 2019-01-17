@@ -35,7 +35,7 @@ class RndQD(object):
       self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=self.pop_size)
     else:
       self.metric = None
-    self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
+    self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
   # TODO make this run in parallel

@@ -61,7 +61,7 @@ class FitnessOptimizer(BaseOptimizer):
       if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
 
-
+# TODO
 class NSGCOptimizer(BaseOptimizer):
 
   def step(self, **kwargs):
@@ -112,6 +112,16 @@ class ParetoOptimizer(BaseOptimizer):
     # Find best agents
     costs = np.array([self.pop['reward'].values, self.pop['surprise'].values]).transpose()
     is_pareto = self._get_pareto_front(costs)
+
+    if self.archive.size == 0: # First step, so copy the whole pop.
+      for idx in range(self.pop.size):
+        self.archive.add(self.pop.copy(idx, with_data=True))
+    else: # add only the non dominated
+      arch_costs = np.array([np.stack(self.archive['surprise'].values), np.stack(self.archive['reward'].values)]).transpose()
+      for idx in is_pareto:
+        costs = np.array([self.pop[idx]['surprise'], self.pop[idx]['reward']])
+        if np.any(np.any(arch_costs > costs, axis=1)):
+          self.archive.add(self.pop.copy(idx, with_data=True))
 
     # Create new gen by substituting random agents with copies of the best ones.
     # (Also the best ones can be subst, effectively reducing the amount of dead agents)

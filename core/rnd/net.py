@@ -65,7 +65,7 @@ class TargetNet(nn.Module):
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
-    # x = self.bn(x)
+    x = self.bn(x)
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
     x = self.linear(x[-1])
@@ -127,7 +127,7 @@ class PredictorNet(nn.Module):
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)
-    # x = self.bn(x)
+    x = self.bn(x)
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
     x = self.linear(x[-1])
