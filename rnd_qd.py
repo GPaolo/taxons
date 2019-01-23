@@ -5,12 +5,12 @@ from core import optimizer
 import gym, torch
 import multiprocessing as mp
 import os
-
-env_tag = 'MountainCarContinuous-v0'
+import gym_billiard
+env_tag = 'Billiard-v0'
 
 class RndQD(object):
 
-  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size, use_novelty=True):
+  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size, use_novelty=True, use_archive=False):
     '''
 
     :param env: Environment in which we act
@@ -26,13 +26,15 @@ class RndQD(object):
                                             input_shape=obs_shape,
                                             output_shape=action_shape,
                                             pop_size=self.pop_size)
-    self.archive = population.Population(agents.FFNeuralAgent,
-                                         input_shape=obs_shape,
-                                         output_shape=action_shape,
-                                         pop_size=0)
+    self.archive = None
+    if use_archive:
+      self.archive = population.Population(agents.FFNeuralAgent,
+                                           input_shape=obs_shape,
+                                           output_shape=action_shape,
+                                           pop_size=0)
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if self.use_novelty:
-      self.metric = rnd.RND(input_shape=self.env.observation_space.shape[0], encoding_shape=bs_shape, pop_size=self.pop_size)
+      self.metric = rnd.RND(input_shape=obs_shape, encoding_shape=bs_shape, pop_size=self.pop_size)
     else:
       self.metric = None
     self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
@@ -49,16 +51,15 @@ class RndQD(object):
     cumulated_reward = 0
 
     obs = self.env.reset()
+    obs = np.concatenate(obs)
     if self.use_novelty: state = np.array([obs])
     obs = np.array([obs])
     while not done:
       action = np.squeeze(agent['agent'](obs))
-      # if action > 0:
-      #   action = 1
-      # else:
-      #   action = 0
 
-      obs, reward, done, info = self.env.step([action])
+      obs, reward, done, info = self.env.step(action)
+      obs = np.concatenate(obs)
+
       obs = np.array([obs])
       if self.use_novelty: state = np.append(state, obs, axis=0)
 
@@ -69,7 +70,7 @@ class RndQD(object):
       state = torch.Tensor(state)
       surprise, bs_point = self.metric(state.unsqueeze(0))# Input Dimensions need to be [1, traj_len, obs_space]
       surprise = surprise.cpu().data.numpy()
-      agent['bs'] = np.squeeze(bs_point.cpu().data.numpy())
+      agent['bs'] = obs[0]
       self.cumulated_state.append(state) # Append here all the states
 
     agent['surprise'] = surprise
@@ -99,6 +100,7 @@ class RndQD(object):
   def train(self, steps=10000):
     '''
     This function trains the agents and the RND
+    :param steps: number of update steps (or generations)
     :return:
     '''
     self.elapsed_gen = 0
@@ -141,13 +143,18 @@ if __name__ == '__main__':
   np.random.seed()
   torch.initial_seed()
 
-  rnd_qd = RndQD(env, action_shape=1, obs_shape=2, bs_shape=512, pop_size=25, use_novelty=True)
+  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=512, pop_size=100, use_novelty=True)
   try:
     rnd_qd.train()
   except KeyboardInterrupt:
     print('User Interruption.')
+
+  if rnd_qd.archive is None:
+    pop = rnd_qd.population
+  else:
+    pop = rnd_qd.archive
   print('Total generations: {}'.format(rnd_qd.elapsed_gen))
-  print('Archive length {}'.format(rnd_qd.archive.size))
+  print('Archive length {}'.format(pop.size))
 
   # try:
   #   print('Testing best reward')
@@ -191,25 +198,26 @@ if __name__ == '__main__':
   #       obs = rnd_qd.env.reset()
 
   print('Behaviour space coverage representation.')
-  bs_points = rnd_qd.archive['bs'].values
+  bs_points = pop['bs'].values
   import matplotlib.pyplot as plt
-  pts = ([x[0] for x in bs_points], [y[1] for y in bs_points])
+  pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.scatter(pts[0], pts[1])
   plt.show()
 
-  print('Testing archive')
-  rewards = rnd_qd.archive['reward'].sort_values(ascending=False)
-  rnd_qd.archive[rewards.iloc[:1].index.values[0]]
-  for idx in range(rnd_qd.archive.size):
-    tested = rnd_qd.archive[rewards.iloc[idx:idx+1].index.values[0]]
+  print('Testing result according to best reward.')
+  rewards = pop['reward'].sort_values(ascending=False)
+  pop[rewards.iloc[:1].index.values[0]]
+  for idx in range(pop.size):
+    tested = pop[rewards.iloc[idx:idx+1].index.values[0]]
     print()
     print('Testing agent with reward {}'.format(tested['reward']))
     done = False
     ts = 0
     obs = rnd_qd.env.reset()
     while not done and ts < 1000:
+      obs = np.concatenate(obs)
       rnd_qd.env.render()
       action = np.squeeze(tested['agent'](np.array([obs])))
-      obs, reward, done, info = rnd_qd.env.step([action])
+      obs, reward, done, info = rnd_qd.env.step(action)
 
 

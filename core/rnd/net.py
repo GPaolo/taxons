@@ -27,7 +27,7 @@ class TargetNet(nn.Module):
                                 nn.Linear(64, 128), nn.Tanh(),
                                 nn.Linear(128, 32), nn.Tanh(),
                                 nn.Linear(32,16), nn.Tanh(),
-                                nn.Linear(16, self.output_shape), nn.Tanh())
+                                nn.Linear(16, self.output_shape))
 
     self.reduced_bs = nn.Sequential(nn.Linear(self.output_shape, 16), nn.Tanh(),
                                     nn.Linear(16, self.reduced_bs_shape))
