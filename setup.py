@@ -7,7 +7,8 @@ setup(name='rnd_qd',
             'torch',
             'pytest',
             'nevergrad',
-            'gym'
+            'gym',
+            'sklearn'
       ],
       dependency_link=[
             'git+https://github.com/facebookresearch/nevergrad@master#egg=nevergrad -0'
