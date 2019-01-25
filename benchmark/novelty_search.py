@@ -1,20 +1,19 @@
 import numpy as np
 from core.rnd import rnd
 from core.qd import population, agents
-from core import optimizer
 import gym
 import random
 import gym_billiard
-env_tag = 'Billiard-v0'
+env_tag = 'MountainCarContinuous-v0'
 
 class NoveltySearch(object):
-  def __init__(self, env, obs_shape=6, action_shape=2):
+  def __init__(self, env, obs_shape=6, action_shape=2, pop_size=50):
     self.obs_space = obs_shape
     self.action_space = action_shape
     self.pop = population.Population(agent=agents.FFNeuralAgent,
                                      input_shape=obs_shape,
                                      output_shape=action_shape,
-                                     pop_size=25)
+                                     pop_size=pop_size)
     self.archive = population.Population(agent=agents.FFNeuralAgent,
                                          input_shape=obs_shape,
                                          output_shape=action_shape,
@@ -40,6 +39,7 @@ class NoveltySearch(object):
     k = 6
     if self.archive.size <= k:
       idx = list(range(self.archive.size))
+      k = len(idx)
     else:
       idx = np.argpartition(dists, k) # Get 5 nearest neighs
     novel = True
@@ -53,7 +53,7 @@ class NoveltySearch(object):
       self.archive.add(agent)
       agent['best'] = True
       self.novel_in_gen += 1
-    elif np.random.uniform() <= 0.02:
+    elif np.random.uniform() <= 0.005:
       self.archive.add(agent)
       agent['best'] = True
       self.novel_in_gen += 1
@@ -67,17 +67,28 @@ class NoveltySearch(object):
     done = False
     cumulated_reward = 0
     obs = self.env.reset()
-    obs = np.concatenate(obs)
+    if env_tag is 'Billiard-v0':
+      obs = np.concatenate(obs)
     obs = np.array([obs])
     while not done:
       action = np.squeeze(agent['agent'](obs))
-      obs, reward, done, info = self.env.step(action)
-      obs = np.concatenate(obs)
+      obs, reward, done, info = self.env.step([action])
+      if env_tag is 'Billiard-v0':
+        obs = np.concatenate(obs)
       obs = np.array([obs])
       cumulated_reward += reward
-    agent['bs'] = np.array([obs[0][:2]])
+    agent['bs'] = np.array([[obs[0][0], 0]])
     agent['reward'] = cumulated_reward
 
+  def show_bs(self):
+    print('Behaviour space coverage representation.')
+    bs_points = np.concatenate(self.archive['bs'].values)
+    import matplotlib.pyplot as plt
+
+    pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
+    # plt.scatter(pts[0], pts[1])
+    plt.hist(pts[0])
+    plt.show()
 
   def evolve(self, gen=1000):
     self.elapsed_gen = 0
@@ -118,6 +129,9 @@ class NoveltySearch(object):
         print('Min distance {}'.format(self.min_dist))
         print()
 
+      if self.elapsed_gen % 1000 == 0:
+        self.show_bs()
+
 
 
 if __name__ == '__main__':
@@ -125,18 +139,14 @@ if __name__ == '__main__':
 
   env.seed()
   np.random.seed()
-  ns = NoveltySearch(env)
+  ns = NoveltySearch(env, pop_size=50, obs_shape=2, action_shape=1)
   try:
     ns.evolve(3000)
   except KeyboardInterrupt:
     print('User Interruption')
 
-  print('Behaviour space coverage representation.')
-  bs_points = np.concatenate(ns.archive['bs'].values)
-  import matplotlib.pyplot as plt
+  ns.show_bs()
 
-  pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-  plt.scatter(pts[0], pts[1])
-  plt.show()
+
 
 

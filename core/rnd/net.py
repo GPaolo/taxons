@@ -29,11 +29,11 @@ class TargetNet(nn.Module):
                                 nn.Linear(32,16), nn.Tanh(),
                                 nn.Linear(16, self.output_shape))
 
-    self.reduced_bs = nn.Sequential(nn.Linear(self.output_shape, 16), nn.Tanh(),
-                                    nn.Linear(16, self.reduced_bs_shape))
+    # self.reduced_bs = nn.Sequential(nn.Linear(self.output_shape, 16), nn.Tanh(),
+    #                                 nn.Linear(16, self.reduced_bs_shape))
 
     self.linear.apply(self.init_layers)
-    self.reduced_bs.apply(self.init_layers)
+    # self.reduced_bs.apply(self.init_layers)
     self.lstm.apply(self.init_layers)
 
     self.to(device)
@@ -69,8 +69,8 @@ class TargetNet(nn.Module):
     x = x.transpose(1, 0)
     x, hidden = self.lstm(x, hidden)
     x = self.linear(x[-1])
-    r_bs = self.reduced_bs(x)
-    return x, r_bs
+    # r_bs = self.reduced_bs(x)
+    return x
 
 
 class PredictorNet(nn.Module):
@@ -111,7 +111,7 @@ class PredictorNet(nn.Module):
     :return:
     '''
     if type(m) == nn.Linear:
-      nn.init.normal_(m.weight, mean=0, std=10)
+      nn.init.normal_(m.weight, mean=0, std=5)
     elif type(m) == nn.LSTM:
       nn.init.normal_(m.weight_ih_l0, mean=0, std=1)
       nn.init.normal_(m.weight_hh_l0, mean=0, std=1)
@@ -119,11 +119,11 @@ class PredictorNet(nn.Module):
   def init_hidden(self, train=False):
     # The axes semantics are (num_layers, minibatch_size, hidden_dim)
     if not train:
-      return (torch.rand(1, 1, self.hidden_dim, device=self.device),
-              torch.rand(1, 1, self.hidden_dim, device=self.device))
+      return (torch.zeros(1, 1, self.hidden_dim, device=self.device),
+              torch.zeros(1, 1, self.hidden_dim, device=self.device))
     else:
-      return (torch.rand(1, self.batch_dim, self.hidden_dim, device=self.device),
-              torch.rand(1, self.batch_dim, self.hidden_dim, device=self.device))
+      return (torch.zeros(1, self.batch_dim, self.hidden_dim, device=self.device),
+              torch.zeros(1, self.batch_dim, self.hidden_dim, device=self.device))
 
   def forward(self, x, train=False):
     hidden = self.init_hidden(train)

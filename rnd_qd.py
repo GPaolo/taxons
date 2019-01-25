@@ -6,11 +6,13 @@ import gym, torch
 import multiprocessing as mp
 import os
 import gym_billiard
-env_tag = 'Billiard-v0'
+# env_tag = 'Billiard-v0'
+env_tag = 'MountainCarContinuous-v0'
+
 
 class RndQD(object):
 
-  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size, use_novelty=True, use_archive=False):
+  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size, use_novelty=True, use_archive=False, gpu=False):
     '''
 
     :param env: Environment in which we act
@@ -32,12 +34,15 @@ class RndQD(object):
                                            input_shape=obs_shape,
                                            output_shape=action_shape,
                                            pop_size=0)
-    self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if gpu:
+      self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+      self.device = torch.device('cpu')
     if self.use_novelty:
       self.metric = rnd.RND(input_shape=obs_shape, encoding_shape=bs_shape, pop_size=self.pop_size)
     else:
       self.metric = None
-    self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
+    self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
   # TODO make this run in parallel
@@ -51,14 +56,16 @@ class RndQD(object):
     cumulated_reward = 0
 
     obs = self.env.reset()
-    obs = np.concatenate(obs)
+    if env_tag is 'Billiard-v0':
+      obs = np.concatenate(obs)
     if self.use_novelty: state = np.array([obs])
     obs = np.array([obs])
     while not done:
       action = np.squeeze(agent['agent'](obs))
 
-      obs, reward, done, info = self.env.step(action)
-      obs = np.concatenate(obs)
+      obs, reward, done, info = self.env.step([action])
+      if env_tag is 'Billiard-v0':
+        obs = np.concatenate(obs)
 
       obs = np.array([obs])
       if self.use_novelty: state = np.append(state, obs, axis=0)
@@ -68,9 +75,9 @@ class RndQD(object):
     surprise = 0
     if self.use_novelty:
       state = torch.Tensor(state)
-      surprise, bs_point = self.metric(state.unsqueeze(0))# Input Dimensions need to be [1, traj_len, obs_space]
+      surprise = self.metric(state.unsqueeze(0))# Input Dimensions need to be [1, traj_len, obs_space]
       surprise = surprise.cpu().data.numpy()
-      agent['bs'] = obs[0]
+      agent['bs'] = np.array([[obs[0][0], 0]])
       self.cumulated_state.append(state) # Append here all the states
 
     agent['surprise'] = surprise
@@ -120,8 +127,9 @@ class RndQD(object):
         print('Generation {}'.format(self.elapsed_gen))
         if self.archive is not None:
           print('Archive size {}'.format(self.archive.size))
-        print('Average surprise {}'.format(cs/self.pop_size))
+        print('Average generation surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
+        # self.show()
         print()
 
   def save(self, filepath):
@@ -134,6 +142,20 @@ class RndQD(object):
     self.archive.save_pop(filepath, 'archive')
     self.metric.save(filepath)
 
+  def show(self):
+    print('Behaviour space coverage representation.')
+    if self.archive is not None:
+      bs_points = np.concatenate(self.archive['bs'].values)
+    else:
+      bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
+      print(bs_points)
+    import matplotlib.pyplot as plt
+
+    pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
+    # plt.scatter(pts[0], pts[1])
+    plt.hist(pts[0])
+    plt.show()
+
 
 if __name__ == '__main__':
   import time
@@ -143,7 +165,7 @@ if __name__ == '__main__':
   np.random.seed()
   torch.initial_seed()
 
-  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=512, pop_size=100, use_novelty=True)
+  rnd_qd = RndQD(env, action_shape=1, obs_shape=2, bs_shape=512, pop_size=50, use_novelty=True, use_archive=True, gpu=True)
   try:
     rnd_qd.train()
   except KeyboardInterrupt:
@@ -197,16 +219,10 @@ if __name__ == '__main__':
   #     if done:
   #       obs = rnd_qd.env.reset()
 
-  print('Behaviour space coverage representation.')
-  bs_points = pop['bs'].values
-  import matplotlib.pyplot as plt
-  pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-  plt.scatter(pts[0], pts[1])
-  plt.show()
+  rnd_qd.show()
 
   print('Testing result according to best reward.')
   rewards = pop['reward'].sort_values(ascending=False)
-  pop[rewards.iloc[:1].index.values[0]]
   for idx in range(pop.size):
     tested = pop[rewards.iloc[idx:idx+1].index.values[0]]
     print()
@@ -215,9 +231,10 @@ if __name__ == '__main__':
     ts = 0
     obs = rnd_qd.env.reset()
     while not done and ts < 1000:
-      obs = np.concatenate(obs)
+      if env_tag is 'Billiard-v0':
+        obs = np.concatenate(obs)
       rnd_qd.env.render()
       action = np.squeeze(tested['agent'](np.array([obs])))
-      obs, reward, done, info = rnd_qd.env.step(action)
+      obs, reward, done, info = rnd_qd.env.step([action])
 
 

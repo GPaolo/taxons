@@ -23,7 +23,7 @@ class RND(object):
     # Loss
     self.criterion = nn.MSELoss()
     # Optimizer
-    self.learning_rate = 0.001
+    self.learning_rate = 0.01
     self.optimizer = optim.Adam(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x, train=False):
@@ -32,9 +32,9 @@ class RND(object):
     :param x: Network input. Needs to be a torch tensor.
     :return: surprise as a 1 dimensional torch tensor
     '''
-    target, r_bs = self.target_model(x, train)
+    target = self.target_model(x, train)
     prediction = self.predictor_model(x, train)
-    return self.criterion(prediction, target), r_bs
+    return self.criterion(prediction, target)
 
   def __call__(self, x):
     return self._get_surprise(x)
@@ -46,7 +46,7 @@ class RND(object):
     :return: surprise as a 1 dimensional torch tensor
     '''
     self.optimizer.zero_grad()
-    surprise, _ = self._get_surprise(x, train=True)
+    surprise = self._get_surprise(x, train=True)
     surprise.backward()
     # torch.nn.utils.clip_grad_norm_(self.predictor_model.parameters(), 0.1)
     self.optimizer.step()
@@ -68,12 +68,14 @@ class RND(object):
 
 if __name__ == '__main__':
   device = torch.device('cpu')
-  rnd = RND(6, 2, device)
+  rnd = RND(6, 2, device=device)
 
-  for _ in range(1000):
-    x = torch.rand([1, 6])
-    print(rnd.training_step(x))
+  for _ in range(30000):
+    x = torch.randn([10, 15, 6])
+    a = rnd.training_step(x)
+    if _ %100 == 0:
+      print('{} {}'.format(_, a))
 
-  x = torch.Tensor([0.2, 0.4, 0.557, 0.36, 0, 1.5])
+  x = torch.rand([1, 15, 6])
   print(rnd(x))
 

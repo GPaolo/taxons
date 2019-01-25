@@ -8,7 +8,8 @@ setup(name='rnd_qd',
             'pytest',
             'nevergrad',
             'gym',
-            'sklearn'
+            'pygame',
+            'box2d'
       ],
       dependency_link=[
             'git+https://github.com/facebookresearch/nevergrad@master#egg=nevergrad -0'

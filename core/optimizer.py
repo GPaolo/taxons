@@ -139,6 +139,7 @@ class ParetoOptimizer(BaseOptimizer):
     for a in self.pop:
       if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
+      a['best'] = False
 
 
 class NoveltyOptimizer(BaseOptimizer):
@@ -147,15 +148,19 @@ class NoveltyOptimizer(BaseOptimizer):
     This function performs an optimization step by taking the most novel agents
     :return:
     '''
-    if self.archive.size == 0: # First step, so copy the whole pop.
-      for idx in range(self.pop.size):
-        self.archive.add(self.pop.copy(idx, with_data=True))
-    else:
-      novel = np.stack(self.archive['surprise'].values)
-      self.archive.avg_surprise = np.mean(novel)
-      for idx in range(self.pop.size):
-        if self.pop[idx]['surprise'] >= self.archive.avg_surprise:
-          self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
+    if self.archive is not None:
+      if self.archive.size == 0: # First step, so copy the whole pop.
+        for idx in range(self.pop.size):
+          self.archive.add(self.pop.copy(idx, with_data=True))
+      else:
+        novel = np.stack(self.archive['surprise'].values)
+        self.archive.avg_surprise = np.mean(novel)
+        for idx in range(self.pop.size):
+          random_addition = np.random.uniform() <= 0.005
+          if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
+            self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
+            if random_addition:
+              print('Randomly selecting agent for archive.')
 
 
     new_gen = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to reproduce
@@ -167,6 +172,8 @@ class NoveltyOptimizer(BaseOptimizer):
     for a in self.pop:
       if np.random.random() <= self.mutation_rate:
         a['agent'].mutate()
+      a['best'] = False
+
 
 
 
