@@ -1,7 +1,7 @@
 import numpy as np
 from core.rnd import rnd
 from core.qd import population, agents
-from core import optimizer
+from core import optimizer, utils
 import gym, torch
 import multiprocessing as mp
 import os
@@ -55,19 +55,13 @@ class RndQD(object):
     done = False
     cumulated_reward = 0
 
-    obs = self.env.reset()
-    if env_tag is 'Billiard-v0':
-      obs = np.concatenate(obs)
-    if self.use_novelty: state = np.array([obs])
-    obs = np.array([obs])
+    obs = utils.obs_formatting(env_tag, self.env.reset())
+    if self.use_novelty: state = obs
     while not done:
-      action = np.squeeze(agent['agent'](obs))
+      action = utils.action_formatting(env_tag, agent['agent'](obs))
 
-      obs, reward, done, info = self.env.step([action])
-      if env_tag is 'Billiard-v0':
-        obs = np.concatenate(obs)
-
-      obs = np.array([obs])
+      obs, reward, done, info = self.env.step(action)
+      obs = utils.obs_formatting(env_tag, obs)
       if self.use_novelty: state = np.append(state, obs, axis=0)
 
       cumulated_reward += reward
@@ -229,12 +223,10 @@ if __name__ == '__main__':
     print('Testing agent with reward {}'.format(tested['reward']))
     done = False
     ts = 0
-    obs = rnd_qd.env.reset()
+    obs = utils.obs_formatting(env_tag, rnd_qd.env.reset())
     while not done and ts < 1000:
-      if env_tag is 'Billiard-v0':
-        obs = np.concatenate(obs)
       rnd_qd.env.render()
-      action = np.squeeze(tested['agent'](np.array([obs])))
-      obs, reward, done, info = rnd_qd.env.step([action])
-
+      action = utils.action_formatting(env_tag, tested['agent'](obs))
+      obs, reward, done, info = rnd_qd.env.step(action)
+      obs = utils.obs_formatting(env_tag, obs)
 

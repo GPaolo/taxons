@@ -25,3 +25,27 @@ class FCLayer(object):
     print('Layer {}:'.format(self.name))
     print('Weights {}'.format(self.w))
     print('Bias {}'.format(self.bias))
+
+
+def action_formatting(env_tag, action):
+  """
+  This function helps reformat the actions according to the environment
+  :param env_tag: Environment name
+  :param action: Action to reformat
+  :return:
+  """
+  if env_tag == 'MountainCarContinuous-v0':
+    assert action.shape == (1,1), 'Shape is not of dimension {}. Has dimension {}'.format([1,1], action)
+    return action[0]
+
+def obs_formatting(env_tag, obs):
+  """
+    This function helps reformat the observations according to the environment
+    :param env_tag: Environment name
+    :param obs: Observation to reformat
+    :return:
+  """
+  if env_tag == 'MountainCarContinuous-v0':
+    return np.array([obs])
+  elif env_tag is 'Billiard-v0':
+    return np.array([np.concatenate(obs)])

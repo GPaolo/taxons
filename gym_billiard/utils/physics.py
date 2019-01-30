@@ -39,7 +39,7 @@ class PhysicsSim(object):
 
     # Create physic simulator
     self.world = b2.b2World(gravity=(0, 0), doSleep=True)
-    self.dt = 1./60
+    self.dt = self.params.TIME_STEP
     self.vel_iter = 100
     self.pos_iter = 100
     self._create_table()
@@ -113,7 +113,7 @@ class PhysicsSim(object):
                                          fixtures=b2.b2FixtureDef(
                                            shape=b2.b2PolygonShape(box=(self.params.LINK_THICKNESS,
                                                                         self.params.LINK_0_LENGTH/2)),
-                                           density=3,
+                                           density=5,
                                            friction=self.params.LINK_FRICTION,
                                            restitution=self.params.LINK_ELASTICITY))
 
@@ -125,27 +125,27 @@ class PhysicsSim(object):
                                          fixtures=b2.b2FixtureDef(
                                            shape=b2.b2PolygonShape(box=(self.params.LINK_THICKNESS,
                                                                         self.params.LINK_1_LENGTH / 2)),
-                                           density=3,
+                                           density=1,
                                            friction=self.params.LINK_FRICTION,
                                            restitution=self.params.LINK_ELASTICITY))
 
     jointW0 = self.world.CreateRevoluteJoint(bodyA=self.walls[3],
                                              bodyB=link0,
                                              anchor=self.walls[3].worldCenter,
-                                             lowerAngle=-.5 * b2.b2_pi,
-                                             upperAngle=.5 * b2.b2_pi,
+                                             lowerAngle=-.4 * b2.b2_pi,
+                                             upperAngle=.4 * b2.b2_pi,
                                              enableLimit=True,
-                                             maxMotorTorque=1000.0,
+                                             maxMotorTorque=100000.0,
                                              motorSpeed=0.0,
                                              enableMotor=True)
 
     joint01 = self.world.CreateRevoluteJoint(bodyA=link0,
                                              bodyB=link1,
                                              anchor=link0.worldCenter + b2.b2Vec2((0, self.params.LINK_0_LENGTH/2)),
-                                             lowerAngle=-b2.b2_pi,
-                                             upperAngle=b2.b2_pi,
-                                             enableLimit=False,
-                                             maxMotorTorque=1000.0,
+                                             lowerAngle=-b2.b2_pi*0.9,
+                                             upperAngle=b2.b2_pi*0.9,
+                                             enableLimit=True,
+                                             maxMotorTorque=10000.0,
                                              motorSpeed=0.0,
                                              enableMotor=True)
 
@@ -171,6 +171,9 @@ class PhysicsSim(object):
 
   def move_joint(self, joint, value):
     speed = self.arm[joint].motorSpeed
+    # Limit max joint speed
+    if np.abs(speed) > 8:
+      return
     if self.params.TORQUE_CONTROL:
       self.arm[joint].motorSpeed = speed + value * self.dt
     else:
