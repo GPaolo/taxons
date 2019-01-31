@@ -152,6 +152,23 @@ if __name__ == '__main__':
     print('User Interruption')
 
   ns.show_bs()
+  print(ns.archive['name'].values)
+
+  print('Testing result according to best reward.')
+  rewards = ns.archive['reward'].sort_values(ascending=False)
+  for idx in range(ns.archive.size):
+    tested = ns.archive[rewards.iloc[idx:idx + 1].index.values[0]]
+    print()
+    print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
+    done = False
+    ts = 0
+    obs = utils.obs_formatting(env_tag, ns.env.reset())
+    while not done and ts < 1000:
+      ns.env.render()
+      action = utils.action_formatting(env_tag, tested['agent'](obs))
+      obs, reward, done, info = ns.env.step(action)
+      obs = utils.obs_formatting(env_tag, obs)
+
 
 
 
