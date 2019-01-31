@@ -37,3 +37,4 @@ class Params(object):
     self.TEST = True
 
     self.RANDOM_ARM_INIT_POSE = False
+    self.RANDOM_BALL_INIT_POSE = False
