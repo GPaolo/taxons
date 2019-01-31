@@ -23,7 +23,7 @@ class RND(object):
     # Loss
     self.criterion = nn.MSELoss()
     # Optimizer
-    self.learning_rate = 0.01
+    self.learning_rate = 0.001
     self.optimizer = optim.Adam(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x, train=False):

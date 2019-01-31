@@ -6,8 +6,8 @@ import gym, torch
 import multiprocessing as mp
 import os
 import gym_billiard
-# env_tag = 'Billiard-v0'
-env_tag = 'MountainCarContinuous-v0'
+env_tag = 'Billiard-v0'
+# env_tag = 'MountainCarContinuous-v0'
 
 
 class RndQD(object):
@@ -42,7 +42,7 @@ class RndQD(object):
       self.metric = rnd.RND(input_shape=obs_shape, encoding_shape=bs_shape, pop_size=self.pop_size)
     else:
       self.metric = None
-    self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
+    self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
   # TODO make this run in parallel
@@ -71,7 +71,7 @@ class RndQD(object):
       state = torch.Tensor(state)
       surprise = self.metric(state.unsqueeze(0))# Input Dimensions need to be [1, traj_len, obs_space]
       surprise = surprise.cpu().data.numpy()
-      agent['bs'] = np.array([[obs[0][0], 0]])
+      agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
       self.cumulated_state.append(state) # Append here all the states
 
     agent['surprise'] = surprise
@@ -123,8 +123,9 @@ class RndQD(object):
           print('Archive size {}'.format(self.archive.size))
         print('Average generation surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
-        # self.show()
         print()
+      # if self.elapsed_gen % 100 == 0 and not self.elapsed_gen == 0:
+      #   self.show()
 
   def save(self, filepath):
     if not os.path.exists(filepath):
@@ -146,8 +147,8 @@ class RndQD(object):
     import matplotlib.pyplot as plt
 
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-    # plt.scatter(pts[0], pts[1])
-    plt.hist(pts[0])
+    plt.scatter(pts[0], pts[1])
+    # plt.hist(pts[0])
     plt.show()
 
 
@@ -159,7 +160,7 @@ if __name__ == '__main__':
   np.random.seed()
   torch.initial_seed()
 
-  rnd_qd = RndQD(env, action_shape=1, obs_shape=2, bs_shape=512, pop_size=50, use_novelty=True, use_archive=True, gpu=True)
+  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=512, pop_size=50, use_novelty=True, use_archive=True, gpu=True)
   try:
     rnd_qd.train()
   except KeyboardInterrupt:

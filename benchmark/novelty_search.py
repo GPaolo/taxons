@@ -1,10 +1,12 @@
 import numpy as np
 from core.rnd import rnd
 from core.qd import population, agents
+from core import utils
 import gym
 import random
 import gym_billiard
-env_tag = 'MountainCarContinuous-v0'
+# env_tag = 'MountainCarContinuous-v0'
+env_tag = 'Billiard-v0'
 
 class NoveltySearch(object):
   def __init__(self, env, obs_shape=6, action_shape=2, pop_size=50):
@@ -66,18 +68,13 @@ class NoveltySearch(object):
     '''
     done = False
     cumulated_reward = 0
-    obs = self.env.reset()
-    if env_tag is 'Billiard-v0':
-      obs = np.concatenate(obs)
-    obs = np.array([obs])
+    obs = utils.obs_formatting(env_tag, self.env.reset())
     while not done:
-      action = np.squeeze(agent['agent'](obs))
-      obs, reward, done, info = self.env.step([action])
-      if env_tag is 'Billiard-v0':
-        obs = np.concatenate(obs)
-      obs = np.array([obs])
+      action = utils.action_formatting(env_tag, agent['agent'](obs))
+      obs, reward, done, info = self.env.step(action)
+      obs = utils.obs_formatting(env_tag, obs)
       cumulated_reward += reward
-    agent['bs'] = np.array([[obs[0][0], 0]])
+    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
 
   def show_bs(self):
@@ -86,8 +83,8 @@ class NoveltySearch(object):
     import matplotlib.pyplot as plt
 
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-    # plt.scatter(pts[0], pts[1])
-    plt.hist(pts[0])
+    plt.scatter(pts[0], pts[1])
+    # plt.hist(pts[0])
     plt.show()
 
   def evolve(self, gen=1000):
@@ -139,7 +136,7 @@ if __name__ == '__main__':
 
   env.seed()
   np.random.seed()
-  ns = NoveltySearch(env, pop_size=50, obs_shape=2, action_shape=1)
+  ns = NoveltySearch(env, pop_size=50, obs_shape=6, action_shape=2)
   try:
     ns.evolve(3000)
   except KeyboardInterrupt:

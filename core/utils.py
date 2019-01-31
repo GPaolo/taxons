@@ -37,6 +37,7 @@ def action_formatting(env_tag, action):
   if env_tag == 'MountainCarContinuous-v0':
     assert action.shape == (1,1), 'Shape is not of dimension {}. Has dimension {}'.format([1,1], action)
     return action[0]
+  else: return action[0]
 
 def obs_formatting(env_tag, obs):
   """
@@ -47,5 +48,6 @@ def obs_formatting(env_tag, obs):
   """
   if env_tag == 'MountainCarContinuous-v0':
     return np.array([obs])
-  elif env_tag is 'Billiard-v0':
+  elif env_tag == 'Billiard-v0':
     return np.array([np.concatenate(obs)])
+  else: return obs

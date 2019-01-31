@@ -5,7 +5,7 @@ from gym_billiard.utils import parameters
 from pprint import pprint
 
 
-# TODO implement different intial arm positions
+# TODO implement different initial arm positions
 # TODO implement checks on balls spawning positions (not in holes or on arm or overlapped'
 
 # Extend polygon shape with drawing function
@@ -40,8 +40,8 @@ class PhysicsSim(object):
     # Create physic simulator
     self.world = b2.b2World(gravity=(0, 0), doSleep=True)
     self.dt = self.params.TIME_STEP
-    self.vel_iter = 100
-    self.pos_iter = 100
+    self.vel_iter = self.params.VEL_ITER
+    self.pos_iter = self.params.POS_ITER
     self._create_table()
     self._create_balls(balls_pose)
     self._create_robotarm(arm_position)
@@ -100,13 +100,55 @@ class PhysicsSim(object):
                                                                    restitution=self.params.BALL_ELASTICITY,))
       self.balls.append(ball)
 
+  def _calculate_arm_pose(self, arm_position=None):
+    '''
+    This function calculates the arm initial position according to the joints angles in randiants
+    :param arm_position:
+    :return: link0 and link1 position.
+    '''
+    pose = {'link0_center': np.array((self.params.TABLE_CENTER[0], self.params.LINK_0_LENGTH/2)),
+            'link1_center': np.array((self.params.TABLE_CENTER[0], self.params.LINK_0_LENGTH - .1 + self.params.LINK_1_LENGTH / 2)),
+            'joint01_center': np.array([self.params.TABLE_CENTER[0], self.params.LINK_0_LENGTH]),
+            'link0_angle':0,
+            'link1_angle':0}
+    if arm_position is not None:
+      ## LINK 0
+      l0_joint_center = np.array([self.params.TABLE_CENTER[0], 0]) # Get joint0 position
+      pose['link0_center'] = pose['link0_center'] - l0_joint_center # Center link0 on joint0 position
+      # Rotate link0 center according to joint0 angle
+      x = np.cos(arm_position[0]) * pose['link0_center'][0] - np.sin(arm_position[0]) * pose['link0_center'][1]
+      y = np.sin(arm_position[0]) * pose['link0_center'][0] + np.cos(arm_position[0]) * pose['link0_center'][1]
+      pose['link0_center'] = np.array((x, y)) + l0_joint_center
+
+      ## LINK 1
+      l1_joint_center = pose['joint01_center'] # Get joint1 position
+      pose['link1_center'] = pose['link1_center'] - l1_joint_center # Center link1 on joint1 position
+      # Rotate link1 center according to joint1 angle
+      x = np.cos(arm_position[1]) * pose['link1_center'][0] - np.sin(arm_position[1]) * pose['link1_center'][1]
+      y = np.sin(arm_position[1]) * pose['link1_center'][0] + np.cos(arm_position[1]) * pose['link1_center'][1]
+
+      l1_joint_center = l1_joint_center - l0_joint_center  # Center joint1 on joint0 position
+      # Rotate joint1 center according to joint0 angle
+      jx = np.cos(arm_position[0]) * l1_joint_center[0] - np.sin(arm_position[0]) * l1_joint_center[1]
+      jy = np.sin(arm_position[0]) * l1_joint_center[0] + np.cos(arm_position[0]) * l1_joint_center[1]
+      l1_joint_center = np.array((jx, jy)) + l0_joint_center
+
+      pose['link1_center'] = np.array((x, y)) + l1_joint_center
+      pose['joint01_center'] = l1_joint_center
+      pose['link0_angle'] = arm_position[0]
+      pose['link1_angle'] = arm_position[1]  # Have to also center the angle
+
+    return pose
+
   def _create_robotarm(self, arm_position=None):
     '''
     Creates the robotic arm.
     :param angular_position: Initial angular position
     :return:
     '''
-    link0 = self.world.CreateDynamicBody(position=(self.params.TABLE_CENTER[0], self.params.LINK_0_LENGTH/2),
+    arm_pose = self._calculate_arm_pose(arm_position)
+    link0 = self.world.CreateDynamicBody(position=arm_pose['link0_center'],
+                                         angle=arm_pose['link0_angle'],
                                          bullet=True,
                                          allowSleep=True,
                                          userData={'name': 'link0'},
@@ -118,7 +160,8 @@ class PhysicsSim(object):
                                            restitution=self.params.LINK_ELASTICITY))
 
     # The -.1 in the position is so that the two links can overlap in order to create the joint
-    link1 = self.world.CreateDynamicBody(position=(self.params.TABLE_CENTER[0], self.params.LINK_0_LENGTH - .1 + self.params.LINK_1_LENGTH / 2),
+    link1 = self.world.CreateDynamicBody(position=arm_pose['link1_center'],
+                                         angle=arm_pose['link1_angle'],
                                          bullet=True,
                                          allowSleep=True,
                                          userData={'name': 'link1'},
@@ -132,8 +175,8 @@ class PhysicsSim(object):
     jointW0 = self.world.CreateRevoluteJoint(bodyA=self.walls[3],
                                              bodyB=link0,
                                              anchor=self.walls[3].worldCenter,
-                                             lowerAngle=-.4 * b2.b2_pi,
-                                             upperAngle=.4 * b2.b2_pi,
+                                             lowerAngle=-.4 * b2.b2_pi - arm_pose['link0_angle'],
+                                             upperAngle=.4 * b2.b2_pi - arm_pose['link0_angle'],
                                              enableLimit=True,
                                              maxMotorTorque=100000.0,
                                              motorSpeed=0.0,
@@ -141,9 +184,9 @@ class PhysicsSim(object):
 
     joint01 = self.world.CreateRevoluteJoint(bodyA=link0,
                                              bodyB=link1,
-                                             anchor=link0.worldCenter + b2.b2Vec2((0, self.params.LINK_0_LENGTH/2)),
-                                             lowerAngle=-b2.b2_pi*0.9,
-                                             upperAngle=b2.b2_pi*0.9,
+                                             anchor=arm_pose['joint01_center'],
+                                             lowerAngle=-b2.b2_pi*0.9 + arm_pose['link0_angle'] - arm_pose['link1_angle'],
+                                             upperAngle=b2.b2_pi*0.9 + arm_pose['link0_angle'] - arm_pose['link1_angle'],
                                              enableLimit=True,
                                              maxMotorTorque=10000.0,
                                              motorSpeed=0.0,
@@ -171,13 +214,13 @@ class PhysicsSim(object):
 
   def move_joint(self, joint, value):
     speed = self.arm[joint].motorSpeed
-    # Limit max joint speed
-    if np.abs(speed) > 8:
-      return
     if self.params.TORQUE_CONTROL:
-      self.arm[joint].motorSpeed = speed + value * self.dt
+      speed = speed + value * self.dt
     else:
-      self.arm[joint].motorSpeed = value
+      speed = value
+
+    # Limit max joint speed
+    self.arm[joint].motorSpeed = np.sign(speed)*min(1, np.abs(speed))
 
   def step(self):
     '''
@@ -189,4 +232,4 @@ class PhysicsSim(object):
 
 if __name__ == "__main__":
   phys = PhysicsSim(balls_pose=[[0, 0], [1, 1]])
-  print(phys.walls[0])
+  print(phys.arm['link0'])

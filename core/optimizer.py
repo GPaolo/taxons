@@ -142,6 +142,7 @@ class ParetoOptimizer(BaseOptimizer):
       a['best'] = False
 
 
+# TODO change this to literature implementation
 class NoveltyOptimizer(BaseOptimizer):
   def step(self, **kwargs):
     '''
@@ -149,9 +150,12 @@ class NoveltyOptimizer(BaseOptimizer):
     :return:
     '''
     if self.archive is not None:
-      if self.archive.size == 0: # First step, so copy the whole pop.
+      if self.archive.size == 0: # First step, so copy pop randomly
         for idx in range(self.pop.size):
-          self.archive.add(self.pop.copy(idx, with_data=True))
+          random_addition = np.random.uniform() <= 0.005
+          if random_addition:
+            self.archive.add(self.pop.copy(idx, with_data=True))
+            self.pop[idx]['best'] = True
       else:
         novel = np.stack(self.archive['surprise'].values)
         self.archive.avg_surprise = np.mean(novel)
@@ -159,6 +163,7 @@ class NoveltyOptimizer(BaseOptimizer):
           random_addition = np.random.uniform() <= 0.005
           if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
             self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
+            self.pop[idx]['best'] = True
             if random_addition:
               print('Randomly selecting agent for archive.')
 
@@ -168,9 +173,18 @@ class NoveltyOptimizer(BaseOptimizer):
     for ng, d in zip(new_gen, dead):
       self.pop[d] = self.pop.copy(ng)
 
+    # new_gen = []  # Select only the most novel to reproduce
+    # for i, a in enumerate(self.pop):
+    #   if a['best']:
+    #     new_gen.append(self.pop.copy(i))
+    #
+    # dead = random.sample(range(self.pop.size), len(new_gen))
+    # for i, new_agent in zip(dead, new_gen):
+    #   self.pop[i] = new_agent
+
     # Mutate pops
     for a in self.pop:
-      if np.random.random() <= self.mutation_rate:
+      if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
       a['best'] = False
 

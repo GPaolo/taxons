@@ -51,14 +51,16 @@ class BilliardEnv(gym.Env):
     self.np_random, seed = seeding.np_random(seed)
     return [seed]
 
-  def reset(self):
-    init_ball_pose = np.array([self.np_random.uniform(low=-1.5, high=1.5), # x
-                               self.np_random.uniform(low=-1.5, high=0)])  # y
+  def reset(self, ball_pose=None):
+    init_ball_pose = np.array([self.np_random.uniform(low=-1.3, high=1.3), # x
+                               self.np_random.uniform(low=-1.3, high=0)])  # y
 
-    init_joint_pose = np.array([self.np_random.uniform(low=-np.pi/2, high=np.pi/2), # Joint0
-                                self.np_random.uniform(low=-np.pi, high=np.pi)])    # Joint1
+    if self.params.RANDOM_ARM_INIT_POSE:
+      init_joint_pose = np.array([self.np_random.uniform(low=-np.pi * .2, high=np.pi * .2), # Joint0
+                                  self.np_random.uniform(low=-np.pi * .9, high=np.pi * .9)])    # Joint1
+    else:
+      init_joint_pose = None
 
-    init_joint_pose = np.zeros(2)
     self.physics_eng.reset([init_ball_pose], init_joint_pose)
     self.steps = 0
     return self._get_obs()
@@ -72,6 +74,8 @@ class BilliardEnv(gym.Env):
     joint0_v = self.physics_eng.arm['jointW0'].speed
     joint1_a = self.physics_eng.arm['joint01'].angle
     joint1_v = self.physics_eng.arm['joint01'].speed
+    if np.abs(ball_pose[0])> 1.5 or np.abs(ball_pose[1]) > 1.5:
+      print('WHAT')
     self.state = (np.array([ball_pose[0], ball_pose[1]]), np.array([joint0_a, joint1_a]), np.array([joint0_v, joint1_v]))
     self.steps += 1
     return self.state
