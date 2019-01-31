@@ -16,7 +16,7 @@ class Params(object):
     self.LINK_THICKNESS = 0.05
 
     self.BALL_RADIUS = .1
-    self.BALL_ELASTICITY = .9
+    self.BALL_ELASTICITY = .7
     self.BALL_FRICTION = .9
 
     self.WALL_THICKNESS = .1
@@ -33,7 +33,7 @@ class Params(object):
 
     self.MAX_ENV_STEPS = 500
 
-    self.TORQUE_CONTROL = True
+    self.TORQUE_CONTROL = False
     self.TEST = True
 
     self.RANDOM_ARM_INIT_POSE = False

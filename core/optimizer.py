@@ -114,22 +114,27 @@ class ParetoOptimizer(BaseOptimizer):
     is_pareto = self._get_pareto_front(costs)
 
     if self.archive is not None:
-      if self.archive.size == 0: # First step, so copy the whole pop.
-        for idx in range(self.pop.size):
+      if self.archive.size == 0: # First step, so copy all the pareto
+        for idx in is_pareto:
           self.archive.add(self.pop.copy(idx, with_data=True))
       else: # add only the non dominated
         arch_costs = np.array([np.stack(self.archive['surprise'].values), np.stack(self.archive['reward'].values)]).transpose()
         for idx in is_pareto:
-          costs = np.array([self.pop[idx]['surprise'], self.pop[idx]['reward']])
-          if np.any(np.any(arch_costs > costs, axis=1)):
-            self.archive.add(self.pop.copy(idx, with_data=True))
+          if self.pop[idx]['name'] not in self.archive['name'].values: # Add an element in the archive only if not present already
+            costs = np.array([self.pop[idx]['surprise'], self.pop[idx]['reward']])
+            if np.any(np.any(costs > arch_costs, axis=1)): # TODO Invece di fare cosi potrei ricalcolare il pareto front dell'archivio+quello da aggiungere e vedere se ci sta. Se ci sta lo aggiungo
+              self.archive.add(self.pop.copy(idx, with_data=True))
+              self.pop[idx]['best'] = True
+
+    # TODO NB: un'altra cosa che potrei fare e' far riprodurre solo quelli che aggiungo all'archivio.
 
     # Create new gen by substituting random agents with copies of the best ones.
     # (Also the best ones can be subst, effectively reducing the amount of dead agents)
     new_gen = []
     for i in is_pareto:
-      new_gen.append(self.pop.copy(i))
-      self.pop[i]['best'] = True
+      if self.pop[i]['best']:
+        new_gen.append(self.pop.copy(i)) # Reproduce only if has been added to the archive. This way we push exploration
+
 
     dead = random.sample(range(self.pop.size), len(new_gen))
     for i, new_agent in zip(dead, new_gen):
@@ -160,12 +165,13 @@ class NoveltyOptimizer(BaseOptimizer):
         novel = np.stack(self.archive['surprise'].values)
         self.archive.avg_surprise = np.mean(novel)
         for idx in range(self.pop.size):
-          random_addition = np.random.uniform() <= 0.005
-          if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
-            self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
-            self.pop[idx]['best'] = True
-            if random_addition:
-              print('Randomly selecting agent for archive.')
+          if self.pop[idx]['name'] not in self.archive['name'].values:  # Add an element in the archive only if not present already
+            random_addition = np.random.uniform() <= 0.005
+            if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
+              self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
+              self.pop[idx]['best'] = True
+              if random_addition:
+                print('Randomly selecting agent for archive.')
 
 
     new_gen = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to reproduce

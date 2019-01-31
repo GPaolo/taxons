@@ -56,13 +56,13 @@ class RndQD(object):
     cumulated_reward = 0
 
     obs = utils.obs_formatting(env_tag, self.env.reset())
-    if self.use_novelty: state = obs
+    if self.use_novelty: state = obs[0:2]
     while not done:
       action = utils.action_formatting(env_tag, agent['agent'](obs))
 
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
-      if self.use_novelty: state = np.append(state, obs, axis=0)
+      if self.use_novelty: state = np.append(state, obs[0:2], axis=0)
 
       cumulated_reward += reward
 
@@ -221,7 +221,7 @@ if __name__ == '__main__':
   for idx in range(pop.size):
     tested = pop[rewards.iloc[idx:idx+1].index.values[0]]
     print()
-    print('Testing agent with reward {}'.format(tested['reward']))
+    print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
     done = False
     ts = 0
     obs = utils.obs_formatting(env_tag, rnd_qd.env.reset())

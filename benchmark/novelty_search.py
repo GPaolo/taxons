@@ -11,6 +11,7 @@ env_tag = 'Billiard-v0'
 class NoveltySearch(object):
   def __init__(self, env, obs_shape=6, action_shape=2, pop_size=50):
     self.obs_space = obs_shape
+    self.max_arch_len = 1000
     self.action_space = action_shape
     self.pop = population.Population(agent=agents.FFNeuralAgent,
                                      input_shape=obs_shape,
@@ -26,12 +27,12 @@ class NoveltySearch(object):
     self.not_added = 0
     self.mutation_rate = 0.5
 
-  def novelty(self, agent):
-    bs_point = agent['bs']
+  def novelty(self, agent_idx):
+    bs_point = self.pop[agent_idx]['bs']
     # If the archive is empty, add the agent directly
     if self.archive.size == 0:
-      agent['best'] = True
-      self.archive.add(agent)
+      self.archive.add(self.pop.copy(agent_idx, with_data=True))
+      self.pop[agent_idx]['best'] = True
       return
     else:
       bs_space = np.concatenate(self.archive['bs'].values)
@@ -51,13 +52,21 @@ class NoveltySearch(object):
         novel = False
         break
 
-    if novel:
-      self.archive.add(agent)
-      agent['best'] = True
+    if novel and self.pop[agent_idx]['name'] not in self.archive['name'].values:
+      if len(self.archive) >= self.max_arch_len:
+        replaced = random.randint(0, len(self.archive)-1)
+        self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
+      else:
+        self.archive.add(self.pop.copy(agent_idx, with_data=True))
+      self.pop[agent_idx]['best'] = True
       self.novel_in_gen += 1
-    elif np.random.uniform() <= 0.005:
-      self.archive.add(agent)
-      agent['best'] = True
+    elif np.random.uniform() <= 0.005 and self.pop[agent_idx]['name'] not in self.archive['name'].values:
+      if len(self.archive) >= self.max_arch_len:
+        replaced = random.randint(0, len(self.archive)-1)
+        self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
+      else:
+        self.archive.add(self.pop.copy(agent_idx, with_data=True))
+      self.pop[agent_idx]['best'] = True
       self.novel_in_gen += 1
 
   def evaluate_agent(self, agent):
@@ -90,9 +99,9 @@ class NoveltySearch(object):
   def evolve(self, gen=1000):
     self.elapsed_gen = 0
     for self.elapsed_gen in range(gen):
-      for a in self.pop:
+      for i, a in enumerate(self.pop):
         self.evaluate_agent(a)
-        self.novelty(a)
+        self.novelty(i)
 
       if self.novel_in_gen > 2:
         self.min_dist += self.min_dist*0.1
@@ -126,8 +135,8 @@ class NoveltySearch(object):
         print('Min distance {}'.format(self.min_dist))
         print()
 
-      if self.elapsed_gen % 1000 == 0:
-        self.show_bs()
+      #if self.elapsed_gen % 1000 == 0:
+       # self.show_bs()
 
 
 
@@ -138,7 +147,7 @@ if __name__ == '__main__':
   np.random.seed()
   ns = NoveltySearch(env, pop_size=50, obs_shape=6, action_shape=2)
   try:
-    ns.evolve(3000)
+    ns.evolve(5000)
   except KeyboardInterrupt:
     print('User Interruption')
 
