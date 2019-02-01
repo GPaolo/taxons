@@ -144,6 +144,8 @@ class ParetoOptimizer(BaseOptimizer):
     for a in self.pop:
       if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
+        a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
+        self.pop.agent_name += 1
       a['best'] = False
 
 
@@ -174,24 +176,26 @@ class NoveltyOptimizer(BaseOptimizer):
                 print('Randomly selecting agent for archive.')
 
 
-    new_gen = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to reproduce
-    dead = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to die    # new_gen = [self.pop[i[0]].copy() for i in novel[:3]] # Get first 3 most novel agents
-    for ng, d in zip(new_gen, dead):
-      self.pop[d] = self.pop.copy(ng)
-
-    # new_gen = []  # Select only the most novel to reproduce
-    # for i, a in enumerate(self.pop):
-    #   if a['best']:
-    #     new_gen.append(self.pop.copy(i))
+    # new_gen = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to reproduce
+    # dead = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to die    # new_gen = [self.pop[i[0]].copy() for i in novel[:3]] # Get first 3 most novel agents
+    # for ng, d in zip(new_gen, dead):
+    #   self.pop[d] = self.pop.copy(ng)
     #
-    # dead = random.sample(range(self.pop.size), len(new_gen))
-    # for i, new_agent in zip(dead, new_gen):
-    #   self.pop[i] = new_agent
+    new_gen = []  # Select only the most novel to reproduce
+    for i, a in enumerate(self.pop):
+      if a['best']:
+        new_gen.append(self.pop.copy(i))
+
+    dead = random.sample(range(self.pop.size), len(new_gen))
+    for i, new_agent in zip(dead, new_gen):
+      self.pop[i] = new_agent
 
     # Mutate pops
     for a in self.pop:
       if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
+        a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
+        self.pop.agent_name += 1
       a['best'] = False
 
 

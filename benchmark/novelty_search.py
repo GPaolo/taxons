@@ -4,6 +4,7 @@ from core.qd import population, agents
 from core import utils
 import gym
 import random
+import threading
 import gym_billiard
 # env_tag = 'MountainCarContinuous-v0'
 env_tag = 'Billiard-v0'
@@ -26,6 +27,15 @@ class NoveltySearch(object):
     self.novel_in_gen = 0
     self.not_added = 0
     self.mutation_rate = 0.5
+    self.thread = threading.Thread(target=self._show_progress)
+    self.thread.start()
+
+  def _show_progress(self):
+    print('If you want to show the progress, press s.')
+    while True:
+      action = input(' ')
+      if action == 's':
+        self.show()
 
   def novelty(self, agent_idx):
     bs_point = self.pop[agent_idx]['bs']
