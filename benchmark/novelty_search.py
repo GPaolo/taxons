@@ -6,6 +6,7 @@ import gym
 import random
 import threading
 import gym_billiard
+import matplotlib
 # env_tag = 'MountainCarContinuous-v0'
 env_tag = 'Billiard-v0'
 
@@ -31,6 +32,7 @@ class NoveltySearch(object):
     self.thread.start()
 
   def _show_progress(self):
+    matplotlib.use('agg')
     print('If you want to show the progress, press s.')
     while True:
       action = input(' ')
@@ -60,10 +62,9 @@ class NoveltySearch(object):
       idx = np.argpartition(dists, k) # Get 6 nearest neighs
     novel = True
 
-    for a in dists[idx[:k]]:
-      if a <= self.min_dist:
-        novel = False
-        break
+    mean_k_dist = np.mean(dists[idx[:k]])
+    if mean_k_dist <= self.min_dist:
+      novel = False
 
     if novel and self.pop[agent_idx]['name'] not in self.archive['name'].values:
       if len(self.archive) >= self.max_arch_len:
@@ -79,8 +80,8 @@ class NoveltySearch(object):
         self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
       else:
         self.archive.add(self.pop.copy(agent_idx, with_data=True))
-      self.pop[agent_idx]['best'] = True
-      self.novel_in_gen += 1
+      # self.pop[agent_idx]['best'] = True
+      # self.novel_in_gen += 1
 
   def evaluate_agent(self, agent):
     '''
@@ -166,7 +167,7 @@ if __name__ == '__main__':
   except KeyboardInterrupt:
     print('User Interruption')
 
-  ns.show_bs('NS_{}_{}'.format(ns.elapsed_gen, env_tag))
+  ns.show('NS_{}_{}'.format(ns.elapsed_gen, env_tag))
   print(ns.archive['name'].values)
 
   print('Testing result according to best reward.')
