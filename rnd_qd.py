@@ -3,8 +3,7 @@ from core.rnd import rnd
 from core.qd import population, agents
 from core import optimizer, utils
 import gym, torch
-import multiprocessing as mp
-import os
+import os, threading
 import gym_billiard
 env_tag = 'Billiard-v0'
 # env_tag = 'MountainCarContinuous-v0'
@@ -42,8 +41,18 @@ class RndQD(object):
       self.metric = rnd.RND(input_shape=obs_shape, encoding_shape=bs_shape, pop_size=self.pop_size)
     else:
       self.metric = None
-    self.opt = optimizer.ParetoOptimizer(self.population, archive=self.archive)
+    self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
+
+    self.thread = threading.Thread(target=self._show_progress)
+    self.thread.start()
+
+  def _show_progress(self):
+    print('If you want to show the progress, press s.')
+    while True:
+      action = input(' ')
+      if action == 's':
+        self.show()
 
   # TODO make this run in parallel
   def evaluate_agent(self, agent):
@@ -124,8 +133,6 @@ class RndQD(object):
         print('Average generation surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
         print()
-      # if self.elapsed_gen % 100 == 0 and not self.elapsed_gen == 0:
-      #   self.show()
 
   def save(self, filepath):
     if not os.path.exists(filepath):
@@ -172,47 +179,6 @@ if __name__ == '__main__':
     pop = rnd_qd.archive
   print('Total generations: {}'.format(rnd_qd.elapsed_gen))
   print('Archive length {}'.format(pop.size))
-
-  # try:
-  #   print('Testing best reward')
-  #   obs = rnd_qd.env.reset()
-  #
-  #   rewards = rnd_qd.archive['reward'].sort_values(ascending=False)
-  #   best = rnd_qd.archive[rewards.iloc[:1].index.values[0]]  # Get best
-  #
-  #   print('Best archive reward {}'.format(best['reward']))
-  #   for _ in range(1000):
-  #     rnd_qd.env.render()
-  #     action = np.squeeze(best['agent'](np.array([obs])))
-  #     # if action > 0:
-  #     #   action = 1
-  #     # else:
-  #     #   action = 0
-  #
-  #     obs, reward, done, info = rnd_qd.env.step([action])
-  #     if done:
-  #       obs = rnd_qd.env.reset()
-  # except KeyboardInterrupt:
-  #   print('User Interruption.')
-
-  # if rnd_qd.use_novelty:
-  #   print('Testing best surprise')
-  #   obs = rnd_qd.env.reset()
-  #   surprises = rnd_qd.archive['surprise'].sort_values(ascending=False)
-  #   best = rnd_qd.archive[surprises.iloc[:1].index.values[0]]  # Get best
-  #
-  #   print('Best archive surprise {}'.format(best['surprise']))
-  #   for _ in range(1000):
-  #     rnd_qd.env.render()
-  #     action = np.squeeze(best['agent'](np.array([obs])))
-  #     # if action > 0:
-  #     #   action = 1
-  #     # else:
-  #     #   action = 0
-  #
-  #     obs, reward, done, info = rnd_qd.env.step([action])
-  #     if done:
-  #       obs = rnd_qd.env.reset()
 
   rnd_qd.show()
 
