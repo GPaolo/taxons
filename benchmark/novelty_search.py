@@ -42,46 +42,50 @@ class NoveltySearch(object):
         except:
           print('Cannot show progress now.')
 
-  def novelty(self, agent_idx):
-    bs_point = self.pop[agent_idx]['bs']
-    # If the archive is empty, add the agent directly
-    if self.archive.size == 0:
-      self.archive.add(self.pop.copy(agent_idx, with_data=True))
-      self.pop[agent_idx]['best'] = True
-      return
-    else:
-      bs_space = np.concatenate(self.archive['bs'].values)
-    # Get distances
-    diff = np.atleast_2d(bs_space - bs_point)
-    dists = np.sqrt(np.sum(diff * diff, axis=1))
-    k = 6
-    if self.archive.size <= k:
-      idx = list(range(self.archive.size))
-      k = len(idx)
-    else:
-      idx = np.argpartition(dists, k) # Get 6 nearest neighs
-    novel = True
+  def measure_novelty(self):
+    # MEASURE AGENT NOVELTY
+    for agent_idx in range(self.pop.size):
+      bs_point = self.pop[agent_idx]['bs']
 
-    mean_k_dist = np.mean(dists[idx[:k]])
-    if mean_k_dist <= self.min_dist:
-      novel = False
+      bs_space = np.concatenate(self.pop['bs'].values)
+      bs_space = np.delete(bs_space, agent_idx, axis=0)
+      if self.archive.size > 0:
+        archive_bs_space = np.concatenate(self.archive['bs'].values)
+        bs_space = np.concatenate([bs_space, archive_bs_space])
+      # Get distances
+      diff = np.atleast_2d(bs_space - bs_point)
+      dists = np.sqrt(np.sum(diff * diff, axis=1))
+      k = 6
+      if len(dists) <= k: # Should never happen
+        idx = list(range(len(dists)))
+        k = len(idx)
+      else:
+        idx = np.argpartition(dists, k)  # Get 6 nearest neighs
+      novel = True
 
-    if novel and self.pop[agent_idx]['name'] not in self.archive['name'].values:
-      if len(self.archive) >= self.max_arch_len:
-        replaced = random.randint(0, len(self.archive)-1)
-        self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
-      else:
-        self.archive.add(self.pop.copy(agent_idx, with_data=True))
-      self.pop[agent_idx]['best'] = True
-      self.novel_in_gen += 1
-    elif np.random.uniform() <= 0.005 and self.pop[agent_idx]['name'] not in self.archive['name'].values:
-      if len(self.archive) >= self.max_arch_len:
-        replaced = random.randint(0, len(self.archive)-1)
-        self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
-      else:
-        self.archive.add(self.pop.copy(agent_idx, with_data=True))
-      # self.pop[agent_idx]['best'] = True
-      # self.novel_in_gen += 1
+      mean_k_dist = np.mean(dists[idx[:k]])
+      if mean_k_dist <= self.min_dist:
+        novel = False
+      self.pop[agent_idx]['best'] = novel
+
+  def update_archive(self):
+    # ADD AGENT TO ARCHIVE
+    for agent_idx in range(self.pop.size):
+      if self.pop[agent_idx]['best'] and self.pop[agent_idx]['name'] not in self.archive['name'].values:
+        if len(self.archive) >= self.max_arch_len: # If archive is full, replace a random element
+          replaced = random.randint(0, len(self.archive)-1)
+          self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
+        else:
+          self.archive.add(self.pop.copy(agent_idx, with_data=True))
+        self.novel_in_gen += 1
+
+      elif np.random.uniform() <= 0.005 and self.pop[agent_idx]['name'] not in self.archive['name'].values:
+        if len(self.archive) >= self.max_arch_len:
+          replaced = random.randint(0, len(self.archive)-1)
+          self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
+        else:
+          self.archive.add(self.pop.copy(agent_idx, with_data=True))
+        # self.novel_in_gen += 1
 
   def evaluate_agent(self, agent):
     '''
@@ -116,9 +120,11 @@ class NoveltySearch(object):
   def evolve(self, gen=1000):
     self.elapsed_gen = 0
     for self.elapsed_gen in range(gen):
-      for i, a in enumerate(self.pop):
+      for a in self.pop:
         self.evaluate_agent(a)
-        self.novelty(i)
+
+      self.measure_novelty()
+      self.update_archive()
 
       if self.novel_in_gen > 2:
         self.min_dist += self.min_dist*0.1
@@ -131,7 +137,7 @@ class NoveltySearch(object):
       if self.not_added > 4 and self.min_dist > 0.3:
         self.min_dist -= self.min_dist * 0.1
 
-      new_gen = []
+      new_gen = [] # Reproduce only the novel ones
       for i, a in enumerate(self.pop):
         if a['best']:
           new_gen.append(self.pop.copy(i))
