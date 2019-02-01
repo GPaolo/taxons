@@ -48,7 +48,7 @@ class NoveltySearch(object):
     novel = True
 
     for a in dists[idx[:k]]:
-      if not a == 0 and a <= self.min_dist:
+      if a <= self.min_dist:
         novel = False
         break
 
@@ -111,7 +111,7 @@ class NoveltySearch(object):
       else:
         self.not_added = 0
       self.novel_in_gen = 0
-      if self.not_added > 4 and self.min_dist > 0.2:
+      if self.not_added > 4 and self.min_dist > 0.3:
         self.min_dist -= self.min_dist * 0.1
 
       new_gen = []
@@ -127,6 +127,8 @@ class NoveltySearch(object):
       for a in self.pop:
         if np.random.random() <= self.mutation_rate and not a['best']:
           a['agent'].mutate()
+          a['name'] = self.pop.agent_name # When an agent is mutated it also changes name, otherwise it will never be added to the archive
+          self.pop.agent_name += 1
         a['best'] = False
 
       if self.elapsed_gen % 10 == 0:
@@ -147,7 +149,7 @@ if __name__ == '__main__':
   np.random.seed()
   ns = NoveltySearch(env, pop_size=50, obs_shape=6, action_shape=2)
   try:
-    ns.evolve(5000)
+    ns.evolve(10000)
   except KeyboardInterrupt:
     print('User Interruption')
 
