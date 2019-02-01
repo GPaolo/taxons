@@ -13,7 +13,7 @@ env_tag = 'Billiard-v0'
 class NoveltySearch(object):
   def __init__(self, env, obs_shape=6, action_shape=2, pop_size=50):
     self.obs_space = obs_shape
-    self.max_arch_len = 1000
+    self.max_arch_len = 100000
     self.action_space = action_shape
     self.pop = population.Population(agent=agents.FFNeuralAgent,
                                      input_shape=obs_shape,
@@ -55,7 +55,7 @@ class NoveltySearch(object):
       # Get distances
       diff = np.atleast_2d(bs_space - bs_point)
       dists = np.sqrt(np.sum(diff * diff, axis=1))
-      k = 6
+      k = 15
       if len(dists) <= k: # Should never happen
         idx = list(range(len(dists)))
         k = len(idx)
@@ -111,6 +111,8 @@ class NoveltySearch(object):
 
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
     plt.scatter(pts[0], pts[1])
+    plt.xlim(-1.5, 1.5)
+    plt.ylim(-1.5, 1.5)
     # plt.hist(pts[0])
     if name is None:
       plt.savefig('./behaviour.pdf')
