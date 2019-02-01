@@ -6,6 +6,8 @@ import gym, torch
 import os, threading
 import gym_billiard
 env_tag = 'Billiard-v0'
+import matplotlib.pyplot as plt
+import matplotlib
 # env_tag = 'MountainCarContinuous-v0'
 
 
@@ -49,10 +51,14 @@ class RndQD(object):
 
   def _show_progress(self):
     print('If you want to show the progress, press s.')
+    matplotlib.use('agg')
     while True:
       action = input(' ')
       if action == 's':
-        self.show()
+        try:
+          self.show()
+        except:
+          print('Cannot show progress now.')
 
   # TODO make this run in parallel
   def evaluate_agent(self, agent):
@@ -144,19 +150,20 @@ class RndQD(object):
     self.archive.save_pop(filepath, 'archive')
     self.metric.save(filepath)
 
-  def show(self):
+  def show(self, name=None):
     print('Behaviour space coverage representation.')
     if self.archive is not None:
       bs_points = np.concatenate(self.archive['bs'].values)
     else:
       bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
       print(bs_points)
-    import matplotlib.pyplot as plt
-
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
     plt.scatter(pts[0], pts[1])
     # plt.hist(pts[0])
-    plt.show()
+    if name is None:
+      plt.savefig('./behaviour.pdf')
+    else:
+      plt.savefig('./{}.pdf'.format(name))
 
 
 if __name__ == '__main__':
@@ -180,7 +187,7 @@ if __name__ == '__main__':
   print('Total generations: {}'.format(rnd_qd.elapsed_gen))
   print('Archive length {}'.format(pop.size))
 
-  rnd_qd.show()
+  rnd_qd.show('RNDQD_{}_{}'.format(rnd_qd.elapsed_gen, env_tag))
 
   print('Testing result according to best reward.')
   rewards = pop['reward'].sort_values(ascending=False)

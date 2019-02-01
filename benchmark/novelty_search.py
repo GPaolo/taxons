@@ -35,7 +35,10 @@ class NoveltySearch(object):
     while True:
       action = input(' ')
       if action == 's':
-        self.show()
+        try:
+          self.show()
+        except:
+          print('Cannot show progress now.')
 
   def novelty(self, agent_idx):
     bs_point = self.pop[agent_idx]['bs']
@@ -54,7 +57,7 @@ class NoveltySearch(object):
       idx = list(range(self.archive.size))
       k = len(idx)
     else:
-      idx = np.argpartition(dists, k) # Get 5 nearest neighs
+      idx = np.argpartition(dists, k) # Get 6 nearest neighs
     novel = True
 
     for a in dists[idx[:k]]:
@@ -96,7 +99,7 @@ class NoveltySearch(object):
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
 
-  def show_bs(self):
+  def show(self, name=None):
     print('Behaviour space coverage representation.')
     bs_points = np.concatenate(self.archive['bs'].values)
     import matplotlib.pyplot as plt
@@ -104,7 +107,10 @@ class NoveltySearch(object):
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
     plt.scatter(pts[0], pts[1])
     # plt.hist(pts[0])
-    plt.show()
+    if name is None:
+      plt.savefig('./behaviour.pdf')
+    else:
+      plt.savefig('./{}.pdf'.format(name))
 
   def evolve(self, gen=1000):
     self.elapsed_gen = 0
@@ -147,9 +153,6 @@ class NoveltySearch(object):
         print('Min distance {}'.format(self.min_dist))
         print()
 
-      #if self.elapsed_gen % 1000 == 0:
-       # self.show_bs()
-
 
 
 if __name__ == '__main__':
@@ -163,7 +166,7 @@ if __name__ == '__main__':
   except KeyboardInterrupt:
     print('User Interruption')
 
-  ns.show_bs()
+  ns.show_bs('NS_{}_{}'.format(ns.elapsed_gen, env_tag))
   print(ns.archive['name'].values)
 
   print('Testing result according to best reward.')
