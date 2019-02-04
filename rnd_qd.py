@@ -159,6 +159,8 @@ class RndQD(object):
       print(bs_points)
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
     plt.scatter(pts[0], pts[1])
+    plt.xlim(-1.5, 1.5)
+    plt.ylim(-1.5, 1.5)
     # plt.hist(pts[0])
     if name is None:
       plt.savefig('./behaviour.pdf')
@@ -174,7 +176,7 @@ if __name__ == '__main__':
   np.random.seed()
   torch.initial_seed()
 
-  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=512, pop_size=50, use_novelty=True, use_archive=True, gpu=True)
+  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=512, pop_size=100, use_novelty=True, use_archive=True, gpu=True)
   try:
     rnd_qd.train()
   except KeyboardInterrupt:

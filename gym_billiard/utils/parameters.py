@@ -33,7 +33,7 @@ class Params(object):
 
     self.MAX_ENV_STEPS = 500
 
-    self.TORQUE_CONTROL = False
+    self.TORQUE_CONTROL = True
     self.TEST = True
 
     self.RANDOM_ARM_INIT_POSE = False

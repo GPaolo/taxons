@@ -171,7 +171,8 @@ class NoveltyOptimizer(BaseOptimizer):
             random_addition = np.random.uniform() <= 0.005
             if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
               self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
-              self.pop[idx]['best'] = True
+              if not random_addition:
+                self.pop[idx]['best'] = True
               if random_addition:
                 print('Randomly selecting agent for archive.')
 

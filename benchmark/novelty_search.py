@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
   env.seed()
   np.random.seed()
-  ns = NoveltySearch(env, pop_size=50, obs_shape=6, action_shape=2)
+  ns = NoveltySearch(env, pop_size=100, obs_shape=6, action_shape=2)
   try:
     ns.evolve(10000)
   except KeyboardInterrupt:
@@ -196,4 +196,4 @@ if __name__ == '__main__':
 
 
 
-
+# NOTE NELLA TAB 1 VA QUELLO CON VELOCITY CONTROL, NELLA TAB 2 QUELL CON TORQUE CONTROL
