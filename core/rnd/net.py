@@ -23,17 +23,13 @@ class TargetNet(nn.Module):
     self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
     self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
     self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 32), nn.Tanh(),
-                                nn.Linear(32, 64), nn.Tanh(),
-                                nn.Linear(64, 128), nn.Tanh(),
-                                nn.Linear(128, 32), nn.Tanh(),
-                                nn.Linear(32,16), nn.Tanh(),
-                                nn.Linear(16, self.output_shape))
-
-    # self.reduced_bs = nn.Sequential(nn.Linear(self.output_shape, 16), nn.Tanh(),
-    #                                 nn.Linear(16, self.reduced_bs_shape))
+                                # nn.Linear(32, 64), nn.Tanh(),
+                                # nn.Linear(64, 128), nn.Tanh(),
+                                # nn.Linear(128, 32), nn.Tanh(),
+                                # nn.Linear(32,16), nn.Tanh(),
+                                nn.Linear(32, self.output_shape))
 
     self.linear.apply(self.init_layers)
-    # self.reduced_bs.apply(self.init_layers)
     self.lstm.apply(self.init_layers)
 
     self.to(device)
@@ -93,8 +89,8 @@ class PredictorNet(nn.Module):
     self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
     self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
     self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 16), nn.Tanh(),
-                                nn.Linear(16, 32), nn.Tanh(),
-                                nn.Linear(32, 16), nn.Tanh(),
+                                # nn.Linear(16, 32), nn.Tanh(),
+                                # nn.Linear(32, 16), nn.Tanh(),
                                 nn.Linear(16, self.output_shape))
     self.linear.apply(self.init_layers)
     self.lstm.apply(self.init_layers)

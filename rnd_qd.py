@@ -71,18 +71,19 @@ class RndQD(object):
     cumulated_reward = 0
 
     obs = utils.obs_formatting(env_tag, self.env.reset())
-    if self.use_novelty: state = obs[0:2]
+    # if self.use_novelty: state = obs[0:2]
     while not done:
       action = utils.action_formatting(env_tag, agent['agent'](obs))
 
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
-      if self.use_novelty: state = np.append(state, obs[0:2], axis=0)
+      # if self.use_novelty: state = np.append(state, obs[0:2], axis=0)
 
       cumulated_reward += reward
 
     surprise = 0
     if self.use_novelty:
+      state = self.env.render(rendered=False)
       state = torch.Tensor(state)
       surprise = self.metric(state.unsqueeze(0))# Input Dimensions need to be [1, traj_len, obs_space]
       surprise = surprise.cpu().data.numpy()
@@ -176,7 +177,7 @@ if __name__ == '__main__':
   np.random.seed()
   torch.initial_seed()
 
-  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=512, pop_size=100, use_novelty=True, use_archive=True, gpu=True)
+  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=64, pop_size=100, use_novelty=True, use_archive=True, gpu=True)
   try:
     rnd_qd.train()
   except KeyboardInterrupt:

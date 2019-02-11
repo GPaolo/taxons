@@ -156,40 +156,54 @@ class NoveltyOptimizer(BaseOptimizer):
     This function performs an optimization step by taking the most novel agents
     :return:
     '''
+    # if self.archive is not None:
+    #   if self.archive.size == 0: # First step, so copy pop randomly
+    #     for idx in range(self.pop.size):
+    #       random_addition = np.random.uniform() <= 0.005
+    #       if random_addition:
+    #         self.archive.add(self.pop.copy(idx, with_data=True))
+    #         self.pop[idx]['best'] = True
+    #   else:
+    #     novel = np.stack(self.archive['surprise'].values)
+    #     self.archive.avg_surprise = np.mean(novel)
+    #     for idx in range(self.pop.size):
+    #       if self.pop[idx]['name'] not in self.archive['name'].values:  # Add an element in the archive only if not present already
+    #         random_addition = np.random.uniform() <= 0.005
+    #         if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
+    #           self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
+    #           if not random_addition:
+    #             self.pop[idx]['best'] = True
+    #           if random_addition:
+    #             print('Randomly selecting agent for archive.')
+    novel = self.pop['surprise'].sort_values(ascending=False)
+    best = novel.iloc[:5].index.values  # Get 5 best
+    worst = novel.iloc[-5:].index.values  # Get 5 worst
     if self.archive is not None:
-      if self.archive.size == 0: # First step, so copy pop randomly
-        for idx in range(self.pop.size):
-          random_addition = np.random.uniform() <= 0.005
-          if random_addition:
-            self.archive.add(self.pop.copy(idx, with_data=True))
-            self.pop[idx]['best'] = True
-      else:
-        novel = np.stack(self.archive['surprise'].values)
-        self.archive.avg_surprise = np.mean(novel)
-        for idx in range(self.pop.size):
-          if self.pop[idx]['name'] not in self.archive['name'].values:  # Add an element in the archive only if not present already
-            random_addition = np.random.uniform() <= 0.005
-            if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
-              self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
-              if not random_addition:
-                self.pop[idx]['best'] = True
-              if random_addition:
-                print('Randomly selecting agent for archive.')
+      for idx in best:
+        if self.pop[idx]['name'] not in self.archive['name'].values:
+          self.archive.add(self.pop.copy(idx, with_data=True))  # Only add the most novel ones
 
+    new_gen = []
+    for i in best:
+      new_gen.append(self.pop.copy(i))
+      self.pop[i]['best'] = True
+
+    for i, new_agent in zip(worst, new_gen):
+      self.pop[i] = new_agent
 
     # new_gen = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to reproduce
     # dead = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to die    # new_gen = [self.pop[i[0]].copy() for i in novel[:3]] # Get first 3 most novel agents
     # for ng, d in zip(new_gen, dead):
     #   self.pop[d] = self.pop.copy(ng)
     #
-    new_gen = []  # Select only the most novel to reproduce
-    for i, a in enumerate(self.pop):
-      if a['best']:
-        new_gen.append(self.pop.copy(i))
-
-    dead = random.sample(range(self.pop.size), len(new_gen))
-    for i, new_agent in zip(dead, new_gen):
-      self.pop[i] = new_agent
+    # new_gen = []  # Select only the most novel to reproduce
+    # for i, a in enumerate(self.pop):
+    #   if a['best']:
+    #     new_gen.append(self.pop.copy(i))
+    #
+    # dead = random.sample(range(self.pop.size), len(new_gen))
+    # for i, new_agent in zip(dead, new_gen):
+    #   self.pop[i] = new_agent
 
     # Mutate pops
     for a in self.pop:
