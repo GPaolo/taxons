@@ -23,8 +23,8 @@ class RND(object):
     # Loss
     self.criterion = nn.MSELoss()
     # Optimizer
-    self.learning_rate = 0.001
-    self.optimizer = optim.Adam(self.predictor_model.parameters(), self.learning_rate)
+    self.learning_rate = 0.0001
+    self.optimizer = optim.SGD(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x, train=False):
     '''
@@ -70,12 +70,11 @@ if __name__ == '__main__':
   device = torch.device('cpu')
   rnd = RND(6, 2, device=device)
 
-  for _ in range(30000):
-    x = torch.randn([10, 15, 6])
-    a = rnd.training_step(x)
-    if _ %100 == 0:
-      print('{} {}'.format(_, a))
+  import numpy as np
+  state = np.load('../../env.npy')/255
+  state = torch.Tensor(state).permute(2,0,1).unsqueeze(0)
 
-  x = torch.rand([1, 15, 6])
-  print(rnd(x))
+  for i in range(1000):
+    aaa = rnd.training_step(state)
+    print(aaa)
 

@@ -183,6 +183,9 @@ class NoveltyOptimizer(BaseOptimizer):
         if self.pop[idx]['name'] not in self.archive['name'].values:
           self.archive.add(self.pop.copy(idx, with_data=True))  # Only add the most novel ones
 
+    # Maybe I should add to new gen only the ones that are added to the archive? In order not to have repetitions?
+    # No, it does not makes sense, like this is better, so if one is still novel after the first time it can still
+    # create ''novel'' kids.
     new_gen = []
     for i in best:
       new_gen.append(self.pop.copy(i))

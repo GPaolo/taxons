@@ -7,6 +7,7 @@ import os, threading
 import gym_billiard
 env_tag = 'Billiard-v0'
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import matplotlib
 # env_tag = 'MountainCarContinuous-v0'
 
@@ -84,11 +85,12 @@ class RndQD(object):
     surprise = 0
     if self.use_novelty:
       state = self.env.render(rendered=False)
-      state = torch.Tensor(state)
-      surprise = self.metric(state.unsqueeze(0))# Input Dimensions need to be [1, traj_len, obs_space]
+      state = torch.Tensor(state).permute(2,0,1)
+      # We perform the training step directly here, this way we measure the novelty of one agent also wrt to the others
+      surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
       surprise = surprise.cpu().data.numpy()
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
-      self.cumulated_state.append(state) # Append here all the states
+      # self.cumulated_state.append(state) # Append here all the states
 
     agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
@@ -129,8 +131,8 @@ class RndQD(object):
         cs += a['surprise']
         if max_rew < a['reward']:
           max_rew = a['reward']
-      if self.use_novelty:
-        self.update_rnd() # From here we can get the cumulated surprise on the same state as cs but after training
+      # if self.use_novelty:
+      #   self.update_rnd() # From here we can get the cumulated surprise on the same state as cs but after training
 
       self.opt.step()
       if self.elapsed_gen % 10 == 0:
@@ -159,14 +161,28 @@ class RndQD(object):
       bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
       print(bs_points)
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-    plt.scatter(pts[0], pts[1])
-    plt.xlim(-1.5, 1.5)
-    plt.ylim(-1.5, 1.5)
+    plt.rcParams["patch.force_edgecolor"] = True
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15,6))
+    axes[0].set_title('Ball position')
+    axes[0].scatter(pts[0], pts[1])
+    axes[0].set_xlim(-1.5, 1.5)
+    axes[0].set_ylim(-1.5, 1.5)
+
+    axes[1].set_title('Histogram')
+    hist = axes[1].hist2d(pts[0], pts[1], bins=100, range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
+    axes[1].set_xlim(-1.5, 1.5)
+    axes[1].set_ylim(-1.5, 1.5)
+    plt.colorbar(hist[3], ax=axes[1])
+
+    # plt.scatter(pts[0], pts[1])
+    # plt.xlim(-1.5, 1.5)
+    # plt.ylim(-1.5, 1.5)
     # plt.hist(pts[0])
     if name is None:
-      plt.savefig('./behaviour.pdf')
+      fig.savefig('./behaviour.pdf')
     else:
-      plt.savefig('./{}.pdf'.format(name))
+      fig.savefig('./{}.pdf'.format(name))
+    print('Plots saved.')
 
 
 if __name__ == '__main__':
@@ -201,7 +217,7 @@ if __name__ == '__main__':
     done = False
     ts = 0
     obs = utils.obs_formatting(env_tag, rnd_qd.env.reset())
-    while not done and ts < 1000:
+    while not done and ts < 3000:
       rnd_qd.env.render()
       action = utils.action_formatting(env_tag, tested['agent'](obs))
       obs, reward, done, info = rnd_qd.env.step(action)

@@ -20,17 +20,26 @@ class TargetNet(nn.Module):
     self.batch_dim = pop_size
     self.fixed = fixed
 
-    self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
-    self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
-    self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 32), nn.Tanh(),
+    # self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
+    # self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
+    # self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 32), nn.Tanh(),
                                 # nn.Linear(32, 64), nn.Tanh(),
                                 # nn.Linear(64, 128), nn.Tanh(),
                                 # nn.Linear(128, 32), nn.Tanh(),
                                 # nn.Linear(32,16), nn.Tanh(),
-                                nn.Linear(32, self.output_shape))
+                                # nn.Linear(32, self.output_shape))
+
+
+    self.subsample = nn.AvgPool2d(7)
+
+    self.conv = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.ReLU(),
+                              nn.Conv2d(in_channels=8, out_channels=16, kernel_size=5, stride=2), nn.ReLU(),
+                              nn.Conv2d(in_channels=16, out_channels=8, kernel_size=3), nn.ReLU())
+    self.linear = nn.Sequential(nn.Linear(2312, 512), nn.Tanh(),
+                                nn.Linear(512, 64))
 
     self.linear.apply(self.init_layers)
-    self.lstm.apply(self.init_layers)
+    # self.lstm.apply(self.init_layers)
 
     self.to(device)
     for l in self.parameters():
@@ -60,12 +69,18 @@ class TargetNet(nn.Module):
               torch.zeros(1, self.batch_dim, self.hidden_dim, device=self.device))
 
   def forward(self, x, train=False):
-    hidden = self.init_hidden(train)
-    x = self.bn(x)
-    x = x.transpose(1, 0)
-    x, hidden = self.lstm(x, hidden)
-    x = self.linear(x[-1])
+    # hidden = self.init_hidden(train)
+    # x = self.bn(x)
+    # x = x.transpose(1, 0)
+    # x, hidden = self.lstm(x, hidden)
+    # x = self.linear(x[-1])
     # r_bs = self.reduced_bs(x)
+
+    x = self.subsample(x)
+    x = self.conv(x)
+    x = x.view(x.size(0), -1)
+    x = self.linear(x)
+
     return x
 
 
@@ -86,14 +101,22 @@ class PredictorNet(nn.Module):
     self.batch_dim = pop_size
     self.fixed = fixed
 
-    self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
-    self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
-    self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 16), nn.Tanh(),
-                                # nn.Linear(16, 32), nn.Tanh(),
-                                # nn.Linear(32, 16), nn.Tanh(),
-                                nn.Linear(16, self.output_shape))
-    self.linear.apply(self.init_layers)
-    self.lstm.apply(self.init_layers)
+    # self.bn = nn.BatchNorm1d(self.input_shape, track_running_stats=False, affine=False)
+    # self.lstm = nn.LSTM(self.input_shape, self.hidden_dim)
+    # self.linear = nn.Sequential(nn.Linear(self.hidden_dim, 16), nn.Tanh(),
+    #                             # nn.Linear(16, 32), nn.Tanh(),
+    #                             # nn.Linear(32, 16), nn.Tanh(),
+    #                             nn.Linear(16, self.output_shape))
+
+    self.subsample = nn.AvgPool2d(10)
+
+    self.conv = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.ReLU(),
+                              nn.Conv2d(in_channels=8, out_channels=4, kernel_size=3), nn.ReLU())
+    self.linear = nn.Sequential(nn.Linear(2704, 512), nn.Tanh(),
+                                nn.Linear(512, 64))
+
+    # self.linear.apply(self.init_layers)
+    # self.lstm.apply(self.init_layers)
 
     self.to(device)
     for l in self.parameters():
@@ -122,11 +145,16 @@ class PredictorNet(nn.Module):
               torch.zeros(1, self.batch_dim, self.hidden_dim, device=self.device))
 
   def forward(self, x, train=False):
-    hidden = self.init_hidden(train)
-    x = self.bn(x)
-    x = x.transpose(1, 0)
-    x, hidden = self.lstm(x, hidden)
-    x = self.linear(x[-1])
+    # hidden = self.init_hidden(train)
+    # x = self.bn(x)
+    # x = x.transpose(1, 0)
+    # x, hidden = self.lstm(x, hidden)
+    # x = self.linear(x[-1])
+    x = self.subsample(x)
+    x = self.conv(x)
+    x = x.view(x.size(0), -1)
+    x = self.linear(x)
+
     try:
       assert not torch.isnan(x).any()
     except:
