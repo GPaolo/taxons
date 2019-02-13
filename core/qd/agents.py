@@ -86,57 +86,75 @@ class FFNeuralAgent(BaseAgent):
 
 
 class DMPAgent(BaseAgent):
+
   def __init__(self, mutation_distr=None, **kwargs):
     super(DMPAgent, self).__init__(mutation_distr)
 
-    self.dmp = []
+    self.genome = []
     self.dof = kwargs['dof']
     self.num_bf = kwargs['num_bf']
 
     for i in range(self.dof):
-      self.dmp.append(utils.DMP(self.num_bf))
+      self.genome.append(utils.DMP(self.num_bf))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)
-    for i, dmp in enumerate(self.dmp):
+    for i, dmp in enumerate(self.genome):
       output[i] = dmp(x)
-
-    return output
+    return [output]
 
   def __call__(self, x):
     return self.evaluate(x)
 
   def mutate(self):
-    for dmp in self.dmp:
+    for dmp in self.genome:
       dmp.w = dmp.w + self.mutation_operator(dmp.w.shape[0])
       dmp.mu = dmp.mu + self.mutation_operator(dmp.w.shape[0])
       dmp.sigma = dmp.sigma + self.mutation_operator(dmp.w.shape[0])
       dmp.a_x = dmp.a_x + self.mutation_operator()
+      dmp.tau = dmp.tau + self.mutation_operator()
 
 
 
 
 
 if __name__ == '__main__':
-  agent = DMPAgent(dof=1, num_bf=20)
-  a = []
-  b = []
-  ts = 500
-  for k in range(ts):
-    f = agent(k)
-    a.append(f)
-  agent.mutate()
-  for k in range(ts):
-    f = agent(k)
-    b.append(f)
+  agent = DMPAgent(dof=2, num_bf=20)
+  import gym, gym_billiard
 
-  print(len(a))
-  import matplotlib.pyplot as plt
+  env = gym.make('Billiard-v0')
+  env.seed()
 
-  fig = plt.figure()
-  ax1 = fig.add_subplot(111)
+  t = 0
+  done=False
+  obs = utils.obs_formatting('Billiard-v0', env.reset())
+  while not done:
+    action = utils.action_formatting('Billiard-v0', agent(t))
+    t += 1
+    print(action)
+    obs, reward, done, info = env.step(action)
+    obs = utils.obs_formatting('Billiard-v0', obs)
+    env.render()
 
-  ax1.plot(list(range(ts)), a)
-  ax1.plot(list(range(ts)), b)
-  plt.show()
+
+  # a = []
+  # b = []
+  # ts = 500
+  # for k in range(ts):
+  #   f = agent(k)
+  #   a.append(f)
+  # agent.mutate()
+  # for k in range(ts):
+  #   f = agent(k)
+  #   b.append(f)
+  #
+  # print(len(a))
+  # import matplotlib.pyplot as plt
+  #
+  # fig = plt.figure()
+  # ax1 = fig.add_subplot(111)
+  #
+  # ax1.plot(list(range(ts)), a)
+  # ax1.plot(list(range(ts)), b)
+  # plt.show()
 
