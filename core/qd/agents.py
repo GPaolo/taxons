@@ -5,7 +5,7 @@ from copy import deepcopy
 
 class BaseAgent(metaclass=ABCMeta):
 
-  def __init__(self, mutation_distr=None):
+  def __init__(self, mutation_distr=None, **kwargs):
     '''
     This class defines the base agent from which other agents should inherit
     '''
@@ -41,7 +41,7 @@ class BaseAgent(metaclass=ABCMeta):
 
 class FFNeuralAgent(BaseAgent):
 
-  def __init__(self, shapes, mutation_distr=None):
+  def __init__(self, mutation_distr=None, **kwargs):
     '''
     This agent embeds an NN. Not using pytorch cause it does not give any advantage (cannot parallelize on one GPU)
     :param mutation_distr: distribution used for mutation
@@ -51,8 +51,8 @@ class FFNeuralAgent(BaseAgent):
     '''
     super(FFNeuralAgent, self).__init__(mutation_distr)
 
-    self.input_shape = shapes['input_shape']
-    self.output_shape = shapes['output_shape']
+    self.input_shape = kwargs['input_shape']
+    self.output_shape = kwargs['output_shape']
 
     self.fc1 = utils.FCLayer(self.input_shape, 16, 'fc1')
     self.fc2 = utils.FCLayer(16, 32, 'fc2')
@@ -85,8 +85,58 @@ class FFNeuralAgent(BaseAgent):
       l.bias = l.bias + self.mutation_operator(l.bias.shape[0], l.bias.shape[1])
 
 
+class DMPAgent(BaseAgent):
+  def __init__(self, mutation_distr=None, **kwargs):
+    super(DMPAgent, self).__init__(mutation_distr)
+
+    self.dmp = []
+    self.dof = kwargs['dof']
+    self.num_bf = kwargs['num_bf']
+
+    for i in range(self.dof):
+      self.dmp.append(utils.DMP(self.num_bf))
+
+  def evaluate(self, x):
+    output = np.zeros(self.dof)
+    for i, dmp in enumerate(self.dmp):
+      output[i] = dmp(x)
+
+    return output
+
+  def __call__(self, x):
+    return self.evaluate(x)
+
+  def mutate(self):
+    for dmp in self.dmp:
+      dmp.w = dmp.w + self.mutation_operator(dmp.w.shape[0])
+      dmp.mu = dmp.mu + self.mutation_operator(dmp.w.shape[0])
+      dmp.sigma = dmp.sigma + self.mutation_operator(dmp.w.shape[0])
+      dmp.a_x = dmp.a_x + self.mutation_operator()
+
+
+
+
 
 if __name__ == '__main__':
-  net = FFNeuralAgent({'input_shape':2, 'output_shape':3})
-  net.fc1.show
+  agent = DMPAgent(dof=1, num_bf=20)
+  a = []
+  b = []
+  ts = 500
+  for k in range(ts):
+    f = agent(k)
+    a.append(f)
+  agent.mutate()
+  for k in range(ts):
+    f = agent(k)
+    b.append(f)
+
+  print(len(a))
+  import matplotlib.pyplot as plt
+
+  fig = plt.figure()
+  ax1 = fig.add_subplot(111)
+
+  ax1.plot(list(range(ts)), a)
+  ax1.plot(list(range(ts)), b)
+  plt.show()
 

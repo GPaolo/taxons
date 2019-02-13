@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 class FCLayer(object):
+
   def __init__(self, input, output, name='fc'):
     super().__init__()
     std = np.random.uniform()
@@ -26,6 +27,37 @@ class FCLayer(object):
     print('Layer {}:'.format(self.name))
     print('Weights {}'.format(self.w))
     print('Bias {}'.format(self.bias))
+
+
+class DMP(object):
+  def __init__(self, num_bf=20):
+    self.num_bf = num_bf
+    self.mu = np.abs(np.random.randn(self.num_bf))
+    self.sigma = np.random.uniform(size=self.num_bf)
+    self.w = np.random.randn(self.num_bf)
+    self.a_x  = np.random.uniform()
+    self.tau = 100
+
+  def __call__(self, t):
+    g = np.zeros(self.num_bf)
+    x = np.exp( -self.a_x*t/self.tau )
+
+    for k in range(self.num_bf):
+      g[k] = self.basis_function(x, self.mu[k], self.sigma[k])
+    f = np.sum(g*self.w)/np.sum(g)*x
+    return f
+
+  def basis_function(self, x, mu, sigma):
+    """
+    This basis function samples the value of gaussian in x.
+    :param x: Point where to sample the gaussian
+    :param mu: Center of the gaussian
+    :param sigma: Std deviation
+    :return:
+    """
+    return np.exp(-np.power((x - mu)/sigma, 2)/2)
+
+
 
 
 def action_formatting(env_tag, action):

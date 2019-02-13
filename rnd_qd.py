@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
   rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=64, pop_size=100, use_novelty=True, use_archive=True, gpu=True)
   try:
-    rnd_qd.train()
+    rnd_qd.train(500)
   except KeyboardInterrupt:
     print('User Interruption.')
     rnd_qd.save('RND_QD_{}'.format(rnd_qd.elapsed_gen))
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     bs_points = np.concatenate(rnd_qd.archive['bs'].values)
   else:
     bs_points = np.concatenate([a['bs'] for a in rnd_qd.population if a['bs'] is not None])
-  utils.show('RNDQD_{}_{}'.format(rnd_qd.elapsed_gen, env_tag))
+  utils.show(bs_points, 'RNDQD_{}_{}'.format(rnd_qd.elapsed_gen, env_tag))
 
   print('Testing result according to best reward.')
   rewards = pop['reward'].sort_values(ascending=False)
