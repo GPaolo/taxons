@@ -36,7 +36,8 @@ class TargetNet(nn.Module):
                               nn.Conv2d(in_channels=8, out_channels=16, kernel_size=5, stride=2), nn.ReLU(),
                               nn.Conv2d(in_channels=16, out_channels=8, kernel_size=3), nn.ReLU())
     self.linear = nn.Sequential(nn.Linear(2312, 512), nn.Tanh(),
-                                nn.Linear(512, 64))
+                                nn.Linear(512, 64), nn.Tanh(),
+                                nn.Linear(64, 32))
 
     self.linear.apply(self.init_layers)
     # self.lstm.apply(self.init_layers)
@@ -113,7 +114,7 @@ class PredictorNet(nn.Module):
     self.conv = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.ReLU(),
                               nn.Conv2d(in_channels=8, out_channels=4, kernel_size=3), nn.ReLU())
     self.linear = nn.Sequential(nn.Linear(2704, 512), nn.Tanh(),
-                                nn.Linear(512, 64))
+                                nn.Linear(512, 32))
 
     # self.linear.apply(self.init_layers)
     # self.lstm.apply(self.init_layers)

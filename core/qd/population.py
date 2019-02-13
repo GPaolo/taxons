@@ -90,7 +90,8 @@ class Population(object):
       genome = a.get_genome()
       save_ckpt[str(i)] = [(l.params) for l in genome]
     try:
-      pkl.dump(save_ckpt, os.path.join(filepath, 'qd_{}.pkl'.format(name)))
+      with open(os.path.join(filepath, 'qd_{}.pkl'.format(name)), 'wb') as file:
+        pkl.dump(save_ckpt, file)
     except:
       print('Cannot Save {}.'.format(name))
 

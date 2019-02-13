@@ -148,6 +148,7 @@ class RndQD(object):
         print()
 
   def save(self, filepath):
+    print('Saving...')
     if not os.path.exists(filepath):
       try:
         os.mkdir(os.path.abspath(filepath))
@@ -156,6 +157,7 @@ class RndQD(object):
     self.population.save_pop(filepath, 'pop')
     self.archive.save_pop(filepath, 'archive')
     self.metric.save(filepath)
+    print('Done')
 
 if __name__ == '__main__':
   import time
@@ -170,6 +172,7 @@ if __name__ == '__main__':
     rnd_qd.train()
   except KeyboardInterrupt:
     print('User Interruption.')
+    rnd_qd.save('RND_QD_{}'.format(rnd_qd.elapsed_gen))
 
   if rnd_qd.archive is None:
     pop = rnd_qd.population
