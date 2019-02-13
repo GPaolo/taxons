@@ -7,6 +7,8 @@ import random
 import threading
 import gym_billiard
 import matplotlib
+import matplotlib.pyplot as plt
+import os
 # env_tag = 'MountainCarContinuous-v0'
 env_tag = 'Billiard-v0'
 
@@ -30,6 +32,7 @@ class NoveltySearch(object):
     self.mutation_rate = 0.5
     self.thread = threading.Thread(target=self._show_progress)
     self.thread.start()
+    self.adaptive_distance = False
 
   def _show_progress(self):
     matplotlib.use('agg')
@@ -38,7 +41,8 @@ class NoveltySearch(object):
       action = input(' ')
       if action == 's':
         try:
-          self.show()
+          bs_points = np.concatenate(self.archive['bs'].values)
+          utils.show(bs_points)
         except:
           print('Cannot show progress now.')
 
@@ -64,28 +68,62 @@ class NoveltySearch(object):
       novel = True
 
       mean_k_dist = np.mean(dists[idx[:k]])
-      if mean_k_dist <= self.min_dist:
-        novel = False
-      self.pop[agent_idx]['best'] = novel
+      if not self.adaptive_distance:
+        self.pop[agent_idx]['surprise'] = mean_k_dist
+      else:
+        if mean_k_dist <= self.min_dist:
+          novel = False
+        self.pop[agent_idx]['best'] = novel
 
   def update_archive(self):
-    # ADD AGENT TO ARCHIVE
-    for agent_idx in range(self.pop.size):
-      if self.pop[agent_idx]['best'] and self.pop[agent_idx]['name'] not in self.archive['name'].values:
-        if len(self.archive) >= self.max_arch_len: # If archive is full, replace a random element
-          replaced = random.randint(0, len(self.archive)-1)
-          self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
-        else:
-          self.archive.add(self.pop.copy(agent_idx, with_data=True))
-        self.novel_in_gen += 1
+    new_gen = []  # Reproduce only the novel ones
 
-      elif np.random.uniform() <= 0.005 and self.pop[agent_idx]['name'] not in self.archive['name'].values:
-        if len(self.archive) >= self.max_arch_len:
-          replaced = random.randint(0, len(self.archive)-1)
-          self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
-        else:
-          self.archive.add(self.pop.copy(agent_idx, with_data=True))
-        # self.novel_in_gen += 1
+    # ADD AGENT TO ARCHIVE
+    if not self.adaptive_distance:
+      novel = self.pop['surprise'].sort_values(ascending=False)
+      best = novel.iloc[:5].index.values  # Get 5 best
+      dead = novel.iloc[-5:].index.values  # Get 5 worst
+      if self.archive is not None:
+        for idx in best:
+          if self.pop[idx]['name'] not in self.archive['name'].values:
+            self.archive.add(self.pop.copy(idx, with_data=True))  # Only add the most novel ones
+      for i in best:
+        new_gen.append(self.pop.copy(i))
+        self.pop[i]['best'] = True
+
+    else:
+      for agent_idx in range(self.pop.size):
+        if self.pop[agent_idx]['best'] and self.pop[agent_idx]['name'] not in self.archive['name'].values:
+          if len(self.archive) >= self.max_arch_len: # If archive is full, replace a random element
+            replaced = random.randint(0, len(self.archive)-1)
+            self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
+          else:
+            self.archive.add(self.pop.copy(agent_idx, with_data=True))
+          self.novel_in_gen += 1
+
+        elif np.random.uniform() <= 0.005 and self.pop[agent_idx]['name'] not in self.archive['name'].values:
+          if len(self.archive) >= self.max_arch_len:
+            replaced = random.randint(0, len(self.archive)-1)
+            self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
+          else:
+            self.archive.add(self.pop.copy(agent_idx, with_data=True))
+          # self.novel_in_gen += 1
+      for i, a in enumerate(self.pop):
+        if a['best']:
+          new_gen.append(self.pop.copy(i))
+      dead = random.sample(range(self.pop.size), len(new_gen))
+
+    # This one is common in both adaptive and non adaptive distance
+    for i, new_agent in zip(dead, new_gen):
+      self.pop[i] = new_agent
+
+    # Mutate pop that are not novel
+    for a in self.pop:
+      if np.random.random() <= self.mutation_rate and not a['best']:
+        a['agent'].mutate()
+        a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
+        self.pop.agent_name += 1
+      a['best'] = False
 
   def evaluate_agent(self, agent):
     '''
@@ -103,21 +141,6 @@ class NoveltySearch(object):
       cumulated_reward += reward
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
-
-  def show(self, name=None):
-    print('Behaviour space coverage representation.')
-    bs_points = np.concatenate(self.archive['bs'].values)
-    import matplotlib.pyplot as plt
-
-    pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-    plt.scatter(pts[0], pts[1])
-    plt.xlim(-1.5, 1.5)
-    plt.ylim(-1.5, 1.5)
-    # plt.hist(pts[0])
-    if name is None:
-      plt.savefig('./behaviour.pdf')
-    else:
-      plt.savefig('./{}.pdf'.format(name))
 
   def evolve(self, gen=1000):
     self.elapsed_gen = 0
@@ -139,23 +162,6 @@ class NoveltySearch(object):
       if self.not_added > 4 and self.min_dist > 0.3:
         self.min_dist -= self.min_dist * 0.1
 
-      new_gen = [] # Reproduce only the novel ones
-      for i, a in enumerate(self.pop):
-        if a['best']:
-          new_gen.append(self.pop.copy(i))
-
-      dead = random.sample(range(self.pop.size), len(new_gen))
-      for i, new_agent in zip(dead, new_gen):
-        self.pop[i] = new_agent
-
-      # Mutate pop that are not novel
-      for a in self.pop:
-        if np.random.random() <= self.mutation_rate and not a['best']:
-          a['agent'].mutate()
-          a['name'] = self.pop.agent_name # When an agent is mutated it also changes name, otherwise it will never be added to the archive
-          self.pop.agent_name += 1
-        a['best'] = False
-
       if self.elapsed_gen % 10 == 0:
         print('Gen {}'.format(self.elapsed_gen))
         print('Archive size {}'.format(self.archive.size))
@@ -171,11 +177,12 @@ if __name__ == '__main__':
   np.random.seed()
   ns = NoveltySearch(env, pop_size=100, obs_shape=6, action_shape=2)
   try:
-    ns.evolve(10000)
+    ns.evolve(500)
   except KeyboardInterrupt:
     print('User Interruption')
 
-  ns.show('NS_{}_{}'.format(ns.elapsed_gen, env_tag))
+  bs_points = np.concatenate(ns.archive['bs'].values)
+  utils.show(bs_points, 'NS_{}_{}'.format(ns.elapsed_gen, env_tag))
   print(ns.archive['name'].values)
 
   print('Testing result according to best reward.')

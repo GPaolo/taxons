@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
+import os
 
 class FCLayer(object):
   def __init__(self, input, output, name='fc'):
@@ -51,3 +52,29 @@ def obs_formatting(env_tag, obs):
   elif env_tag == 'Billiard-v0':
     return np.array([np.concatenate(obs)])
   else: return obs
+
+def show(bs_points, name=None):
+  print('Behaviour space coverage representation.')
+
+  pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
+  plt.rcParams["patch.force_edgecolor"] = True
+  fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
+  axes[0].set_title('Ball position')
+  axes[0].scatter(pts[0], pts[1])
+  axes[0].set_xlim(-1.5, 1.5)
+  axes[0].set_ylim(-1.5, 1.5)
+
+  axes[1].set_title('Histogram')
+  H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(100, 100), range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
+  extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+  cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
+  axes[1].set_xlim(-1.5, 1.5)
+  axes[1].set_ylim(-1.5, 1.5)
+  plt.colorbar(cax, ax=axes[1])
+
+  if name is None:
+    plt.savefig('./behaviour.pdf')
+  else:
+    plt.savefig('./{}.pdf'.format(name))
+  print('Plot saved in {}/'.format(os.getcwd()))
+

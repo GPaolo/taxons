@@ -57,7 +57,11 @@ class RndQD(object):
       action = input(' ')
       if action == 's':
         try:
-          self.show()
+          if self.archive is not None:
+            bs_points = np.concatenate(self.archive['bs'].values)
+          else:
+            bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
+          utils.show(bs_points)
         except:
           print('Cannot show progress now.')
 
@@ -153,38 +157,6 @@ class RndQD(object):
     self.archive.save_pop(filepath, 'archive')
     self.metric.save(filepath)
 
-  def show(self, name=None):
-    print('Behaviour space coverage representation.')
-    if self.archive is not None:
-      bs_points = np.concatenate(self.archive['bs'].values)
-    else:
-      bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-      print(bs_points)
-    pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-    plt.rcParams["patch.force_edgecolor"] = True
-    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15,6))
-    axes[0].set_title('Ball position')
-    axes[0].scatter(pts[0], pts[1])
-    axes[0].set_xlim(-1.5, 1.5)
-    axes[0].set_ylim(-1.5, 1.5)
-
-    axes[1].set_title('Histogram')
-    hist = axes[1].hist2d(pts[0], pts[1], bins=100, range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
-    axes[1].set_xlim(-1.5, 1.5)
-    axes[1].set_ylim(-1.5, 1.5)
-    plt.colorbar(hist[3], ax=axes[1])
-
-    # plt.scatter(pts[0], pts[1])
-    # plt.xlim(-1.5, 1.5)
-    # plt.ylim(-1.5, 1.5)
-    # plt.hist(pts[0])
-    if name is None:
-      fig.savefig('./behaviour.pdf')
-    else:
-      fig.savefig('./{}.pdf'.format(name))
-    print('Plots saved.')
-
-
 if __name__ == '__main__':
   import time
   env = gym.make(env_tag)
@@ -206,7 +178,11 @@ if __name__ == '__main__':
   print('Total generations: {}'.format(rnd_qd.elapsed_gen))
   print('Archive length {}'.format(pop.size))
 
-  rnd_qd.show('RNDQD_{}_{}'.format(rnd_qd.elapsed_gen, env_tag))
+  if rnd_qd.archive is not None:
+    bs_points = np.concatenate(rnd_qd.archive['bs'].values)
+  else:
+    bs_points = np.concatenate([a['bs'] for a in rnd_qd.population if a['bs'] is not None])
+  utils.show('RNDQD_{}_{}'.format(rnd_qd.elapsed_gen, env_tag))
 
   print('Testing result according to best reward.')
   rewards = pop['reward'].sort_values(ascending=False)
