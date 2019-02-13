@@ -41,7 +41,7 @@ class BaseAgent(metaclass=ABCMeta):
 
 class FFNeuralAgent(BaseAgent):
 
-  def __init__(self, mutation_distr=None, **kwargs):
+  def __init__(self, shapes, mutation_distr=None):
     '''
     This agent embeds an NN. Not using pytorch cause it does not give any advantage (cannot parallelize on one GPU)
     :param mutation_distr: distribution used for mutation
@@ -51,8 +51,8 @@ class FFNeuralAgent(BaseAgent):
     '''
     super(FFNeuralAgent, self).__init__(mutation_distr)
 
-    self.input_shape = kwargs['input_shape']
-    self.output_shape = kwargs['output_shape']
+    self.input_shape = shapes['input_shape']
+    self.output_shape = shapes['output_shape']
 
     self.fc1 = utils.FCLayer(self.input_shape, 16, 'fc1')
     self.fc2 = utils.FCLayer(16, 32, 'fc2')
@@ -87,12 +87,12 @@ class FFNeuralAgent(BaseAgent):
 
 class DMPAgent(BaseAgent):
 
-  def __init__(self, mutation_distr=None, **kwargs):
+  def __init__(self, shapes, mutation_distr=None):
     super(DMPAgent, self).__init__(mutation_distr)
 
     self.genome = []
-    self.dof = kwargs['dof']
-    self.num_bf = kwargs['num_bf']
+    self.dof = shapes['dof']
+    self.num_bf = shapes['num_bf']
 
     for i in range(self.dof):
       self.genome.append(utils.DMP(self.num_bf))
@@ -119,42 +119,42 @@ class DMPAgent(BaseAgent):
 
 
 if __name__ == '__main__':
-  agent = DMPAgent(dof=2, num_bf=20)
+  agent = DMPAgent({'dof':1, 'num_bf':20})
   import gym, gym_billiard
 
   env = gym.make('Billiard-v0')
   env.seed()
 
-  t = 0
-  done=False
-  obs = utils.obs_formatting('Billiard-v0', env.reset())
-  while not done:
-    action = utils.action_formatting('Billiard-v0', agent(t))
-    t += 1
-    print(action)
-    obs, reward, done, info = env.step(action)
-    obs = utils.obs_formatting('Billiard-v0', obs)
-    env.render()
+  # t = 0
+  # done=False
+  # obs = utils.obs_formatting('Billiard-v0', env.reset())
+  # while not done:
+  #   action = utils.action_formatting('Billiard-v0', agent(t))
+  #   t += 1
+  #   print(action)
+  #   obs, reward, done, info = env.step(action)
+  #   obs = utils.obs_formatting('Billiard-v0', obs)
+  #   env.render()
 
 
-  # a = []
-  # b = []
-  # ts = 500
+  a = []
+  b = []
+  ts = 1000
   # for k in range(ts):
-  #   f = agent(k)
-  #   a.append(f)
-  # agent.mutate()
-  # for k in range(ts):
-  #   f = agent(k)
-  #   b.append(f)
-  #
-  # print(len(a))
-  # import matplotlib.pyplot as plt
-  #
-  # fig = plt.figure()
-  # ax1 = fig.add_subplot(111)
-  #
-  # ax1.plot(list(range(ts)), a)
+    # f = agent.genome[0].basis_function(k, 0, 0.1)
+    # a.append(f)
+  agent.mutate()
+  for k in range(ts):
+    f = agent(k)
+    b.append(f[0])
+
+  print(len(a))
+  import matplotlib.pyplot as plt
+
+  fig = plt.figure()
+  ax1 = fig.add_subplot(111)
+
+  ax1.plot(list(range(ts)), b)
   # ax1.plot(list(range(ts)), b)
-  # plt.show()
+  plt.show()
 

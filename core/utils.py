@@ -36,7 +36,7 @@ class DMP(object):
     self.sigma = np.random.uniform(size=self.num_bf)
     self.w = np.random.randn(self.num_bf)
     self.a_x  = np.random.uniform()
-    self.tau = 100
+    self.tau = 500
 
   def __call__(self, t):
     g = np.zeros(self.num_bf)
@@ -44,7 +44,7 @@ class DMP(object):
 
     for k in range(self.num_bf):
       g[k] = self.basis_function(x, self.mu[k], self.sigma[k])
-    f = np.sum(g*self.w)/np.sum(g)*x
+    f = np.sum(g*self.w)/np.sum(g)
     return f
 
   def basis_function(self, x, mu, sigma):
@@ -55,7 +55,7 @@ class DMP(object):
     :param sigma: Std deviation
     :return:
     """
-    return np.exp(-np.power((x - mu)/sigma, 2)/2)
+    return np.exp(np.sin((x - mu)/sigma)/2)
 
 
 

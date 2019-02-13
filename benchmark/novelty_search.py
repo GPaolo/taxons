@@ -17,13 +17,13 @@ class NoveltySearch(object):
     self.obs_space = obs_shape
     self.max_arch_len = 100000
     self.action_space = action_shape
-    self.pop = population.Population(agent=agents.FFNeuralAgent,
-                                     input_shape=obs_shape,
-                                     output_shape=action_shape,
+    self.pop = population.Population(agent=agents.DMPAgent,
+                                     dof=2,
+                                     num_bf=20,
                                      pop_size=pop_size)
-    self.archive = population.Population(agent=agents.FFNeuralAgent,
-                                         input_shape=obs_shape,
-                                         output_shape=action_shape,
+    self.archive = population.Population(agent=agents.DMPAgent,
+                                         dof=2,
+                                         num_bf=20,
                                          pop_size=0)
     self.env = env
     self.min_dist = 0.5
@@ -134,11 +134,13 @@ class NoveltySearch(object):
     done = False
     cumulated_reward = 0
     obs = utils.obs_formatting(env_tag, self.env.reset())
+    t = 0
     while not done:
-      action = utils.action_formatting(env_tag, agent['agent'](obs))
+      action = utils.action_formatting(env_tag, agent['agent'](t))
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
       cumulated_reward += reward
+      t += 1
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
 
@@ -196,9 +198,10 @@ if __name__ == '__main__':
     obs = utils.obs_formatting(env_tag, ns.env.reset())
     while not done and ts < 1000:
       ns.env.render()
-      action = utils.action_formatting(env_tag, tested['agent'](obs))
+      action = utils.action_formatting(env_tag, tested['agent'](ts))
       obs, reward, done, info = ns.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
+      ts += 1
 
 
 

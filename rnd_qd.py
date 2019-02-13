@@ -26,15 +26,15 @@ class RndQD(object):
     self.use_novelty = use_novelty
     self.parameters = None
     self.env = env
-    self.population = population.Population(agents.FFNeuralAgent,
-                                            input_shape=obs_shape,
-                                            output_shape=action_shape,
+    self.population = population.Population(agents.DMPAgent,
+                                            dof=2,
+                                            num_bf=20,
                                             pop_size=self.pop_size)
     self.archive = None
     if use_archive:
-      self.archive = population.Population(agents.FFNeuralAgent,
-                                           input_shape=obs_shape,
-                                           output_shape=action_shape,
+      self.archive = population.Population(agents.DMPAgent,
+                                           dof=2,
+                                           num_bf=20,
                                            pop_size=0)
     if gpu:
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -77,11 +77,13 @@ class RndQD(object):
 
     obs = utils.obs_formatting(env_tag, self.env.reset())
     # if self.use_novelty: state = obs[0:2]
+    t = 0
     while not done:
-      action = utils.action_formatting(env_tag, agent['agent'](obs))
+      action = utils.action_formatting(env_tag, agent['agent'](t))
 
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
+      t += 1
       # if self.use_novelty: state = np.append(state, obs[0:2], axis=0)
 
       cumulated_reward += reward
@@ -93,9 +95,8 @@ class RndQD(object):
       # We perform the training step directly here, this way we measure the novelty of one agent also wrt to the others
       surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
       surprise = surprise.cpu().data.numpy()
-      agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
       # self.cumulated_state.append(state) # Append here all the states
-
+    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
 
@@ -172,7 +173,8 @@ if __name__ == '__main__':
     rnd_qd.train(500)
   except KeyboardInterrupt:
     print('User Interruption.')
-    rnd_qd.save('RND_QD_{}'.format(rnd_qd.elapsed_gen))
+
+  rnd_qd.save('RND_QD_{}'.format(rnd_qd.elapsed_gen))
 
   if rnd_qd.archive is None:
     pop = rnd_qd.population
@@ -198,7 +200,8 @@ if __name__ == '__main__':
     obs = utils.obs_formatting(env_tag, rnd_qd.env.reset())
     while not done and ts < 3000:
       rnd_qd.env.render()
-      action = utils.action_formatting(env_tag, tested['agent'](obs))
+      action = utils.action_formatting(env_tag, tested['agent'](ts))
       obs, reward, done, info = rnd_qd.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
+      ts += 1
 
