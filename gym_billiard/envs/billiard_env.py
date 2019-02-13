@@ -149,6 +149,8 @@ class BilliardEnv(gym.Env):
         color = [0, 0, 180, 255]
       elif obj_name in ['link0', 'link1']:
         color = [100, 100, 100]
+        if not rendered:
+          color = [0, 0, 0]
       elif 'wall' in obj_name:
         color = [150, 150, 150]
 
