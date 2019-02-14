@@ -94,7 +94,6 @@ class FFNeuralAgent(BaseAgent):
       g.bias = p['bias']
 
 
-
 class DMPAgent(BaseAgent):
 
   def __init__(self, shapes, mutation_distr=None):
