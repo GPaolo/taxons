@@ -86,14 +86,47 @@ class Population(object):
 
   def save_pop(self, filepath, name):
     save_ckpt = {}
-    for i, a in enumerate(self['agent']):
-      genome = a.get_genome()
-      save_ckpt[str(i)] = [(l.params) for l in genome]
+
+    save_ckpt['Agent Type'] = self.agent_class.__name__
+    save_ckpt['Genome'] = {}
+
+    for a in self:
+      genome = a['agent'].get_genome()
+      save_ckpt['Genome'][a['name']] = [l.params for l in genome]
     try:
       with open(os.path.join(filepath, 'qd_{}.pkl'.format(name)), 'wb') as file:
         pkl.dump(save_ckpt, file)
     except:
       print('Cannot Save {}.'.format(name))
+
+  def load_pop(self, filepath):
+    if not os.path.exists(filepath):
+      print('File to load not found.')
+      return
+
+    print('Loading population from {}'.format(filepath))
+    with open(filepath, 'rb') as file:
+      ckpt = pkl.load(file)
+
+    assert ckpt['Agent Type'] == self.agent_class.__name__, "Wrong agent type. Saved {}, current {}".format(ckpt['Agent Type'], self.agent_class.__name__)
+
+    del self.pop
+    self.pop = pd.DataFrame(columns=['agent', 'reward', 'surprise', 'best', 'bs', 'name'])
+    self.agent_name = 0
+
+    for agent in ckpt['Genome']:
+      self.add()
+      agent_genome = ckpt['Genome'][agent]
+      assert len(agent_genome) == len(self[-1]['agent'].genome), 'Wrong genome length. Saved {}, current {}'.format(agent_genome, self[-1]['agent'].genome)
+      self[-1]['agent'].load_genome(agent_genome, agent)
+      for k in range(len(agent_genome)):
+        for p in self[-1]['agent'].genome[k].params:
+          assert np.all(self[-1]['agent'].genome[k].params[p] == agent_genome[k][p]), 'Could not load {} of element {} in agent {}'.format(p, k, agent)
+      self.pop['name'].iloc[-1] = agent
+    print("Done")
+
+
+
 
 
 
@@ -101,10 +134,11 @@ class Population(object):
 
 
 if __name__ == '__main__':
-  pop = Population(agent=FFNeuralAgent, input_shape=3, output_shape=3, pop_size=3)
+  pop = Population(agent=DMPAgent, dof=2, num_basis_func=3, pop_size=4)
 
-  kk = pop.save_pop('a')
-  print()
+  pop.save_pop('.', 'test')
+  kk = pop.load_pop('qd_test.pkl')
+  pop.show()
 
 
 

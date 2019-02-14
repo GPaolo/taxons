@@ -28,13 +28,13 @@ class RndQD(object):
     self.env = env
     self.population = population.Population(agents.DMPAgent,
                                             dof=2,
-                                            num_bf=20,
+                                            num_basis_func=20,
                                             pop_size=self.pop_size)
     self.archive = None
     if use_archive:
       self.archive = population.Population(agents.DMPAgent,
                                            dof=2,
-                                           num_bf=20,
+                                           num_basis_func=20,
                                            pop_size=0)
     if gpu:
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

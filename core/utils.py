@@ -20,7 +20,7 @@ class FCLayer(object):
 
   @property
   def params(self):
-    return self.w, self.bias
+    return {'w': self.w, 'bias': self.bias}
 
   @property
   def show(self):
@@ -30,22 +30,27 @@ class FCLayer(object):
 
 
 class DMP(object):
-  def __init__(self, num_bf=20):
-    self.num_bf = num_bf
-    self.mu = np.abs(np.random.randn(self.num_bf))
-    self.sigma = np.random.uniform(size=self.num_bf)
-    self.w = np.random.randn(self.num_bf)
+  def __init__(self, num_basis_func=20, name='dmp'):
+    self.num_basis_func = num_basis_func
+    self.mu = np.abs(np.random.randn(self.num_basis_func))
+    self.sigma = np.random.uniform(size=self.num_basis_func)
+    self.w = np.random.randn(self.num_basis_func)
     self.a_x  = np.random.uniform()
     self.tau = 500
+    self.name = name
 
   def __call__(self, t):
-    g = np.zeros(self.num_bf)
+    g = np.zeros(self.num_basis_func)
     x = np.exp( -self.a_x*t/self.tau )
 
-    for k in range(self.num_bf):
+    for k in range(self.num_basis_func):
       g[k] = self.basis_function(x, self.mu[k], self.sigma[k])
     f = np.sum(g*self.w)/np.sum(g)
     return f
+
+  @property
+  def params(self):
+    return {'mu': self.mu, 'sigma': self.sigma, 'w': self.w, 'a_x': self.a_x, 'tau': self.tau}
 
   def basis_function(self, x, mu, sigma):
     """

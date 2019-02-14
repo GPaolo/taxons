@@ -38,6 +38,8 @@ class BaseAgent(metaclass=ABCMeta):
     '''
     return deepcopy(self)
 
+  def load_genome(self, genome):
+    raise NotImplementedError
 
 class FFNeuralAgent(BaseAgent):
 
@@ -84,6 +86,14 @@ class FFNeuralAgent(BaseAgent):
       l.w = l.w + self.mutation_operator(l.w.shape[0], l.w.shape[1])
       l.bias = l.bias + self.mutation_operator(l.bias.shape[0], l.bias.shape[1])
 
+  def load_genome(self, params, agent_name):
+    for p, g in zip(params, self.genome):
+      assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for layer {} of agent {}'.format(self.name, agent_name)
+      assert np.all(np.shape(g.bias) == np.shape(p['bias'])), 'Wrong shape of bias for layer {} of agent {}'.format(self.name, agent_name)
+      g.w = p['w']
+      g.bias = p['bias']
+
+
 
 class DMPAgent(BaseAgent):
 
@@ -92,10 +102,10 @@ class DMPAgent(BaseAgent):
 
     self.genome = []
     self.dof = shapes['dof']
-    self.num_bf = shapes['num_bf']
+    self.num_basis_func = shapes['num_basis_func']
 
     for i in range(self.dof):
-      self.genome.append(utils.DMP(self.num_bf))
+      self.genome.append(utils.DMP(self.num_basis_func, 'dmp{}'.format(i)))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)
@@ -114,12 +124,22 @@ class DMPAgent(BaseAgent):
       dmp.a_x = dmp.a_x + self.mutation_operator()
       dmp.tau = dmp.tau + self.mutation_operator()
 
+  def load_genome(self, params, agent):
+    for p, g in zip(params, self.genome):
+      assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for dmp {} of agent {}'.format(self.name, agent)
+      assert np.all(np.shape(g.sigma) == np.shape(p['sigma'])), 'Wrong shape of sigma for dmp {} of agent {}'.format(self.name, agent)
+      assert np.all(np.shape(g.mu) == np.shape(p['mu'])), 'Wrong shape of mu for dmp {} of agent {}'.format(self.name, agent)
+      g.w = p['w']
+      g.sigma = p['sigma']
+      g.mu = p['mu']
+      g.tau = p['tau']
+      g.a_x = p['a_x']
 
 
 
 
 if __name__ == '__main__':
-  agent = DMPAgent({'dof':1, 'num_bf':20})
+  agent = DMPAgent({'dof':1, 'num_basis_func':20})
   import gym, gym_billiard
 
   env = gym.make('Billiard-v0')

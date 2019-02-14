@@ -52,7 +52,7 @@ class BilliardEnv(gym.Env):
     return [seed]
 
   def reset(self):
-    if self.params.RANDOM_ARM_INIT_POSE:
+    if self.params.RANDOM_BALL_INIT_POSE:
       init_ball_pose = np.array([self.np_random.uniform(low=-1.3, high=1.3), # x
                                  self.np_random.uniform(low=-1.3, high=0)])  # y
     else:
