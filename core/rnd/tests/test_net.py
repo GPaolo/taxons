@@ -1,4 +1,4 @@
-from rnd_qd.core.rnd import net
+from core.rnd_qd import net
 import torch
 import torch.nn as nn
 import numpy as np

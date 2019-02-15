@@ -13,36 +13,43 @@ env_tag = 'Billiard-v0'
 
 class RndQD(object):
 
-  def __init__(self, env, action_shape, obs_shape, bs_shape, pop_size, use_novelty=True, use_archive=False, gpu=False):
+  def __init__(self, env, agents_shapes, bs_shape, pop_size, save_path, agent_name, use_novelty=True, use_archive=False, gpu=False):
     '''
 
     :param env: Environment in which we act
-    :param action_shape: dimension of the action space
-    :param obs_shape: dimension of the observation space
     :param bs_shape: dimension of the behavious space
     '''
     self.pop_size = pop_size
     self.use_novelty = use_novelty
     self.parameters = None
     self.env = env
-    self.population = population.Population(agents.FFNeuralAgent,
-                                            input_shape=obs_shape,
-                                            output_shape=action_shape,
+    self.save_path = save_path
+    self.agents_shapes = agents_shapes
+    self.agent_name = agent_name
+
+    if self.agent_name == 'Neural':
+      agent_type = agents.FFNeuralAgent
+    elif self.agent_name == 'DMP':
+      agent_type = agents.DMPAgent
+
+    self.population = population.Population(agent=agent_type,
+                                            shapes=self.agents_shapes,
                                             pop_size=self.pop_size)
     self.archive = None
     if use_archive:
-      self.archive = population.Population(agents.FFNeuralAgent,
-                                           input_shape=obs_shape,
-                                           output_shape=action_shape,
+      self.archive = population.Population(agent=agent_type,
+                                           shapes=self.agents_shapes,
                                            pop_size=0)
+
     if gpu:
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     else:
       self.device = torch.device('cpu')
     if self.use_novelty:
-      self.metric = rnd.RND(input_shape=obs_shape, encoding_shape=bs_shape, pop_size=self.pop_size)
+      self.metric = rnd.RND(encoding_shape=bs_shape)
     else:
       self.metric = None
+
     self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
@@ -60,7 +67,7 @@ class RndQD(object):
             bs_points = np.concatenate(self.archive['bs'].values)
           else:
             bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-          utils.show(bs_points)
+          utils.show(bs_points, filepath=self.save_path)
         except:
           print('Cannot show progress now.')
 
@@ -75,16 +82,18 @@ class RndQD(object):
     cumulated_reward = 0
 
     obs = utils.obs_formatting(env_tag, self.env.reset())
-    # if self.use_novelty: state = obs[0:2]
     t = 0
     while not done:
-      action = utils.action_formatting(env_tag, agent['agent'](obs))
+      if self.agent_name == 'Neural':
+        agent_input = obs
+      elif self.agent_name == 'DMP':
+        agent_input = t
+
+      action = utils.action_formatting(env_tag, agent['agent'](agent_input))
 
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
       t += 1
-      # if self.use_novelty: state = np.append(state, obs[0:2], axis=0)
-
       cumulated_reward += reward
 
     surprise = 0
@@ -147,16 +156,16 @@ class RndQD(object):
         print('Max reward {}'.format(max_rew))
         print()
 
-  def save(self, filepath):
+  def save(self):
     print('Saving...')
-    if not os.path.exists(filepath):
+    if not os.path.exists(self.save_path):
       try:
-        os.mkdir(os.path.abspath(filepath))
+        os.mkdir(os.path.abspath(self.save_path))
       except:
         print('Cannot create save folder.')
-    self.population.save_pop(filepath, 'pop')
-    self.archive.save_pop(filepath, 'archive')
-    self.metric.save(filepath)
+    self.population.save_pop(self.save_path, 'pop')
+    self.archive.save_pop(self.save_path, 'archive')
+    self.metric.save(self.save_path)
     print('Done')
 
 if __name__ == '__main__':

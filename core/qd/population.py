@@ -9,10 +9,10 @@ class Population(object):
   Basic Population class. The new generation is just the mutation of the best elements that substitutes the worst.
   The criteria for the best is given by the metric, and is calculated outside.
   '''
-  def __init__(self, agent=BaseAgent, pop_size=10, max_len=None, *args, **kargs):
+  def __init__(self, shapes, agent=BaseAgent, pop_size=10, max_len=None):
     self.pop = pd.DataFrame(columns=['agent', 'reward', 'surprise', 'best', 'bs', 'name'])
     self.agent_class = agent
-    self.kargs = kargs
+    self.shapes = shapes
     self.max_len = max_len
     self.avg_surprise = 0
     self.agent_name = 0
@@ -60,7 +60,7 @@ class Population(object):
     :return:
     '''
     if agent is None:
-      agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': False, 'bs':None, 'name':self.agent_name}
+      agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'best': False, 'bs':None, 'name':self.agent_name}
       self.agent_name += 1
 
     agent = pd.DataFrame([agent], columns=agent.keys()) # If an agent is given, it should already have a name
@@ -72,7 +72,7 @@ class Population(object):
 
   def copy(self, idx, with_data=False):
     assert idx < self.size and idx > -self.size-1, 'Index out of range'
-    agent = {'agent': self.agent_class(self.kargs), 'reward': None, 'surprise': None, 'best': False, 'bs': None, 'name':self.agent_name}
+    agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'best': False, 'bs': None, 'name':self.agent_name}
 
     if with_data:
       for key in agent.keys(): # If copied with data we keep the original name

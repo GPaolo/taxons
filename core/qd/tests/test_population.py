@@ -1,5 +1,5 @@
-from rnd_qd.core.qd import population
-from copy import deepcopy
+from core.rnd_qd import population
+
 
 def test_iter():
   pop = population.Population()

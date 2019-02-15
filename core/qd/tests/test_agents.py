@@ -1,4 +1,4 @@
-from rnd_qd.core.qd import agents
+from core.rnd_qd import agents
 import numpy as np
 
 np.random.seed(7)

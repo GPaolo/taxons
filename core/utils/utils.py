@@ -63,8 +63,6 @@ class DMP(object):
     return np.exp(np.sin((x - mu)/sigma)/2)
 
 
-
-
 def action_formatting(env_tag, action):
   """
   This function helps reformat the actions according to the environment
@@ -90,7 +88,7 @@ def obs_formatting(env_tag, obs):
     return np.array([np.concatenate(obs)])
   else: return obs
 
-def show(bs_points, name=None):
+def show(bs_points, filepath, name=None):
   print('Behaviour space coverage representation.')
 
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
@@ -110,8 +108,15 @@ def show(bs_points, name=None):
   plt.colorbar(cax, ax=axes[1])
 
   if name is None:
-    plt.savefig('./behaviour.pdf')
+    plt.savefig(os.path.join(filepath, 'behaviour.pdf'))
   else:
-    plt.savefig('./{}.pdf'.format(name))
-  print('Plot saved in {}/'.format(os.getcwd()))
+    plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
+  print('Plot saved in {}'.format(filepath))
 
+def get_projectpath():
+  cwd = os.getcwd()
+  folder = os.path.basename(cwd)
+  while not folder == 'rnd_qd':
+    cwd = os.path.dirname(cwd)
+    folder = os.path.basename(cwd)
+  return cwd

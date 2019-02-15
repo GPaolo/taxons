@@ -9,17 +9,16 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class RND(object):
-  '''
-  Class that instantiates the RND component
-  '''
-  def __init__(self, input_shape, encoding_shape, pop_size=10, device=None):
-    self.input_shape = input_shape
+
+  def __init__(self, encoding_shape, device=None):
+    '''
+    Class that instantiates the RND component
+    '''
     self.encoding_shape = encoding_shape
     self.device = device
-    self.pop_size = pop_size
     # Nets
-    self.target_model = TargetNet(self.input_shape, self.encoding_shape, pop_size=self.pop_size, device=self.device, fixed=True)
-    self.predictor_model = PredictorNet(self.input_shape, self.encoding_shape, pop_size=self.pop_size, device=self.device, fixed=False)
+    self.target_model = TargetNet(output_shape=self.encoding_shape, device=self.device, fixed=True)
+    self.predictor_model = PredictorNet(output_shape=self.encoding_shape, device=self.device, fixed=False)
     # Loss
     self.criterion = nn.MSELoss()
     # Optimizer

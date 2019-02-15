@@ -1,4 +1,4 @@
-from rnd_qd.core.rnd import rnd
+from core.rnd_qd import rnd
 import torch
 
 torch.manual_seed(7)
