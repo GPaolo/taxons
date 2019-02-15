@@ -1,14 +1,13 @@
 import numpy as np
 from core.rnd import rnd
 from core.qd import population, agents
-from core import optimizer, utils
+from core.utils import utils
+from core.utils import optimizer
 import gym, torch
-import os, threading
 import gym_billiard
-env_tag = 'Billiard-v0'
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+import os, threading
 import matplotlib
+env_tag = 'Billiard-v0'
 # env_tag = 'MountainCarContinuous-v0'
 
 
@@ -26,15 +25,15 @@ class RndQD(object):
     self.use_novelty = use_novelty
     self.parameters = None
     self.env = env
-    self.population = population.Population(agents.DMPAgent,
-                                            dof=2,
-                                            num_basis_func=20,
+    self.population = population.Population(agents.FFNeuralAgent,
+                                            input_shape=obs_shape,
+                                            output_shape=action_shape,
                                             pop_size=self.pop_size)
     self.archive = None
     if use_archive:
-      self.archive = population.Population(agents.DMPAgent,
-                                           dof=2,
-                                           num_basis_func=20,
+      self.archive = population.Population(agents.FFNeuralAgent,
+                                           input_shape=obs_shape,
+                                           output_shape=action_shape,
                                            pop_size=0)
     if gpu:
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -79,7 +78,7 @@ class RndQD(object):
     # if self.use_novelty: state = obs[0:2]
     t = 0
     while not done:
-      action = utils.action_formatting(env_tag, agent['agent'](t))
+      action = utils.action_formatting(env_tag, agent['agent'](obs))
 
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
@@ -161,7 +160,6 @@ class RndQD(object):
     print('Done')
 
 if __name__ == '__main__':
-  import time
   env = gym.make(env_tag)
 
   env.seed()
@@ -200,7 +198,7 @@ if __name__ == '__main__':
     obs = utils.obs_formatting(env_tag, rnd_qd.env.reset())
     while not done and ts < 3000:
       rnd_qd.env.render()
-      action = utils.action_formatting(env_tag, tested['agent'](ts))
+      action = utils.action_formatting(env_tag, tested['agent'](obs))
       obs, reward, done, info = rnd_qd.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
       ts += 1

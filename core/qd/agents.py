@@ -1,5 +1,5 @@
 import numpy as np
-from core import utils
+from core.utils import utils
 from abc import ABCMeta, abstractmethod # This is to force implementation of child class methods
 from copy import deepcopy
 

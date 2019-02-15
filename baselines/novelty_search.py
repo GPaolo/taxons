@@ -1,7 +1,6 @@
 import numpy as np
-from core.rnd import rnd
 from core.qd import population, agents
-from core import utils
+from core.utils import utils
 import gym
 import random
 import threading
