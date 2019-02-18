@@ -29,7 +29,7 @@ class FCLayer(object):
     print('Bias {}'.format(self.bias))
 
 
-class DMP(object):
+class DMPExp(object):
   def __init__(self, num_basis_func=20, name='dmp'):
     self.num_basis_func = num_basis_func
     self.mu = np.abs(np.random.randn(self.num_basis_func))
@@ -61,6 +61,25 @@ class DMP(object):
     :return:
     """
     return np.exp(np.sin((x - mu)/sigma)/2)
+
+
+class DMPPoly(object):
+  def __init__(self, degree=3, name='dmp'):
+    self.degree = degree
+    self.w = np.random.randn(self.degree+1)
+    self.scale = 100
+    self.name = name
+
+  def __call__(self, t):
+    x = np.cos(t/self.scale) # This way we limit it between [-1, 1]
+    p = 0
+    for i in range(self.degree+1):
+      p += self.w[i]*x**i
+    return p
+
+  @property
+  def params(self):
+    return {'w': self.w, 'degree':self.degree, 'scale':self.scale}
 
 
 def action_formatting(env_tag, action):

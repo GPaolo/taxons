@@ -15,6 +15,8 @@ ex = Experiment()
 
 @ex.config
 def config():
+  info = 'Testing DMP based on 3rd degree polynomial'
+
   exp_name = 'exp'
   seed = 7
 
@@ -35,7 +37,7 @@ def config():
   if qd_agent == 'Neural':
     agent_shapes = {'input_shape':6, 'output_shape':action_shape}
   elif qd_agent == 'DMP':
-    agent_shapes = {'dof':2, 'num_basis_func':20}
+    agent_shapes = {'dof':2, 'degree':20}
   # ---------------------------------------------------------
 
   # RND
