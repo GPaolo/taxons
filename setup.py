@@ -10,6 +10,6 @@ setup(author='Giuseppe Paolo',
             'gym',
             'pygame',
             'box2d',
-            'sacred'
+            'sacred',
       ]
 )

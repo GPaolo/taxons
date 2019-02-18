@@ -53,11 +53,13 @@ class RndQD(object):
     self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
-    self.thread = threading.Thread(target=self._show_progress)
+    self.END = False
+    self.thread = threading.Thread(target=self._control)
     self.thread.start()
 
-  def _show_progress(self):
+  def _control(self):
     print('If you want to show the progress, press s.')
+    print('If you want to stop training, press q.')
     matplotlib.use('agg')
     while True:
       action = input(' ')
@@ -70,6 +72,9 @@ class RndQD(object):
           utils.show(bs_points, filepath=self.save_path)
         except:
           print('Cannot show progress now.')
+      elif action == 'q':
+        print('Quitting training...')
+        self.END = True
 
   # TODO make this run in parallel
   def evaluate_agent(self, agent):
@@ -155,6 +160,10 @@ class RndQD(object):
         print('Average generation surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
         print()
+
+      if self.END:
+        print('Quitting.')
+        break
 
   def save(self):
     print('Saving...')

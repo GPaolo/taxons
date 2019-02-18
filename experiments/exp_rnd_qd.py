@@ -8,6 +8,7 @@ import gym_billiard
 import numpy as np
 from core.qd import agents
 from core.utils import utils
+from sacred.observers import FileStorageObserver
 import os
 
 ex = Experiment()
@@ -46,10 +47,16 @@ def config():
   # Save Path
   save_path = os.path.join(utils.get_projectpath(), 'experiments', exp_name)
 
+  ex.observers.append(FileStorageObserver.create(save_path))
 
 
 @ex.automain
-def main(env_tag, seed, use_novelty, use_archive, pop_size, save_path, agent_shapes, rnd_output_size, generations, qd_agent):
+def main(env_tag, seed,
+         use_novelty, use_archive,
+         pop_size, save_path,
+         agent_shapes, rnd_output_size,
+         generations, qd_agent):
+
   env = gym.make(env_tag)
 
   env.seed(seed)

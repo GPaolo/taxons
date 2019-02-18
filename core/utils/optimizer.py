@@ -149,7 +149,6 @@ class ParetoOptimizer(BaseOptimizer):
       a['best'] = False
 
 
-# TODO change this to literature implementation
 class NoveltyOptimizer(BaseOptimizer):
   def step(self, **kwargs):
     '''
