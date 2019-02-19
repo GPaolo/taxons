@@ -15,9 +15,9 @@ ex = Experiment()
 
 @ex.config
 def config():
-  info = 'Testing DMP based on 3rd degree polynomial'
+  info = 'Testing DMP based on 3rd degree polynomial. Here I mutate also the ones added to the archive'
 
-  exp_name = 'exp'
+  exp_name = 'total_mutation'
   seed = 7
 
   # Environment

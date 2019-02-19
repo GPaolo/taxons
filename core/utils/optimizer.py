@@ -209,7 +209,7 @@ class NoveltyOptimizer(BaseOptimizer):
 
     # Mutate pops
     for a in self.pop:
-      if np.random.random() <= self.mutation_rate and not a['best']:
+      if np.random.random() <= self.mutation_rate:
         a['agent'].mutate()
         a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
         self.pop.agent_name += 1
