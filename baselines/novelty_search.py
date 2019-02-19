@@ -12,17 +12,15 @@ import os
 env_tag = 'Billiard-v0'
 
 class NoveltySearch(object):
-  def __init__(self, env, obs_shape=6, action_shape=2, pop_size=50):
+  def __init__(self, env, filepath, obs_shape=6, action_shape=2, pop_size=50):
     self.obs_space = obs_shape
     self.max_arch_len = 100000
     self.action_space = action_shape
     self.pop = population.Population(agent=agents.DMPAgent,
-                                     dof=2,
-                                     num_bf=20,
+                                     shapes={'dof':2, 'degree':3},
                                      pop_size=pop_size)
     self.archive = population.Population(agent=agents.DMPAgent,
-                                         dof=2,
-                                         num_bf=20,
+                                         shapes={'dof':2, 'degree':3},
                                          pop_size=0)
     self.env = env
     self.min_dist = 0.5
@@ -32,6 +30,10 @@ class NoveltySearch(object):
     self.thread = threading.Thread(target=self._show_progress)
     self.thread.start()
     self.adaptive_distance = False
+    self.filepath = filepath
+    if not os.path.exists(self.filepath):
+      os.mkdir(self.filepath)
+
 
   def _show_progress(self):
     matplotlib.use('agg')
@@ -41,7 +43,7 @@ class NoveltySearch(object):
       if action == 's':
         try:
           bs_points = np.concatenate(self.archive['bs'].values)
-          utils.show(bs_points)
+          utils.show(bs_points, self.filepath)
         except:
           print('Cannot show progress now.')
 
@@ -118,7 +120,7 @@ class NoveltySearch(object):
 
     # Mutate pop that are not novel
     for a in self.pop:
-      if np.random.random() <= self.mutation_rate and not a['best']:
+      if np.random.random() <= self.mutation_rate:
         a['agent'].mutate()
         a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
         self.pop.agent_name += 1
@@ -176,14 +178,17 @@ if __name__ == '__main__':
 
   env.seed()
   np.random.seed()
-  ns = NoveltySearch(env, pop_size=100, obs_shape=6, action_shape=2)
+
+  filepath = os.path.join(utils.get_projectpath(), 'baselines', 'ns')
+
+  ns = NoveltySearch(env, filepath, pop_size=100, obs_shape=6, action_shape=2)
   try:
     ns.evolve(500)
   except KeyboardInterrupt:
     print('User Interruption')
 
   bs_points = np.concatenate(ns.archive['bs'].values)
-  utils.show(bs_points, 'NS_{}_{}'.format(ns.elapsed_gen, env_tag))
+  utils.show(bs_points, ns.filepath, 'NS_{}_{}'.format(ns.elapsed_gen, env_tag))
   print(ns.archive['name'].values)
 
   print('Testing result according to best reward.')
@@ -201,8 +206,3 @@ if __name__ == '__main__':
       obs, reward, done, info = ns.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
       ts += 1
-
-
-
-
-# NOTE NELLA TAB 1 VA QUELLO CON VELOCITY CONTROL, NELLA TAB 2 QUELL CON TORQUE CONTROL
