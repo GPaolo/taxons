@@ -1,5 +1,5 @@
 import numpy as np
-from core.metrics import rnd
+from core.metrics import rnd, ae
 from core.qd import population, agents
 from core.utils import utils
 from core.utils import optimizer
@@ -46,7 +46,7 @@ class RndQD(object):
     else:
       self.device = torch.device('cpu')
     if self.use_novelty:
-      self.metric = rnd.RND(encoding_shape=bs_shape)
+      self.metric = ae.AutoEncoder()
     else:
       self.metric = None
 
@@ -104,7 +104,7 @@ class RndQD(object):
     surprise = 0
     if self.use_novelty:
       state = self.env.render(rendered=False)
-      state = torch.Tensor(state).permute(2,0,1)
+      state = torch.Tensor(state).permute(2,0,1).cuda()
       # We perform the training step directly here, this way we measure the novelty of one agent also wrt to the others
       surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
       surprise = surprise.cpu().data.numpy()
