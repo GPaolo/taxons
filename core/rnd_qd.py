@@ -46,7 +46,7 @@ class RndQD(object):
     else:
       self.device = torch.device('cpu')
     if self.use_novelty:
-      self.metric = rnd.RND(encoding_shape=bs_shape, device=self.device)
+      self.metric = ae.AutoEncoder(device=self.device, encoding_shape=bs_shape)
     else:
       self.metric = None
 

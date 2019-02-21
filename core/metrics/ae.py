@@ -10,7 +10,7 @@ import os
 
 class AutoEncoder(nn.Module):
 
-  def __init__(self, device=None):
+  def __init__(self, device=None, **kwargs):
     super(AutoEncoder, self).__init__()
 
     if device is not None:
@@ -35,7 +35,7 @@ class AutoEncoder(nn.Module):
     #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).cuda(self.device)
 
     self.criterion = nn.MSELoss()
-    self.learning_rate = 0.01
+    self.learning_rate = 0.001
     self.zero_grad()
     self.optimizer = optim.Adam(self.parameters(), self.learning_rate, weight_decay=1e-5)
 

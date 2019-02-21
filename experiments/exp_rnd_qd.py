@@ -17,7 +17,7 @@ ex = Experiment()
 def config():
   info = 'Testing DMP based on 3rd degree polynomial. Here I mutate also the ones added to the archive'
 
-  exp_name = 'TEST'
+  exp_name = 'autoencoder'
   seed = 7
 
   # Environment
@@ -74,7 +74,7 @@ def main(env_tag, seed,
                          pop_size=pop_size,
                          use_novelty=use_novelty,
                          use_archive=use_archive,
-                         gpu=True,
+                         gpu=False,
                          save_path=save_path,
                          agent_name=qd_agent)
   try:
