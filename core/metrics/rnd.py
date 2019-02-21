@@ -15,12 +15,20 @@ class RND(object):
     Class that instantiates the RND component
     '''
     self.encoding_shape = encoding_shape
-    self.device = device
+    if device is not None:
+      self.device = device
+    else:
+      self.device = torch.device("cpu")
+
     # Nets
-    self.target_model = TargetNet(output_shape=self.encoding_shape, device=self.device, fixed=True)
-    self.predictor_model = PredictorNet(output_shape=self.encoding_shape, device=self.device, fixed=False)
+    self.target_model = TargetNet(output_shape=self.encoding_shape, fixed=True)
+    self.predictor_model = PredictorNet(output_shape=self.encoding_shape, fixed=False)
+
+    self.target_model.to(self.device)
+    self.predictor_model.to(self.device)
     # Loss
     self.criterion = nn.MSELoss()
+    self.criterion.to(self.device)
     # Optimizer
     self.learning_rate = 0.0001
     self.optimizer = optim.SGD(self.predictor_model.parameters(), self.learning_rate)

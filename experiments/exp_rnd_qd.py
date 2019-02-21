@@ -17,7 +17,7 @@ ex = Experiment()
 def config():
   info = 'Testing DMP based on 3rd degree polynomial. Here I mutate also the ones added to the archive'
 
-  exp_name = 'autoencoder'
+  exp_name = 'TEST'
   seed = 7
 
   # Environment

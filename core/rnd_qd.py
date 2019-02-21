@@ -46,7 +46,7 @@ class RndQD(object):
     else:
       self.device = torch.device('cpu')
     if self.use_novelty:
-      self.metric = ae.AutoEncoder()
+      self.metric = rnd.RND(encoding_shape=bs_shape, device=self.device)
     else:
       self.metric = None
 
@@ -104,7 +104,7 @@ class RndQD(object):
     surprise = 0
     if self.use_novelty:
       state = self.env.render(rendered=False)
-      state = torch.Tensor(state).permute(2,0,1).cuda()
+      state = torch.Tensor(state).permute(2,0,1).to(self.device)
       # We perform the training step directly here, this way we measure the novelty of one agent also wrt to the others
       surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
       surprise = surprise.cpu().data.numpy()
