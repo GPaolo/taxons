@@ -17,7 +17,7 @@ ex = Experiment()
 def config():
   info = 'Testing DMP based on 3rd degree polynomial. Here I mutate also the ones added to the archive'
 
-  exp_name = 'total_mutation'
+  exp_name = 'neural'
   seed = 7
 
   # Environment
@@ -33,11 +33,11 @@ def config():
   use_novelty = True
   use_archive = True
 
-  qd_agent = 'DMP' #'DMP
+  qd_agent = 'Neural' #'DMP
   if qd_agent == 'Neural':
     agent_shapes = {'input_shape':6, 'output_shape':action_shape}
   elif qd_agent == 'DMP':
-    agent_shapes = {'dof':2, 'degree':20}
+    agent_shapes = {'dof':2, 'degree':3}
   # ---------------------------------------------------------
 
   # RND
