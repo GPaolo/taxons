@@ -1,5 +1,5 @@
 import numpy as np
-from core.rnd import rnd
+from core.metrics import rnd
 from core.qd import population, agents
 from core.utils import utils
 from core.utils import optimizer

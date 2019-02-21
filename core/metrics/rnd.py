@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from core.rnd.net import TargetNet, PredictorNet
+from core.metrics.net import TargetNet, PredictorNet
 import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
