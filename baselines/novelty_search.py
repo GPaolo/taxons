@@ -118,7 +118,7 @@ class NoveltySearch(object):
     for i, new_agent in zip(dead, new_gen):
       self.pop[i] = new_agent
 
-    # Mutate pop that are not novel
+    # Mutate pop
     for a in self.pop:
       if np.random.random() <= self.mutation_rate:
         a['agent'].mutate()
