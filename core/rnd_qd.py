@@ -54,10 +54,10 @@ class RndQD(object):
     self.cumulated_state = []
 
     self.END = False
-    self.thread = threading.Thread(target=self._control)
+    self.thread = threading.Thread(target=self._control_interface)
     self.thread.start()
 
-  def _control(self):
+  def _control_interface(self):
     print('If you want to show the progress, press s.')
     print('If you want to stop training, press q.')
     matplotlib.use('agg')
@@ -105,31 +105,21 @@ class RndQD(object):
     if self.use_novelty:
       state = self.env.render(rendered=False)
       state = torch.Tensor(state).permute(2,0,1).to(self.device)
-      # We perform the training step directly here, this way we measure the novelty of one agent also wrt to the others
+
       surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
       surprise = surprise.cpu().data.numpy()
       # self.cumulated_state.append(state) # Append here all the states
+
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
 
-  def update_rnd(self):
+  def update_metric(self):
     '''
-    This function uses the cumulated state to update the rnd nets and then empties the cumulated_state
+    This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
     '''
-    # Find max trajectory length
-    max_t_len = 0
-    for k in self.cumulated_state:
-      if k.size()[0] > max_t_len:
-        max_t_len = k.size()[0]
-    # Pad trajectories
-    for idx, k in enumerate(self.cumulated_state):
-      while k.size()[0] < max_t_len:
-        k = torch.cat((k, torch.zeros_like(k[:1])))
-      self.cumulated_state[idx] = k
-
-    self.cumulated_state = torch.stack(self.cumulated_state)
+    self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
     cum_surprise = self.metric.training_step(self.cumulated_state)
     self.cumulated_state = []
     return cum_surprise
@@ -150,7 +140,7 @@ class RndQD(object):
         if max_rew < a['reward']:
           max_rew = a['reward']
       # if self.use_novelty:
-      #   self.update_rnd() # From here we can get the cumulated surprise on the same state as cs but after training
+      #   self.update_metric()
 
       self.opt.step()
       if self.elapsed_gen % 10 == 0:

@@ -15,7 +15,7 @@ ex = Experiment()
 
 @ex.config
 def config():
-  info = 'Testing DMP based on 3rd degree polynomial. Here I mutate also the ones added to the archive'
+  info = 'Metric with AE. The metric is updated once per generation.'
 
   exp_name = 'autoencoder'
   seed = 7

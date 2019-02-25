@@ -42,7 +42,6 @@ class AutoEncoder(nn.Module):
     self.to(self.device)
     self.criterion.to(self.device)
 
-
   def _get_surprise(self, x):
     y = self.forward(x)
     x = self.subsample(x)
