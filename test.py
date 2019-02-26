@@ -52,13 +52,17 @@ class AutoEncoder(nn.Module):
     loss.backward()
     # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.1)
     self.optimizer.step()
-    print(loss)
+    return loss
 
 
 if __name__ == '__main__':
+  from tensorboardX import SummaryWriter
+
   import matplotlib.pyplot as plt
   with open('/home/giuseppe/src/rnd_qd/input_img.npy', 'rb') as f:
     x = np.load(f)
+
+  writer = SummaryWriter('/home/giuseppe/src/rnd_qd/runs')
 
   norm = False
   factor = 1
@@ -70,43 +74,46 @@ if __name__ == '__main__':
   test = x[15:16]
   train = x[0:15]
 
-  for k in range(5000):
-    net.train_ae(train)
+  print('Starting training')
+  for k in range(100000):
+    loss = net.train_ae(train)
+    writer.add_scalar('loss', loss, k)
 
 
-  fig, ax = plt.subplots(4, 4)
+  # fig, ax = plt.subplots(4, 4)
 
+  writer.export_scalars_to_json("./all_scalars.json")
+  writer.close()
 
-
-  for i in range(4):
-    for j in range(4):
-      k = i+j
-      b = net(x[k:k+1])
-      a = b[0]
-      a = a.permute(1, 2, 0)
-      a = a.cpu().data.numpy()
-      if not norm:
-        a = a.astype(np.int)
-
-      ax[i, j].imshow(a)
-      # plt.imshow(a)
-  plt.show()
-
-
-  fig, ax = plt.subplots(1, 2)
-  b = net(test)
-  a = b[0]
-  a = a.permute(1, 2, 0)
-  a = a.cpu().data.numpy()
-  if not norm:
-    a = a.astype(np.int)
-  ax[0].imshow(a)
-
-  test = test[0].permute(1,2,0)
-  test = test.cpu().data.numpy()
-  ax[1].imshow(test)
-
-  k = net.subsample(x[15:16])
-  ll = net.criterion(b, k)
-  print(ll)
-  plt.show()
+  # for i in range(4):
+  #   for j in range(4):
+  #     k = i+j
+  #     b = net(x[k:k+1])
+  #     a = b[0]
+  #     a = a.permute(1, 2, 0)
+  #     a = a.cpu().data.numpy()
+  #     if not norm:
+  #       a = a.astype(np.int)
+  #
+  #     ax[i, j].imshow(a)
+  #     # plt.imshow(a)
+  # plt.show()
+  #
+  #
+  # fig, ax = plt.subplots(1, 2)
+  # b = net(test)
+  # a = b[0]
+  # a = a.permute(1, 2, 0)
+  # a = a.cpu().data.numpy()
+  # if not norm:
+  #   a = a.astype(np.int)
+  # ax[0].imshow(a)
+  #
+  # test = test[0].permute(1,2,0)
+  # test = test.cpu().data.numpy()
+  # ax[1].imshow(test)
+  #
+  # k = net.subsample(x[15:16])
+  # ll = net.criterion(b, k)
+  # print(ll)
+  # plt.show()

@@ -7,6 +7,7 @@ import gym, torch
 import gym_billiard
 import os, threading
 import matplotlib
+from tensorboardX import SummaryWriter
 env_tag = 'Billiard-v0'
 # env_tag = 'MountainCarContinuous-v0'
 
@@ -26,6 +27,10 @@ class RndQD(object):
     self.save_path = save_path
     self.agents_shapes = agents_shapes
     self.agent_name = agent_name
+
+    self.writer = SummaryWriter(self.save_path)
+    self.metric_update_steps = 0
+    self.metric_update_single_agent = False
 
     if self.agent_name == 'Neural':
       agent_type = agents.FFNeuralAgent
@@ -106,7 +111,12 @@ class RndQD(object):
       state = self.env.render(rendered=False)
       state = torch.Tensor(state).permute(2,0,1).to(self.device)
 
-      surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
+      if self.metric_update_single_agent:
+        surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
+        self.metric_update_steps += 1
+        self.writer.add_scalar('novelty', surprise, self.metric_update_steps)
+      else:
+        surprise = self.metric(state.unsqueeze(0))
       surprise = surprise.cpu().data.numpy()
       # self.cumulated_state.append(state) # Append here all the states
 
@@ -121,6 +131,10 @@ class RndQD(object):
     '''
     self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
     cum_surprise = self.metric.training_step(self.cumulated_state)
+
+    self.metric_update_steps += 1
+    self.writer.add_scalar('novelty', cum_surprise, self.metric_update_steps)
+
     self.cumulated_state = []
     return cum_surprise
 
@@ -139,10 +153,15 @@ class RndQD(object):
         cs += a['surprise']
         if max_rew < a['reward']:
           max_rew = a['reward']
-      # if self.use_novelty:
-      #   self.update_metric()
+
+      if not self.metric_update_single_agent:
+        self.update_metric()
 
       self.opt.step()
+
+      self.writer.add_scalar('Archive size', self.archive.size, self.elapsed_gen)
+      self.writer.add_scalar('Avg generation novelty', cs/self.pop_size)
+
       if self.elapsed_gen % 10 == 0:
         print('Generation {}'.format(self.elapsed_gen))
         if self.archive is not None:
@@ -165,6 +184,10 @@ class RndQD(object):
     self.population.save_pop(self.save_path, 'pop')
     self.archive.save_pop(self.save_path, 'archive')
     self.metric.save(self.save_path)
+
+    self.writer.export_scalars_to_json(os.path.join(self.save_path, "scalars_log.json"))
+    self.writer.close()
+
     print('Done')
 
 if __name__ == '__main__':
