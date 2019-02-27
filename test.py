@@ -14,7 +14,7 @@ class AutoEncoder(nn.Module):
     super(AutoEncoder, self).__init__()
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    self.subsample = nn.AvgPool2d(8).cuda(self.device) # 600 -> 75
+    self.subsample = nn.AvgPool2d(8).to(self.device) # 600 -> 75
 
     # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2, padding=1), nn.ReLU(), # 75 -> 37
     #                              nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=2), nn.ReLU(), # 37 -> 17
@@ -24,16 +24,16 @@ class AutoEncoder(nn.Module):
     #                              nn.ConvTranspose2d(in_channels=8, out_channels=4, kernel_size=3, stride=2), nn.ReLU(), # 17 -> 35
     #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=3, stride=2), nn.ReLU()).cuda(self.device) # 35 -> 75
 
-    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=7, stride=2), nn.ReLU(), # 75 -> 35
-                                 nn.Conv2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.ReLU()).cuda(self.device) # 35 -> 11
+    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=5, stride=2), nn.ReLU()).to(self.device) # 35 -> 11
 
-    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.ReLU(),
-                                 nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).cuda(self.device)
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=5, stride=2), nn.ReLU()).to(self.device)
 
-    self.criterion = nn.MSELoss().cuda(self.device)
-    self.learning_rate = 0.01
     self.zero_grad()
+    self.learning_rate = 0.01
     self.optimizer = optim.Adam(self.parameters(), self.learning_rate, weight_decay=1e-5)
+
+    self.criterion = nn.MSELoss().to(self.device)
+    self.to(self.device)
 
 
   def forward(self, x):
@@ -75,45 +75,46 @@ if __name__ == '__main__':
   train = x[0:15]
 
   print('Starting training')
-  for k in range(100000):
+  for k in range(5000):
     loss = net.train_ae(train)
+    if k%100 == 0:
+      print('Loss at {}: {}'.format(k, loss))
     writer.add_scalar('loss', loss, k)
 
 
-  # fig, ax = plt.subplots(4, 4)
+  fig, ax = plt.subplots(4, 4)
 
-  writer.export_scalars_to_json("./all_scalars.json")
-  writer.close()
+  #writer.export_scalars_to_json("./all_scalars.json")
+  #writer.close()
 
-  # for i in range(4):
-  #   for j in range(4):
-  #     k = i+j
-  #     b = net(x[k:k+1])
-  #     a = b[0]
-  #     a = a.permute(1, 2, 0)
-  #     a = a.cpu().data.numpy()
-  #     if not norm:
-  #       a = a.astype(np.int)
+  for i in range(4):
+    for j in range(4):
+      k = i+j
+      b = net(x[k:k+1])
+      a = b[0]
+      a = a.permute(1, 2, 0)
+      a = a.cpu().data.numpy()
+      if not norm:
+        a = a.astype(np.int)
+
+      ax[i, j].imshow(a)
+      # plt.imshow(a)
+  plt.show()
+
+  fig, ax = plt.subplots(1, 2)
+  b = net(test)
+  a = b[0]
+  a = a.permute(1, 2, 0)
+  a = a.cpu().data.numpy()
+  if not norm:
+    a = a.astype(np.int)
+  ax[0].imshow(a)
   #
-  #     ax[i, j].imshow(a)
-  #     # plt.imshow(a)
-  # plt.show()
+  test = test[0].permute(1,2,0)
+  test = test.cpu().data.numpy()
+  ax[1].imshow(test)
   #
-  #
-  # fig, ax = plt.subplots(1, 2)
-  # b = net(test)
-  # a = b[0]
-  # a = a.permute(1, 2, 0)
-  # a = a.cpu().data.numpy()
-  # if not norm:
-  #   a = a.astype(np.int)
-  # ax[0].imshow(a)
-  #
-  # test = test[0].permute(1,2,0)
-  # test = test.cpu().data.numpy()
-  # ax[1].imshow(test)
-  #
-  # k = net.subsample(x[15:16])
-  # ll = net.criterion(b, k)
-  # print(ll)
-  # plt.show()
+  k = net.subsample(x[15:16])
+  ll = net.criterion(b, k)
+  print(ll)
+  plt.show()

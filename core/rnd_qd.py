@@ -30,7 +30,7 @@ class RndQD(object):
 
     self.writer = SummaryWriter(self.save_path)
     self.metric_update_steps = 0
-    self.metric_update_single_agent = False
+    self.metric_update_single_agent = True
 
     if self.agent_name == 'Neural':
       agent_type = agents.FFNeuralAgent
@@ -116,6 +116,7 @@ class RndQD(object):
         self.metric_update_steps += 1
         self.writer.add_scalar('novelty', surprise, self.metric_update_steps)
       else:
+        self.cumulated_state.append(state)
         surprise = self.metric(state.unsqueeze(0))
       surprise = surprise.cpu().data.numpy()
       # self.cumulated_state.append(state) # Append here all the states
@@ -159,8 +160,8 @@ class RndQD(object):
 
       self.opt.step()
 
-      self.writer.add_scalar('Archive size', self.archive.size, self.elapsed_gen)
-      self.writer.add_scalar('Avg generation novelty', cs/self.pop_size)
+      self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)
+      self.writer.add_scalar('Avg_generation_novelty', cs/self.pop_size)
 
       if self.elapsed_gen % 10 == 0:
         print('Generation {}'.format(self.elapsed_gen))

@@ -7,6 +7,8 @@ dist/*
 */__pycache__/*
 */*/__pycache__/*
 experiments/*
+runs/*
+*runs*
 *.pt
 *.pdf
 *.npy

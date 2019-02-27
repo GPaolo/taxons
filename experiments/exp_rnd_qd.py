@@ -15,9 +15,9 @@ ex = Experiment()
 
 @ex.config
 def config():
-  info = 'Metric with AE. The metric is updated once per generation.'
+  info = 'Metric with AE. The metric is updated once per agent. AE has a single layer encoder and a single layer decoder'
 
-  exp_name = 'autoencoder'
+  exp_name = 'autoencoder_single_layer'
   seed = 7
 
   # Environment
@@ -74,7 +74,7 @@ def main(env_tag, seed,
                          pop_size=pop_size,
                          use_novelty=use_novelty,
                          use_archive=use_archive,
-                         gpu=False,
+                         gpu=True,
                          save_path=save_path,
                          agent_name=qd_agent)
   try:
