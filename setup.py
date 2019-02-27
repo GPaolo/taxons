@@ -11,6 +11,8 @@ setup(author='Giuseppe Paolo',
             'pygame',
             'box2d',
             'sacred',
-            'tensorboardX'
+            'tensorboardX',
+            'pyjson'
+
       ]
 )

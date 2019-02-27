@@ -24,13 +24,16 @@ class AutoEncoder(nn.Module):
     #                              nn.ConvTranspose2d(in_channels=8, out_channels=4, kernel_size=3, stride=2), nn.ReLU(), # 17 -> 35
     #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=3, stride=2), nn.ReLU()).cuda(self.device) # 35 -> 75
 
-    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=5, stride=2), nn.ReLU()).to(self.device) # 35 -> 11
+    self.encoder = nn.Sequential(nn.Linear(16875, 1024), nn.Tanh(),
+                                 nn.Linear(1024, 256), nn.ReLU()).to(self.device)
+    self.decoder = nn.Sequential(nn.Linear(256, 1024), nn.Tanh(),
+                                 nn.Linear(1024, 16875), nn.ReLU()).to(self.device)
 
-    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=5, stride=2), nn.ReLU()).to(self.device)
 
     self.zero_grad()
     self.learning_rate = 0.01
     self.optimizer = optim.Adam(self.parameters(), self.learning_rate, weight_decay=1e-5)
+    self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, [3000, 8000], 0.1)
 
     self.criterion = nn.MSELoss().to(self.device)
     self.to(self.device)
@@ -38,10 +41,11 @@ class AutoEncoder(nn.Module):
 
   def forward(self, x):
     y = self.subsample(x)
-    y = self.encoder(y)
+    shape = y.shape
+    y = self.encoder(y.view(shape[0], -1))
     y = self.decoder(y)
 
-    return y
+    return y.view(shape)
 
   def train_ae(self, x):
     self.optimizer.zero_grad()
@@ -52,6 +56,7 @@ class AutoEncoder(nn.Module):
     loss.backward()
     # torch.nn.utils.clip_grad_norm_(self.parameters(), 0.1)
     self.optimizer.step()
+    self.scheduler.step()
     return loss
 
 
@@ -75,7 +80,7 @@ if __name__ == '__main__':
   train = x[0:15]
 
   print('Starting training')
-  for k in range(5000):
+  for k in range(10000):
     loss = net.train_ae(train)
     if k%100 == 0:
       print('Loss at {}: {}'.format(k, loss))

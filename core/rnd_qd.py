@@ -14,23 +14,23 @@ env_tag = 'Billiard-v0'
 
 class RndQD(object):
 
-  def __init__(self, env, agents_shapes, bs_shape, pop_size, save_path, agent_name, use_novelty=True, use_archive=False, gpu=False):
+  def __init__(self, env, parameters):
     '''
 
     :param env: Environment in which we act
-    :param bs_shape: dimension of the behavious space
+    :param parameters: Parameters to use
     '''
-    self.pop_size = pop_size
-    self.use_novelty = use_novelty
-    self.parameters = None
+    self.params = parameters
+    self.pop_size = self.params.pop_size
+    self.use_novelty = self.params.use_novelty
     self.env = env
-    self.save_path = save_path
-    self.agents_shapes = agents_shapes
-    self.agent_name = agent_name
+    self.save_path = self.params.save_path
+    self.agents_shapes = self.params.agent_shapes
+    self.agent_name = self.params.qd_agent
 
     self.writer = SummaryWriter(self.save_path)
     self.metric_update_steps = 0
-    self.metric_update_single_agent = True
+    self.metric_update_single_agent = False
 
     if self.agent_name == 'Neural':
       agent_type = agents.FFNeuralAgent
@@ -41,17 +41,17 @@ class RndQD(object):
                                             shapes=self.agents_shapes,
                                             pop_size=self.pop_size)
     self.archive = None
-    if use_archive:
+    if self.params.use_archive:
       self.archive = population.Population(agent=agent_type,
                                            shapes=self.agents_shapes,
                                            pop_size=0)
 
-    if gpu:
+    if self.params.gpu:
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     else:
       self.device = torch.device('cpu')
     if self.use_novelty:
-      self.metric = ae.AutoEncoder(device=self.device, encoding_shape=bs_shape)
+      self.metric = ae.AutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:
       self.metric = None
 
@@ -176,62 +176,18 @@ class RndQD(object):
         break
 
   def save(self):
+    save_subf = os.path.join(self.save_path, 'models')
     print('Saving...')
-    if not os.path.exists(self.save_path):
+    if not os.path.exists(save_subf):
       try:
-        os.mkdir(os.path.abspath(self.save_path))
+        os.makedirs(os.path.abspath(save_subf))
       except:
         print('Cannot create save folder.')
-    self.population.save_pop(self.save_path, 'pop')
-    self.archive.save_pop(self.save_path, 'archive')
-    self.metric.save(self.save_path)
+    self.population.save_pop(save_subf, 'pop')
+    self.archive.save_pop(save_subf, 'archive')
+    self.metric.save(save_subf)
 
     self.writer.export_scalars_to_json(os.path.join(self.save_path, "scalars_log.json"))
     self.writer.close()
 
     print('Done')
-
-if __name__ == '__main__':
-  env = gym.make(env_tag)
-
-  env.seed()
-  np.random.seed()
-  torch.initial_seed()
-
-  rnd_qd = RndQD(env, action_shape=2, obs_shape=6, bs_shape=64, pop_size=100, use_novelty=True, use_archive=True, gpu=True)
-  try:
-    rnd_qd.train(500)
-  except KeyboardInterrupt:
-    print('User Interruption.')
-
-  rnd_qd.save('RND_QD_{}'.format(rnd_qd.elapsed_gen))
-
-  if rnd_qd.archive is None:
-    pop = rnd_qd.population
-  else:
-    pop = rnd_qd.archive
-  print('Total generations: {}'.format(rnd_qd.elapsed_gen))
-  print('Archive length {}'.format(pop.size))
-
-  if rnd_qd.archive is not None:
-    bs_points = np.concatenate(rnd_qd.archive['bs'].values)
-  else:
-    bs_points = np.concatenate([a['bs'] for a in rnd_qd.population if a['bs'] is not None])
-  utils.show(bs_points, 'RNDQD_{}_{}'.format(rnd_qd.elapsed_gen, env_tag))
-
-  print('Testing result according to best reward.')
-  rewards = pop['reward'].sort_values(ascending=False)
-  for idx in range(pop.size):
-    tested = pop[rewards.iloc[idx:idx+1].index.values[0]]
-    print()
-    print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
-    done = False
-    ts = 0
-    obs = utils.obs_formatting(env_tag, rnd_qd.env.reset())
-    while not done and ts < 3000:
-      rnd_qd.env.render()
-      action = utils.action_formatting(env_tag, tested['agent'](obs))
-      obs, reward, done, info = rnd_qd.env.step(action)
-      obs = utils.obs_formatting(env_tag, obs)
-      ts += 1
-

@@ -6,79 +6,83 @@ from core import rnd_qd
 import gym, torch
 import gym_billiard
 import numpy as np
-from core.qd import agents
 from core.utils import utils
 from sacred.observers import FileStorageObserver
 import os
+import json
 
 ex = Experiment()
 
+class Params(object):
+
+  def __init__(self):
+    self.info = 'Metric with AE. The metric is updated once per gen. AE has a single layer encoder and a single layer decoder'
+
+    self.exp_name = 'test_params'
+    self.seed = 7
+
+    # Environment
+    # ---------------------------------------------------------
+    self.action_shape = 2
+    self.env_tag = 'Billiard-v0'  # MountainCarContinuous-v0'
+    # ---------------------------------------------------------
+
+    # QD
+    # ---------------------------------------------------------
+    self.generations = 500
+    self.pop_size = 100
+    self.use_novelty = True
+    self.use_archive = True
+
+    self.qd_agent = 'Neural'  # 'DMP
+    if self.qd_agent == 'Neural':
+      self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
+    elif self.qd_agent == 'DMP':
+      self.agent_shapes = {'dof': 2, 'degree': 3}
+    # ---------------------------------------------------------
+
+    # Metric
+    # ---------------------------------------------------------
+    self.gpu = True
+    self.rnd_input = 'image'
+    self.feature_size = 64
+    self.learning_rate = 0.01
+    # ---------------------------------------------------------
+
+    # Save Path
+    self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
+
+  def _get_dict(self):
+    params_dict = {key:value for key, value in self.__dict__items() if not key.startswith('__') and not callable(key)}
+    return params_dict
+
+  def save(self):
+    if not os.path.exists(self.save_path):
+      os.mkdir(self.save_path)
+    with open(os.path.join(self.save_path, 'params.json'), 'w') as f:
+      json.dump(self._get_dict(), f, indent=4)
+
+
 @ex.config
 def config():
-  info = 'Metric with AE. The metric is updated once per agent. AE has a single layer encoder and a single layer decoder'
-
-  exp_name = 'autoencoder_single_layer'
-  seed = 7
-
-  # Environment
-  # ---------------------------------------------------------
-  action_shape = 2
-  env_tag = 'Billiard-v0'  # MountainCarContinuous-v0'
-  # ---------------------------------------------------------
-
-  # QD
-  # ---------------------------------------------------------
-  generations = 500
-  pop_size = 100
-  use_novelty = True
-  use_archive = True
-
-  qd_agent = 'Neural' #'DMP
-  if qd_agent == 'Neural':
-    agent_shapes = {'input_shape':6, 'output_shape':action_shape}
-  elif qd_agent == 'DMP':
-    agent_shapes = {'dof':2, 'degree':3}
-  # ---------------------------------------------------------
-
-  # RND
-  # ---------------------------------------------------------
-  rnd_input = 'image'
-  rnd_output_size = 64
-  # ---------------------------------------------------------
-
-  # Save Path
-  save_path = os.path.join(utils.get_projectpath(), 'experiments', exp_name)
-
-  ex.observers.append(FileStorageObserver.create(save_path))
-
+  params = Params()
+  ex.observers.append(FileStorageObserver.create(params.save_path))
 
 @ex.automain
-def main(env_tag, seed,
-         use_novelty, use_archive,
-         pop_size, save_path,
-         agent_shapes, rnd_output_size,
-         generations, qd_agent):
+def main(params):
 
-  env = gym.make(env_tag)
+  env = gym.make(params.env_tag)
 
-  env.seed(seed)
-  np.random.seed(seed)
-  torch.manual_seed(seed)
+  env.seed(params.seed)
+  np.random.seed(params.seed)
+  torch.manual_seed(params.seed)
 
-  if not os.path.exists(save_path):
-    os.mkdir(save_path)
+  if not os.path.exists(params.save_path):
+    os.mkdir(params.save_path)
 
-  evolver = rnd_qd.RndQD(env=env,
-                         agents_shapes=agent_shapes,
-                         bs_shape=rnd_output_size,
-                         pop_size=pop_size,
-                         use_novelty=use_novelty,
-                         use_archive=use_archive,
-                         gpu=True,
-                         save_path=save_path,
-                         agent_name=qd_agent)
+  evolver = rnd_qd.RndQD(env=env, parameters=params)
   try:
-    evolver.train(generations)
+    evolver.train(params.generations)
   except KeyboardInterrupt:
     print('User Interruption.')
 
@@ -95,7 +99,7 @@ def main(env_tag, seed,
     bs_points = np.concatenate(evolver.archive['bs'].values)
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
-  utils.show(bs_points, filepath=save_path, name='final_{}_{}'.format(evolver.elapsed_gen, env_tag))
+  utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
 
   print('Testing result according to best reward.')
   rewards = pop['reward'].sort_values(ascending=False)
@@ -105,17 +109,17 @@ def main(env_tag, seed,
     print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
     done = False
     ts = 0
-    obs = utils.obs_formatting(env_tag, evolver.env.reset())
+    obs = utils.obs_formatting(params.env_tag, evolver.env.reset())
     while not done:
       evolver.env.render()
 
-      if qd_agent == 'Neural':
+      if params.qd_agent == 'Neural':
         agent_input = obs
-      elif qd_agent == 'DMP':
+      elif params.qd_agent == 'DMP':
         agent_input = ts
 
-      action = utils.action_formatting(env_tag, tested['agent'](agent_input))
+      action = utils.action_formatting(params.env_tag, tested['agent'](agent_input))
       obs, reward, done, info = evolver.env.step(action)
-      obs = utils.obs_formatting(env_tag, obs)
+      obs = utils.obs_formatting(params.env_tag, obs)
       ts += 1
 

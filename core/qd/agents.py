@@ -118,22 +118,12 @@ class DMPAgent(BaseAgent):
   def mutate(self):
     for dmp in self.genome:
       dmp.w = dmp.w + self.mutation_operator(dmp.w.shape[0])
-      # dmp.mu = dmp.mu + self.mutation_operator(dmp.w.shape[0])
-      # dmp.sigma = dmp.sigma + self.mutation_operator(dmp.w.shape[0])
-      # dmp.a_x = dmp.a_x + self.mutation_operator()
-      # dmp.tau = dmp.tau + self.mutation_operator()
       dmp.scale = dmp.scale + self.mutation_operator()
 
   def load_genome(self, params, agent):
     for p, g in zip(params, self.genome):
       assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for dmp {} of agent {}'.format(self.name, agent)
-      # assert np.all(np.shape(g.sigma) == np.shape(p['sigma'])), 'Wrong shape of sigma for dmp {} of agent {}'.format(self.name, agent)
-      # assert np.all(np.shape(g.mu) == np.shape(p['mu'])), 'Wrong shape of mu for dmp {} of agent {}'.format(self.name, agent)
       g.w = p['w']
-      # g.sigma = p['sigma']
-      # g.mu = p['mu']
-      # g.tau = p['tau']
-      # g.a_x = p['a_x']
       g.scale = p['scale']
 
 
