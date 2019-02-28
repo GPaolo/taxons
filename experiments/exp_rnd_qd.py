@@ -16,9 +16,9 @@ ex = Experiment()
 class Params(object):
 
   def __init__(self):
-    self.info = 'Metric with AE. The metric is updated once per gen. AE has a single layer encoder and a single layer decoder'
+    self.info = 'Metric with AE. The metric is updated once per gen. AE is deep'
 
-    self.exp_name = 'test_params'
+    self.exp_name = 'ae_deep_genup_DMP'
     self.seed = 7
 
     # Environment
@@ -31,22 +31,22 @@ class Params(object):
     # ---------------------------------------------------------
     self.generations = 500
     self.pop_size = 100
-    self.use_novelty = True
     self.use_archive = True
 
-    self.qd_agent = 'Neural'  # 'DMP
+    self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': 2, 'degree': 3}
+      self.agent_shapes = {'dof': 2, 'degree': 5}
     # ---------------------------------------------------------
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = True
-    self.rnd_input = 'image'
+    self.gpu = False
+    self.metric = 'AE' # 'RND'
     self.feature_size = 64
-    self.learning_rate = 0.01
+    self.learning_rate = 0.01 # 0.0001 for RND
+    self.per_agent_update = True
     # ---------------------------------------------------------
 
     # Save Path

@@ -22,7 +22,6 @@ class RndQD(object):
     '''
     self.params = parameters
     self.pop_size = self.params.pop_size
-    self.use_novelty = self.params.use_novelty
     self.env = env
     self.save_path = self.params.save_path
     self.agents_shapes = self.params.agent_shapes
@@ -30,7 +29,7 @@ class RndQD(object):
 
     self.writer = SummaryWriter(self.save_path)
     self.metric_update_steps = 0
-    self.metric_update_single_agent = False
+    self.metric_update_single_agent = self.params.per_agent_update
 
     if self.agent_name == 'Neural':
       agent_type = agents.FFNeuralAgent
@@ -50,10 +49,11 @@ class RndQD(object):
       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     else:
       self.device = torch.device('cpu')
-    if self.use_novelty:
+
+    if self.params.metric == 'AE':
       self.metric = ae.AutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:
-      self.metric = None
+      self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
     self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
@@ -106,20 +106,17 @@ class RndQD(object):
       t += 1
       cumulated_reward += reward
 
-    surprise = 0
-    if self.use_novelty:
-      state = self.env.render(rendered=False)
-      state = torch.Tensor(state).permute(2,0,1).to(self.device)
+    state = self.env.render(rendered=False)
+    state = torch.Tensor(state).permute(2,0,1).to(self.device)
 
-      if self.metric_update_single_agent:
-        surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
-        self.metric_update_steps += 1
-        self.writer.add_scalar('novelty', surprise, self.metric_update_steps)
-      else:
-        self.cumulated_state.append(state)
-        surprise = self.metric(state.unsqueeze(0))
-      surprise = surprise.cpu().data.numpy()
-      # self.cumulated_state.append(state) # Append here all the states
+    if self.metric_update_single_agent:
+      surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
+      self.metric_update_steps += 1
+      self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
+    else:
+      self.cumulated_state.append(state)
+      surprise = self.metric(state.unsqueeze(0))
+    surprise = surprise.cpu().data.numpy()
 
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['surprise'] = surprise

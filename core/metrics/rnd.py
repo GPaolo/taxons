@@ -10,7 +10,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class RND(object):
 
-  def __init__(self, encoding_shape, device=None):
+  def __init__(self, encoding_shape, learning_rate=0.0001, device=None):
     '''
     Class that instantiates the RND component
     '''
@@ -30,7 +30,7 @@ class RND(object):
     self.criterion = nn.MSELoss()
     self.criterion.to(self.device)
     # Optimizer
-    self.learning_rate = 0.0001
+    self.learning_rate = learning_rate
     self.optimizer = optim.SGD(self.predictor_model.parameters(), self.learning_rate)
 
   def _get_surprise(self, x, train=False):

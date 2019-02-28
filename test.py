@@ -16,22 +16,33 @@ class AutoEncoder(nn.Module):
 
     self.subsample = nn.AvgPool2d(8).to(self.device) # 600 -> 75
 
-    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2, padding=1), nn.ReLU(), # 75 -> 37
-    #                              nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=2), nn.ReLU(), # 37 -> 17
+    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=1, padding=1), nn.ReLU(), # 75 -> 37
+    #                              nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=1), nn.ReLU(), # 37 -> 17
     #                              nn.Conv2d(in_channels=16, out_channels=4, kernel_size=3, stride=1), nn.ReLU()).cuda(self.device) # 17 -> 8
     #
     # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=8, kernel_size=3, stride=1), nn.ReLU(), # 8 -> 17
-    #                              nn.ConvTranspose2d(in_channels=8, out_channels=4, kernel_size=3, stride=2), nn.ReLU(), # 17 -> 35
-    #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=3, stride=2), nn.ReLU()).cuda(self.device) # 35 -> 75
+    #                              nn.ConvTranspose2d(in_channels=8, out_channels=4, kernel_size=3, stride=1), nn.ReLU(), # 17 -> 35
+    #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=3, stride=1), nn.ReLU()).cuda(self.device) # 35 -> 75
+    #
+    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=1), nn.ReLU(), # 75 -> 35
+    #                              nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=1), nn.ReLU()).to(self.device)  # 35 -> 11
+    #
+    # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=8, kernel_size=5, stride=1), nn.ReLU(),
+    #                              nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=7, stride=1), nn.ReLU()).to(self.device)
 
-    self.encoder = nn.Sequential(nn.Linear(16875, 1024), nn.Tanh(),
+    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=7, stride=1), nn.ReLU()).to(self.device)  # 75 -> 36
+    # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=1), nn.ReLU()).to(self.device)
+
+    self.encoder = nn.Sequential(nn.Linear(16875, 4096), nn.ReLU(),
+                                 nn.Linear(4096, 1024), nn.ReLU(),
                                  nn.Linear(1024, 256), nn.ReLU()).to(self.device)
-    self.decoder = nn.Sequential(nn.Linear(256, 1024), nn.Tanh(),
-                                 nn.Linear(1024, 16875), nn.ReLU()).to(self.device)
+    self.decoder = nn.Sequential(nn.Linear(256, 1024), nn.ReLU(),
+                                 nn.Linear(1024, 4096), nn.ReLU(),
+                                 nn.Linear(4096, 16875), nn.ReLU()).to(self.device)
 
 
     self.zero_grad()
-    self.learning_rate = 0.01
+    self.learning_rate = 0.001
     self.optimizer = optim.Adam(self.parameters(), self.learning_rate, weight_decay=1e-5)
     self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, [3000, 8000], 0.1)
 
@@ -43,6 +54,7 @@ class AutoEncoder(nn.Module):
     y = self.subsample(x)
     shape = y.shape
     y = self.encoder(y.view(shape[0], -1))
+    # y = self.encoder(y)
     y = self.decoder(y)
 
     return y.view(shape)
@@ -61,6 +73,19 @@ class AutoEncoder(nn.Module):
 
 
 if __name__ == '__main__':
+  # env = gym.make('Billiard-v0')
+  #
+  # env.reset()
+  # state = env.render(rendered=False)
+  #
+  # with open('/home/giuseppe/src/rnd_qd/input_img.npy', 'rb') as f:
+  #   tens = np.load(f)
+  #
+  # test = np.append(tens, np.expand_dims(state, 0), 0)
+  # with open('/home/giuseppe/src/rnd_qd/input_img.npy', 'wb') as f:
+  #   test.dump(f)
+  # print(test.shape)
+
   from tensorboardX import SummaryWriter
 
   import matplotlib.pyplot as plt
@@ -76,8 +101,8 @@ if __name__ == '__main__':
 
   net = AutoEncoder()
   x = torch.Tensor(x/factor).permute(0, 3, 1, 2).cuda(net.device)
-  test = x[15:16]
-  train = x[0:15]
+  test = x[21:22]
+  train = x[15:21]
 
   print('Starting training')
   for k in range(10000):
