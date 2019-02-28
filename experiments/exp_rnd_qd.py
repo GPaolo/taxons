@@ -33,7 +33,7 @@ class Params(object):
     self.pop_size = 100
     self.use_archive = True
 
-    self.qd_agent = 'DMP'  # 'DMP
+    self.qd_agent = 'Neural'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
@@ -42,11 +42,11 @@ class Params(object):
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = False
-    self.metric = 'AE' # 'RND'
+    self.gpu = True
+    self.metric = 'AE'  # 'RND'
     self.feature_size = 64
     self.learning_rate = 0.01 # 0.0001 for RND
-    self.per_agent_update = True
+    self.per_agent_update = False
     # ---------------------------------------------------------
 
     # Save Path

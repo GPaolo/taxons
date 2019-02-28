@@ -1,7 +1,7 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod  # This is to force implementation of child class methods
 import random
-from copy import deepcopy
+
 
 class BaseOptimizer(metaclass=ABCMeta):
   def __init__(self, pop, mutation_rate=.9, archive=None):
@@ -10,13 +10,13 @@ class BaseOptimizer(metaclass=ABCMeta):
     self.mutation_rate = mutation_rate
 
   def _get_pareto_front(self, costs, direction='max'):
-    '''
+    """
     This function calculates the agents in the pareto front. Is taken from:
     https://stackoverflow.com/questions/32791911/fast-calculation-of-pareto-front-in-python
     :param: costs: list of costs along which calculate the front. Shape [pop_len, num_of_pareto_dim]
     :param: direction: can be either 'min' or 'max'. Defines The way we calculate the front.
     :return: The boolean mask of the pareto efficient elements.
-    '''
+    """
     assert direction in ['min', 'max'], 'Direction can be either min or max. Is {}'.format(direction)
     is_pareto = np.arange(len(costs))
 
@@ -35,9 +35,9 @@ class BaseOptimizer(metaclass=ABCMeta):
 
   @abstractmethod
   def step(self, **kwargs):
-    '''
+    """
     Optimizer step
-    '''
+    """
     pass
 
 
@@ -57,45 +57,6 @@ class FitnessOptimizer(BaseOptimizer):
       self.pop[i] = new_agent
 
     # Mutate pop that are not best
-    for a in self.pop:
-      if np.random.random() <= self.mutation_rate and not a['best']:
-        a['agent'].mutate()
-
-# TODO
-class NSGCOptimizer(BaseOptimizer):
-
-  def step(self, **kwargs):
-    '''
-    Perform optimization step according to NSGC procedure. We add to the archive only according to novelty.
-    :return:
-    '''
-    # Find best agents
-    costs = np.array([np.array([a['surprise'], a['reward']]) for a in self.pop])
-    is_pareto = self._get_pareto_front(costs)
-
-    # If archive is empty, add the whole pop to it.
-    if len(self.archive) == 0:
-      for a in self.pop:
-        self.archive.add(deepcopy(a))
-    else: # Otherwise add the novel if
-      for a in self.pop:
-        closest = np.array([np.linalg.norm(a['bs'] - arch['bs']) for arch in self.archive]).argmin()
-        if np.linalg.norm(a['bs'] - self.archive[closest]['bs']) > 0.1:
-          self.archive.add(a)
-        elif a['reward'] > self.archive[closest]['reward']:
-          self.archive[closest] = a
-
-    # Create new gen by substituting random agents with copies of the best ones.
-    # (Also the best ones can be subst, effectively reducing the amount of dead agents)
-    new_gen = [self.pop[i].copy() for i in is_pareto]
-
-    for i in is_pareto:
-      self.pop[i]['best'] = True
-    dead = random.sample(range(self.pop.size), len(new_gen))
-    for i, new_agent in zip(dead, new_gen):
-      self.pop[i] = new_agent
-
-    # Mutate pop that are not pareto optima
     for a in self.pop:
       if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
@@ -149,31 +110,12 @@ class ParetoOptimizer(BaseOptimizer):
       a['best'] = False
 
 
-class NoveltyOptimizer(BaseOptimizer):
+class SurpriseOptimizer(BaseOptimizer):
   def step(self, **kwargs):
-    '''
-    This function performs an optimization step by taking the most novel agents
+    """
+    This function performs an optimization step by taking the agent with the highest surprise
     :return:
-    '''
-    # if self.archive is not None:
-    #   if self.archive.size == 0: # First step, so copy pop randomly
-    #     for idx in range(self.pop.size):
-    #       random_addition = np.random.uniform() <= 0.005
-    #       if random_addition:
-    #         self.archive.add(self.pop.copy(idx, with_data=True))
-    #         self.pop[idx]['best'] = True
-    #   else:
-    #     novel = np.stack(self.archive['surprise'].values)
-    #     self.archive.avg_surprise = np.mean(novel)
-    #     for idx in range(self.pop.size):
-    #       if self.pop[idx]['name'] not in self.archive['name'].values:  # Add an element in the archive only if not present already
-    #         random_addition = np.random.uniform() <= 0.005
-    #         if self.pop[idx]['surprise'] >= self.archive.avg_surprise or random_addition:
-    #           self.archive.add(self.pop.copy(idx, with_data=True)) # Only add the most novel ones
-    #           if not random_addition:
-    #             self.pop[idx]['best'] = True
-    #           if random_addition:
-    #             print('Randomly selecting agent for archive.')
+    """
     novel = self.pop['surprise'].sort_values(ascending=False)
     best = novel.iloc[:5].index.values  # Get 5 best
     worst = novel.iloc[-5:].index.values  # Get 5 worst
@@ -193,20 +135,6 @@ class NoveltyOptimizer(BaseOptimizer):
     for i, new_agent in zip(worst, new_gen):
       self.pop[i] = new_agent
 
-    # new_gen = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to reproduce
-    # dead = np.random.randint(self.pop.size, size=int(self.pop.size/5)) # Randomly select 1/5 of the pop to die    # new_gen = [self.pop[i[0]].copy() for i in novel[:3]] # Get first 3 most novel agents
-    # for ng, d in zip(new_gen, dead):
-    #   self.pop[d] = self.pop.copy(ng)
-    #
-    # new_gen = []  # Select only the most novel to reproduce
-    # for i, a in enumerate(self.pop):
-    #   if a['best']:
-    #     new_gen.append(self.pop.copy(i))
-    #
-    # dead = random.sample(range(self.pop.size), len(new_gen))
-    # for i, new_agent in zip(dead, new_gen):
-    #   self.pop[i] = new_agent
-
     # Mutate pops
     for a in self.pop:
       if np.random.random() <= self.mutation_rate:
@@ -216,8 +144,73 @@ class NoveltyOptimizer(BaseOptimizer):
       a['best'] = False
 
 
+class NoveltyOptimizer(BaseOptimizer):
+  def measure_novelty(self):
+    """
+    This function calculates the novelty of each agent in the population using the bs_point descriptor.
+     The novelty is calculated wrt to the population and the archive.
+    :return:
+    """
+    # MEASURE AGENT NOVELTY
+    for agent_idx in range(self.pop.size):
+      bs_point = self.pop[agent_idx]['features']
 
+      bs_space = np.stack(self.pop['features'].values)
+      bs_space = np.delete(bs_space, agent_idx, axis=0)
+      if self.archive.size > 0:
+        archive_bs_space = np.stack(self.archive['features'].values)
+        bs_space = np.concatenate([bs_space, archive_bs_space])
+      # Get distances
+      diff = np.atleast_2d(bs_space - bs_point)
+      dists = np.sqrt(np.sum(diff * diff, axis=1))
+      k = 15
+      if len(dists) <= k:  # Should never happen
+        idx = list(range(len(dists)))
+        k = len(idx)
+      else:
+        idx = np.argpartition(dists, k)  # Get 15 nearest neighs
 
+      mean_k_dist = np.mean(dists[idx[:k]])
+      self.pop[agent_idx]['novelty'] = mean_k_dist
+
+  def update_archive(self):
+    """
+    This function adds agents to the archive according to the novelty of each of them
+    :return:
+    """
+    new_gen = []  # Reproduce only the novel ones
+    # ADD AGENT TO ARCHIVE
+    novel = self.pop['novelty'].sort_values(ascending=False)
+    best = novel.iloc[:5].index.values  # Get 5 best
+    dead = novel.iloc[-5:].index.values  # Get 5 worst
+    if self.archive is not None:
+      for idx in best:
+        if self.pop[idx]['name'] not in self.archive['name'].values:
+          self.archive.add(self.pop.copy(idx, with_data=True))  # Only add the most novel ones
+    for i in best:
+      new_gen.append(self.pop.copy(i))
+      self.pop[i]['best'] = True
+
+    # This one is common in both adaptive and non adaptive distance
+    for i, new_agent in zip(dead, new_gen):
+      self.pop[i] = new_agent
+
+  def step(self, **kwargs):
+    """
+    This function optimizes the population according to classic novelty metric.
+    :param kwargs:
+    :return:
+    """
+    self.measure_novelty()
+    self.update_archive()
+
+    # Mutate pop
+    for a in self.pop:
+      if np.random.random() <= self.mutation_rate:
+        a['agent'].mutate()
+        a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
+        self.pop.agent_name += 1
+      a['best'] = False
 
 
 

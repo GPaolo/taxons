@@ -10,7 +10,7 @@ class Population(object):
   The criteria for the best is given by the metric, and is calculated outside.
   '''
   def __init__(self, shapes, agent=BaseAgent, pop_size=10, max_len=None):
-    self.pop = pd.DataFrame(columns=['agent', 'reward', 'surprise', 'best', 'bs', 'name'])
+    self.pop = pd.DataFrame(columns=['agent', 'reward', 'surprise', 'best', 'bs', 'name', 'novelty', 'features'])
     self.agent_class = agent
     self.shapes = shapes
     self.max_len = max_len
@@ -60,7 +60,8 @@ class Population(object):
     :return:
     '''
     if agent is None:
-      agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'best': False, 'bs':None, 'name':self.agent_name}
+      agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'novelty': None,
+               'best': False, 'bs':None, 'name':self.agent_name, 'features': None}
       self.agent_name += 1
 
     agent = pd.DataFrame([agent], columns=agent.keys()) # If an agent is given, it should already have a name
@@ -72,7 +73,8 @@ class Population(object):
 
   def copy(self, idx, with_data=False):
     assert idx < self.size and idx > -self.size-1, 'Index out of range'
-    agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'best': False, 'bs': None, 'name':self.agent_name}
+    agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'novelty': None,
+             'best': False, 'bs': None, 'name':self.agent_name, 'features': None}
 
     if with_data:
       for key in agent.keys(): # If copied with data we keep the original name
@@ -111,7 +113,7 @@ class Population(object):
     assert ckpt['Agent Type'] == self.agent_class.__name__, "Wrong agent type. Saved {}, current {}".format(ckpt['Agent Type'], self.agent_class.__name__)
 
     del self.pop
-    self.pop = pd.DataFrame(columns=['agent', 'reward', 'surprise', 'best', 'bs', 'name'])
+    self.pop = pd.DataFrame(columns=['agent', 'reward', 'surprise', 'best', 'bs', 'name', 'novelty', 'features'])
     self.agent_name = 0
 
     for agent in ckpt['Genome']:

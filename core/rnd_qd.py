@@ -5,7 +5,7 @@ from core.utils import utils
 from core.utils import optimizer
 import gym, torch
 import gym_billiard
-import os, threading
+import os, threading, sys, traceback
 import matplotlib
 from tensorboardX import SummaryWriter
 env_tag = 'Billiard-v0'
@@ -75,8 +75,15 @@ class RndQD(object):
           else:
             bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
           utils.show(bs_points, filepath=self.save_path)
-        except:
-          print('Cannot show progress now.')
+        except BaseException as e:
+          ex_type, ex_value, ex_traceback = sys.exc_info()
+          trace_back = traceback.extract_tb(ex_traceback)
+          stack_trace = list()
+          for trace in trace_back:
+            stack_trace.append(
+              "File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+          print('Cannot show progress due to {}: {}'.format(ex_type.__name__, ex_value))
+          print(stack_trace[0])
       elif action == 'q':
         print('Quitting training...')
         self.END = True
@@ -110,38 +117,40 @@ class RndQD(object):
     state = torch.Tensor(state).permute(2,0,1).to(self.device)
 
     if self.metric_update_single_agent:
-      surprise = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
+      surprise, features = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
       self.metric_update_steps += 1
       self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
     else:
       self.cumulated_state.append(state)
-      surprise = self.metric(state.unsqueeze(0))
+      surprise, features = self.metric(state.unsqueeze(0))
     surprise = surprise.cpu().data.numpy()
+    features = features.flatten().cpu().data.numpy()
 
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    agent['features'] = features
     agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
 
   def update_metric(self):
-    '''
+    """
     This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
-    '''
+    """
     self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
     cum_surprise = self.metric.training_step(self.cumulated_state)
 
     self.metric_update_steps += 1
-    self.writer.add_scalar('novelty', cum_surprise, self.metric_update_steps)
+    self.writer.add_scalar('novelty', cum_surprise[0], self.metric_update_steps)
 
     self.cumulated_state = []
     return cum_surprise
 
   def train(self, steps=10000):
-    '''
+    """
     This function trains the agents and the RND
     :param steps: number of update steps (or generations)
     :return:
-    '''
+    """
     self.elapsed_gen = 0
     for self.elapsed_gen in range(steps):
       cs = 0

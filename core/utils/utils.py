@@ -52,7 +52,8 @@ class DMPExp(object):
   def params(self):
     return {'mu': self.mu, 'sigma': self.sigma, 'w': self.w, 'a_x': self.a_x, 'tau': self.tau}
 
-  def basis_function(self, x, mu, sigma):
+  @staticmethod
+  def basis_function(x, mu, sigma):
     """
     This basis function samples the value of gaussian in x.
     :param x: Point where to sample the gaussian
@@ -94,6 +95,7 @@ def action_formatting(env_tag, action):
     return action[0]
   else: return action[0]
 
+
 def obs_formatting(env_tag, obs):
   """
     This function helps reformat the observations according to the environment
@@ -107,6 +109,7 @@ def obs_formatting(env_tag, obs):
     return np.array([np.concatenate(obs)])
   else: return obs
 
+
 def show(bs_points, filepath, name=None):
   print('Behaviour space coverage representation.')
 
@@ -119,7 +122,7 @@ def show(bs_points, filepath, name=None):
   axes[0].set_ylim(-1.5, 1.5)
 
   axes[1].set_title('Histogram')
-  H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(100, 100), range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
+  H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50), range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
   extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
   cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
   axes[1].set_xlim(-1.5, 1.5)

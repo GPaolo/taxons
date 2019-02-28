@@ -11,6 +11,7 @@ import os
 # env_tag = 'MountainCarContinuous-v0'
 env_tag = 'Billiard-v0'
 
+
 class NoveltySearch(object):
   def __init__(self, env, filepath, obs_shape=6, action_shape=2, pop_size=50):
     self.obs_space = obs_shape
@@ -33,7 +34,6 @@ class NoveltySearch(object):
     self.filepath = filepath
     if not os.path.exists(self.filepath):
       os.mkdir(self.filepath)
-
 
   def _show_progress(self):
     matplotlib.use('agg')
@@ -65,7 +65,7 @@ class NoveltySearch(object):
         idx = list(range(len(dists)))
         k = len(idx)
       else:
-        idx = np.argpartition(dists, k)  # Get 6 nearest neighs
+        idx = np.argpartition(dists, k)  # Get 15 nearest neighs
       novel = True
 
       mean_k_dist = np.mean(dists[idx[:k]])
@@ -127,11 +127,11 @@ class NoveltySearch(object):
       a['best'] = False
 
   def evaluate_agent(self, agent):
-    '''
+    """
     This function evaluates the agent in the environment. This function should be run in parallel
     :param agent: agent to evaluate
     :return:
-    '''
+    """
     done = False
     cumulated_reward = 0
     obs = utils.obs_formatting(env_tag, self.env.reset())

@@ -47,23 +47,23 @@ class AutoEncoder(nn.Module):
     self.criterion.to(self.device)
 
   def _get_surprise(self, x):
-    y = self.forward(x)
+    y, feat = self.forward(x)
     x = self.subsample(x)
     loss = self.criterion(x, y)
-    return loss
+    return loss, feat
 
   def forward(self, x):
     y = self.subsample(x)
-    y = self.encoder(y)
-    y = self.decoder(y)
-    return y
+    feat = self.encoder(y)
+    y = self.decoder(feat)
+    return y, feat
 
   def training_step(self, x):
     self.optimizer.zero_grad()
-    novelty = self._get_surprise(x)
+    novelty, feat = self._get_surprise(x)
     novelty.backward()
     self.optimizer.step()
-    return novelty
+    return novelty, feat
 
   def __call__(self, x):
     return self._get_surprise(x)
