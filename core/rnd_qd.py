@@ -15,11 +15,10 @@ env_tag = 'Billiard-v0'
 class RndQD(object):
 
   def __init__(self, env, parameters):
-    '''
-
+    """
     :param env: Environment in which we act
     :param parameters: Parameters to use
-    '''
+    """
     self.params = parameters
     self.pop_size = self.params.pop_size
     self.env = env
@@ -55,7 +54,7 @@ class RndQD(object):
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
-    self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
+    self.opt = optimizer.SurpriseOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
     self.END = False

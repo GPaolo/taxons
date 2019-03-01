@@ -16,9 +16,9 @@ ex = Experiment()
 class Params(object):
 
   def __init__(self):
-    self.info = 'Metric with AE. The metric is updated once per gen. AE is deep'
+    self.info = 'Metric with AE. The metric is updated once per gen. AE is deep. Surprise as metric'
 
-    self.exp_name = 'ae_deep_genup_DMP'
+    self.exp_name = 'ae_deep_genup_Neural_error_long'
     self.seed = 7
 
     # Environment
@@ -29,7 +29,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 500
+    self.generations = 2000
     self.pop_size = 100
     self.use_archive = True
 
