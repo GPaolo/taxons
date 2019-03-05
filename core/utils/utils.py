@@ -135,6 +135,7 @@ def show(bs_points, filepath, name=None):
     plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
   print('Plot saved in {}'.format(filepath))
 
+
 def get_projectpath():
   cwd = os.getcwd()
   folder = os.path.basename(cwd)
@@ -142,3 +143,8 @@ def get_projectpath():
     cwd = os.path.dirname(cwd)
     folder = os.path.basename(cwd)
   return cwd
+
+
+def split_array(a, wanted_parts=1):
+  length = len(a)
+  return [a[i * length // wanted_parts : (i+1) * length // wanted_parts] for i in range(wanted_parts)]

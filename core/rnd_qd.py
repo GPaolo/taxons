@@ -136,13 +136,17 @@ class RndQD(object):
     :return:
     """
     self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
-    cum_surprise = self.metric.training_step(self.cumulated_state)
+    cum_surprise = []
+    # Split the batch in 3 minibatches to have better learning
+    mini_batches = utils.split_array(self.cumulated_state, wanted_parts=3)
+    for data in mini_batches:
+      cum_surprise.append(self.metric.training_step(data))
+      self.metric_update_steps += 1
+      self.writer.add_scalar('novelty', cum_surprise[-1][0], self.metric_update_steps)
 
-    self.metric_update_steps += 1
-    self.writer.add_scalar('novelty', cum_surprise[0], self.metric_update_steps)
-
+    features = torch.cat([cs[1] for cs in cum_surprise])
     self.cumulated_state = []
-    return cum_surprise
+    return (cum_surprise[-1][0], features)
 
   def train(self, steps=10000):
     """

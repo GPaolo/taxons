@@ -18,27 +18,25 @@ class AutoEncoder(nn.Module):
 
     # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=1, padding=1), nn.ReLU(), # 75 -> 37
     #                              nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=1), nn.ReLU(), # 37 -> 17
-    #                              nn.Conv2d(in_channels=16, out_channels=4, kernel_size=3, stride=1), nn.ReLU()).cuda(self.device) # 17 -> 8
-    #
+    #                              nn.Conv2d(in_channels=16, out_channels=4, kernel_size=3, stride=1), nn.ReLU()).to(self.device) # 17 -> 8
     # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=8, kernel_size=3, stride=1), nn.ReLU(), # 8 -> 17
     #                              nn.ConvTranspose2d(in_channels=8, out_channels=4, kernel_size=3, stride=1), nn.ReLU(), # 17 -> 35
-    #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=3, stride=1), nn.ReLU()).cuda(self.device) # 35 -> 75
-    #
+    #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=3, stride=1), nn.ReLU()).to(self.device) # 35 -> 75
+
     # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=1), nn.ReLU(), # 75 -> 35
     #                              nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=1), nn.ReLU()).to(self.device)  # 35 -> 11
-    #
     # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=8, kernel_size=5, stride=1), nn.ReLU(),
     #                              nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=7, stride=1), nn.ReLU()).to(self.device)
+    #
+    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=7, stride=1), nn.ReLU()).to(self.device)  # 75 -> 36
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=1), nn.ReLU()).to(self.device)
 
-    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=7, stride=1), nn.ReLU()).to(self.device)  # 75 -> 36
-    # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=1), nn.ReLU()).to(self.device)
-
-    self.encoder = nn.Sequential(nn.Linear(16875, 4096), nn.ReLU(),
-                                 nn.Linear(4096, 1024), nn.ReLU(),
-                                 nn.Linear(1024, 256), nn.ReLU()).to(self.device)
-    self.decoder = nn.Sequential(nn.Linear(256, 1024), nn.ReLU(),
-                                 nn.Linear(1024, 4096), nn.ReLU(),
-                                 nn.Linear(4096, 16875), nn.ReLU()).to(self.device)
+    # self.encoder = nn.Sequential(nn.Linear(16875, 4096), nn.ReLU(),
+    #                              nn.Linear(4096, 1024), nn.ReLU(),
+    #                              nn.Linear(1024, 256), nn.ReLU()).to(self.device)
+    # self.decoder = nn.Sequential(nn.Linear(256, 1024), nn.ReLU(),
+    #                              nn.Linear(1024, 4096), nn.ReLU(),
+    #                              nn.Linear(4096, 16875), nn.ReLU()).to(self.device)
 
 
     self.zero_grad()
@@ -53,8 +51,8 @@ class AutoEncoder(nn.Module):
   def forward(self, x):
     y = self.subsample(x)
     shape = y.shape
-    y = self.encoder(y.view(shape[0], -1))
-    # y = self.encoder(y)
+    # y = self.encoder(y.view(shape[0], -1))
+    y = self.encoder(y)
     y = self.decoder(y)
 
     return y.view(shape)
@@ -100,12 +98,12 @@ if __name__ == '__main__':
     factor = 255
 
   net = AutoEncoder()
-  x = torch.Tensor(x/factor).permute(0, 3, 1, 2).cuda(net.device)
+  x = torch.Tensor(x/factor).permute(0, 3, 1, 2).to(net.device)
   test = x[21:22]
-  train = x[15:21]
+  train = x[15:22]
 
   print('Starting training')
-  for k in range(10000):
+  for k in range(5000):
     loss = net.train_ae(train)
     if k%100 == 0:
       print('Loss at {}: {}'.format(k, loss))
