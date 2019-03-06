@@ -112,7 +112,7 @@ def obs_formatting(env_tag, obs):
 
 def show(bs_points, filepath, name=None):
   print('Behaviour space coverage representation.')
-
+  limit = 1.35
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.rcParams["patch.force_edgecolor"] = True
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
@@ -122,18 +122,22 @@ def show(bs_points, filepath, name=None):
   axes[0].set_ylim(-1.5, 1.5)
 
   axes[1].set_title('Histogram')
-  H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50), range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
+  H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50), range=np.array([[-limit, limit], [-limit, limit]]))
   extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
   cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
-  axes[1].set_xlim(-1.5, 1.5)
-  axes[1].set_ylim(-1.5, 1.5)
+  axes[1].set_xlim(-limit, limit)
+  axes[1].set_ylim(-limit, limit)
   plt.colorbar(cax, ax=axes[1])
+
+  print('Coverage: {}%'.format(np.count_nonzero(H)/(50*50)*100))
 
   if name is None:
     plt.savefig(os.path.join(filepath, 'behaviour.pdf'))
   else:
     plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
   print('Plot saved in {}'.format(filepath))
+  plt.close(fig)
+
 
 def get_projectpath():
   cwd = os.getcwd()

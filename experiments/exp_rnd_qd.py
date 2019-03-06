@@ -16,9 +16,9 @@ ex = Experiment()
 class Params(object):
 
   def __init__(self):
-    self.info = 'Metric with AE. The metric is updated once per gen. AE is deep. Surprise as metric'
+    self.info = 'Metric with AE. The metric is updated once per gen. AE is deep. Novelty metric and the archive features are reupdated very gen'
 
-    self.exp_name = 'ae_deep_genup_Neural_error_long'
+    self.exp_name = 'ae_deep_novelty_reupdated_feat'
     self.seed = 7
 
     # Environment
@@ -33,7 +33,7 @@ class Params(object):
     self.pop_size = 100
     self.use_archive = True
 
-    self.qd_agent = 'Neural'  # 'DMP
+    self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
@@ -45,7 +45,7 @@ class Params(object):
     self.gpu = True
     self.metric = 'AE'  # 'RND'
     self.feature_size = 64
-    self.learning_rate = 0.01 # 0.0001 for RND
+    self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     # ---------------------------------------------------------
 

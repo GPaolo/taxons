@@ -54,7 +54,7 @@ class RndQD(object):
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
-    self.opt = optimizer.SurpriseOptimizer(self.population, archive=self.archive)
+    self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
     self.END = False
@@ -89,11 +89,11 @@ class RndQD(object):
 
   # TODO make this run in parallel
   def evaluate_agent(self, agent):
-    '''
+    """
     This function evaluates the agent in the environment. This function should be run in parallel
     :param agent: agent to evaluate
     :return:
-    '''
+    """
     done = False
     cumulated_reward = 0
 
@@ -126,9 +126,21 @@ class RndQD(object):
     features = features.flatten().cpu().data.numpy()
 
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
-    agent['features'] = features
+    agent['features'] = [features, self.metric.subsample(state.unsqueeze(0)).cpu().data.numpy()]
     agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
+
+  def update_archive_feat(self):
+    """
+    This function is used to update the position of the archive elements in the feature space (given that is changing
+    while the AE learns)
+    :return:
+    """
+    # TODO this one should be done batch wise! Instead of a for loop, put all the states in a tensor and do a single pass
+    for agent in self.archive:
+      state = torch.Tensor(agent['features'][1]).to(self.device)
+      _, feature = self.metric(state)
+      agent['features'][0] = feature.flatten().cpu().data.numpy()
 
   def update_metric(self):
     """
@@ -163,6 +175,7 @@ class RndQD(object):
       if not self.metric_update_single_agent:
         self.update_metric()
 
+      self.update_archive_feat()
       self.opt.step()
 
       self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)

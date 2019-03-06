@@ -64,14 +64,45 @@ class FitnessOptimizer(BaseOptimizer):
 
 class ParetoOptimizer(BaseOptimizer):
 
+  def measure_novelty(self):
+    """
+    This function calculates the novelty of each agent in the population using the bs_point descriptor.
+     The novelty is calculated wrt to the population and the archive.
+    :return:
+    """
+    # MEASURE AGENT NOVELTY
+    for agent_idx in range(self.pop.size):
+      bs_point = self.pop[agent_idx]['features']
+
+      bs_space = np.stack(self.pop['features'].values)
+      bs_space = np.delete(bs_space, agent_idx, axis=0)
+      if self.archive.size > 0:
+        archive_bs_space = np.stack(self.archive['features'].values)
+        bs_space = np.concatenate([bs_space, archive_bs_space])
+      # Get distances
+      diff = np.atleast_2d(bs_space - bs_point)
+      dists = np.sqrt(np.sum(diff * diff, axis=1))
+      k = 15
+      if len(dists) <= k:  # Should never happen
+        idx = list(range(len(dists)))
+        k = len(idx)
+      else:
+        idx = np.argpartition(dists, k)  # Get 15 nearest neighs
+
+      mean_k_dist = np.mean(dists[idx[:k]])
+      self.pop[agent_idx]['novelty'] = mean_k_dist
+
+
   def step(self, **kwargs):
     """
     Once the agents have been evaluated, it calculates the pareto front of the agents and decides who and how is
     going to reproduce. It also mutates the agents.
     :return:
     """
+    self.measure_novelty()
+
     # Find best agents
-    costs = np.array([self.pop['reward'].values, self.pop['surprise'].values]).transpose()
+    costs = np.array([self.pop['novelty'].values, self.pop['surprise'].values]).transpose()
     is_pareto = self._get_pareto_front(costs)
 
     if self.archive is not None:
@@ -113,7 +144,8 @@ class ParetoOptimizer(BaseOptimizer):
 class SurpriseOptimizer(BaseOptimizer):
   def step(self, **kwargs):
     """
-    This function performs an optimization step by taking the agent with the highest surprise
+    This function performs an optimization step by taking the agent with the highest surprise. The surprise is the error
+    of the network.
     :return:
     """
     novel = self.pop['surprise'].sort_values(ascending=False)
@@ -145,6 +177,7 @@ class SurpriseOptimizer(BaseOptimizer):
 
 
 class NoveltyOptimizer(BaseOptimizer):
+
   def measure_novelty(self):
     """
     This function calculates the novelty of each agent in the population using the bs_point descriptor.
@@ -153,12 +186,12 @@ class NoveltyOptimizer(BaseOptimizer):
     """
     # MEASURE AGENT NOVELTY
     for agent_idx in range(self.pop.size):
-      bs_point = self.pop[agent_idx]['features']
+      bs_point = self.pop[agent_idx]['features'][0]
 
-      bs_space = np.stack(self.pop['features'].values)
+      bs_space = np.stack([a[0] for a in self.pop['features'].values])
       bs_space = np.delete(bs_space, agent_idx, axis=0)
       if self.archive.size > 0:
-        archive_bs_space = np.stack(self.archive['features'].values)
+        archive_bs_space = np.stack([a[0] for a in self.archive['features'].values])
         bs_space = np.concatenate([bs_space, archive_bs_space])
       # Get distances
       diff = np.atleast_2d(bs_space - bs_point)
