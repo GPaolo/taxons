@@ -54,7 +54,7 @@ class RndQD(object):
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
-    self.opt = optimizer.NoveltyOptimizer(self.population, archive=self.archive)
+    self.opt = self.params.optimizer(self.population, archive=self.archive)
     self.cumulated_state = []
 
     self.END = False
@@ -176,7 +176,8 @@ class RndQD(object):
         if max_rew < a['reward']:
           max_rew = a['reward']
 
-      self.update_archive_feat()
+      if not self.params.optimizer_type == 'Surprise':
+        self.update_archive_feat()
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
       if not self.metric_update_single_agent:

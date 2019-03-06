@@ -120,8 +120,8 @@ def show(bs_points, filepath, name=None):
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
   axes[0].set_title('Ball position')
   axes[0].scatter(pts[0], pts[1])
-  axes[0].set_xlim(-1.5, 1.5)
-  axes[0].set_ylim(-1.5, 1.5)
+  axes[0].set_xlim(-limit, limit)
+  axes[0].set_ylim(-limit, limit)
 
   axes[1].set_title('Histogram')
   H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50), range=np.array([[-limit, limit], [-limit, limit]]))
@@ -136,6 +136,10 @@ def show(bs_points, filepath, name=None):
   if name is None:
     plt.savefig(os.path.join(filepath, 'behaviour.pdf'))
   else:
+    with open(os.path.join(filepath, 'data.txt'), 'w') as f:
+      f.write("Coverage {}%\n".format(np.count_nonzero(H)/(50*50)*100))
+      f.write("Total solutions found: {}".format(len(bs_points)))
+
     plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
   print('Plot saved in {}'.format(filepath))
   plt.close(fig)

@@ -6,7 +6,7 @@ from core import rnd_qd
 import gym, torch
 import gym_billiard
 import numpy as np
-from core.utils import utils
+from core.utils import utils, optimizer
 from sacred.observers import FileStorageObserver
 import os
 import json
@@ -18,7 +18,7 @@ class Params(object):
   def __init__(self):
     self.info = 'Metric with AE. The metric is updated once per gen. AE is deep. Novelty metric and the archive features are reupdated very gen'
 
-    self.exp_name = 'ae_deep_novelty_reupdated_feat'
+    self.exp_name = 'ae_deep_surprise_reupdated_feat'
     self.seed = 7
 
     # Environment
@@ -29,7 +29,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 2000
+    self.generations = 500
     self.pop_size = 100
     self.use_archive = True
 
@@ -48,6 +48,19 @@ class Params(object):
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     # ---------------------------------------------------------
+
+    # Optimizer
+    # ---------------------------------------------------------
+    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto'
+
+    if self.optimizer_type == 'Novelty':
+      self.optimizer = optimizer.NoveltyOptimizer
+    elif self.optimizer_type == 'Surprise':
+      self.optimizer = optimizer.SurpriseOptimizer
+    elif self.optimizer_type == 'Pareto':
+      self.optimizer = optimizer.ParetoOptimizer
+    # ---------------------------------------------------------
+
 
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
