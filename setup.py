@@ -12,7 +12,7 @@ setup(author='Giuseppe Paolo',
             'box2d',
             'sacred',
             'tensorboardX',
-            'pyjson'
-
+            'pyjson',
+            'tensorboard'
       ]
 )

@@ -100,12 +100,12 @@ if __name__ == '__main__':
     factor = 255
 
   net = AutoEncoder()
-  x = torch.Tensor(x/factor).permute(0, 3, 1, 2).cuda(net.device)
+  x = torch.Tensor(x/factor).permute(0, 3, 1, 2).to(net.device)
   test = x[21:22]
-  train = x[15:21]
+  train = x[15:22]
 
   print('Starting training')
-  for k in range(10000):
+  for k in range(5000):
     loss = net.train_ae(train)
     if k%100 == 0:
       print('Loss at {}: {}'.format(k, loss))

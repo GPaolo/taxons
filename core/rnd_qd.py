@@ -116,7 +116,7 @@ class RndQD(object):
     state = torch.Tensor(state).permute(2,0,1).to(self.device)
 
     if self.metric_update_single_agent:
-      surprise, features = self.metric.training_step(state.unsqueeze(0))# Input Dimensions need to be [1, input_dim]
+      surprise, features = self.metric.training_step(state.unsqueeze(0))  # Input Dimensions need to be [1, input_dim]
       self.metric_update_steps += 1
       self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
     else:
@@ -148,13 +148,17 @@ class RndQD(object):
     :return:
     """
     self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
-    cum_surprise = self.metric.training_step(self.cumulated_state)
+    cum_surprise = []
+    # Split the batch in 3 minibatches to have better learning
+    mini_batches = utils.split_array(self.cumulated_state, wanted_parts=3)
+    for data in mini_batches:
+      cum_surprise.append(self.metric.training_step(data))
+      self.metric_update_steps += 1
+      self.writer.add_scalar('novelty', cum_surprise[-1][0], self.metric_update_steps)
 
-    self.metric_update_steps += 1
-    self.writer.add_scalar('novelty', cum_surprise[0], self.metric_update_steps)
-
+    features = torch.cat([cs[1] for cs in cum_surprise])
     self.cumulated_state = []
-    return cum_surprise
+    return cum_surprise[-1][0], features
 
   def train(self, steps=10000):
     """
@@ -172,10 +176,11 @@ class RndQD(object):
         if max_rew < a['reward']:
           max_rew = a['reward']
 
+      self.update_archive_feat()
+
+      # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
       if not self.metric_update_single_agent:
         self.update_metric()
-
-      self.update_archive_feat()
       self.opt.step()
 
       self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)

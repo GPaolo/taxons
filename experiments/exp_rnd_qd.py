@@ -13,8 +13,8 @@ import json
 
 ex = Experiment()
 
-class Params(object):
 
+class Params(object):
   def __init__(self):
     self.info = 'Metric with AE. The metric is updated once per gen. AE is deep. Novelty metric and the archive features are reupdated very gen'
 
@@ -51,22 +51,27 @@ class Params(object):
 
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
+  # ---------------------------------------------------------
 
   def _get_dict(self):
     params_dict = {key:value for key, value in self.__dict__items() if not key.startswith('__') and not callable(key)}
     return params_dict
+  # ---------------------------------------------------------
 
   def save(self):
     if not os.path.exists(self.save_path):
       os.mkdir(self.save_path)
     with open(os.path.join(self.save_path, 'params.json'), 'w') as f:
       json.dump(self._get_dict(), f, indent=4)
+  # ---------------------------------------------------------
+# ---------------------------------------------------------
 
 
 @ex.config
 def config():
   params = Params()
   ex.observers.append(FileStorageObserver.create(params.save_path))
+
 
 @ex.automain
 def main(params):

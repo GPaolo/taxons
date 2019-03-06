@@ -93,7 +93,8 @@ def action_formatting(env_tag, action):
   if env_tag == 'MountainCarContinuous-v0':
     assert action.shape == (1,1), 'Shape is not of dimension {}. Has dimension {}'.format([1,1], action)
     return action[0]
-  else: return action[0]
+  else:
+    return action[0]
 
 
 def obs_formatting(env_tag, obs):
@@ -107,7 +108,8 @@ def obs_formatting(env_tag, obs):
     return np.array([obs])
   elif env_tag == 'Billiard-v0':
     return np.array([np.concatenate(obs)])
-  else: return obs
+  else:
+    return obs
 
 
 def show(bs_points, filepath, name=None):
@@ -146,3 +148,8 @@ def get_projectpath():
     cwd = os.path.dirname(cwd)
     folder = os.path.basename(cwd)
   return cwd
+
+
+def split_array(a, wanted_parts=1):
+  length = len(a)
+  return [a[i * length // wanted_parts : (i+1) * length // wanted_parts] for i in range(wanted_parts)]
