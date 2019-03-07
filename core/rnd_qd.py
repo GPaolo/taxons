@@ -178,11 +178,11 @@ class RndQD(object):
 
       if not self.params.optimizer_type == 'Surprise':
         self.update_archive_feat()
+      self.opt.step()
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
       if not self.metric_update_single_agent:
         self.update_metric()
-      self.opt.step()
 
       self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)
       self.writer.add_scalar('Avg_generation_novelty', cs/self.pop_size)

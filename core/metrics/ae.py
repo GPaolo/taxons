@@ -20,18 +20,18 @@ class AutoEncoder(nn.Module):
 
     self.subsample = nn.AvgPool2d(8).cuda(self.device) # 600 -> 75
 
-    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.LeakyReLU(), # 75 -> 36
-                                nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.LeakyReLU(), # 36 -> 17
-                                nn.Conv2d(in_channels=8, out_channels=4, kernel_size=3, stride=1), nn.LeakyReLU()).to(self.device) # 17 -> 15
-
-    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=8, kernel_size=3, stride=1), nn.LeakyReLU(), # 8 -> 17
-                                nn.ConvTranspose2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.LeakyReLU(), # 17 -> 36
-                                nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=5, stride=2), nn.ReLU()).to(self.device) # 36 -> 75
-
-    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2), nn.LeakyReLU(), # 75 -> 35
-    #                              nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU()).to(self.device)  # 35 -> 11
-    # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU(),
-    #                              nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).to(self.device)
+    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.ReLU(), # 75 -> 36
+    #                             nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.ReLU(), # 36 -> 17
+    #                             nn.Conv2d(in_channels=8, out_channels=4, kernel_size=3, stride=1), nn.ReLU()).to(self.device) # 17 -> 15
+    #
+    # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=8, kernel_size=3, stride=1), nn.ReLU(), # 8 -> 17
+    #                             nn.ConvTranspose2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.ReLU(), # 17 -> 36
+    #                             nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=5, stride=2), nn.ReLU()).to(self.device) # 36 -> 75
+    #
+    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2), nn.LeakyReLU(), # 75 -> 35
+                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU()).to(self.device)  # 35 -> 11
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU(),
+                                 nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).to(self.device)
 
     # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=5, stride=2), nn.ReLU()).to(self.device)  # 75 -> 36
     #

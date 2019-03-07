@@ -18,7 +18,7 @@ class Params(object):
   def __init__(self):
     self.info = 'Metric with AE. The metric is updated once per gen. AE is deep. Novelty metric and the archive features are reupdated very gen'
 
-    self.exp_name = 'ae_deep_surprise_reupdated_feat'
+    self.exp_name = 'ae_deep_pareto_reupdated_feat_RELU'
     self.seed = 7
 
     # Environment
@@ -51,7 +51,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto'
 
     if self.optimizer_type == 'Novelty':
       self.optimizer = optimizer.NoveltyOptimizer
