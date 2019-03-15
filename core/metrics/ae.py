@@ -18,7 +18,7 @@ class AutoEncoder(nn.Module):
     else:
       self.device = torch.device("cpu")
 
-    self.subsample = nn.AvgPool2d(8).cuda(self.device) # 600 -> 75
+    self.subsample = nn.AdaptiveAvgPool3d((20, 75, 75)).to(self.device) # 600 -> 75
 
     # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.ReLU(), # 75 -> 36
     #                             nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.ReLU(), # 36 -> 17
@@ -28,10 +28,10 @@ class AutoEncoder(nn.Module):
     #                             nn.ConvTranspose2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.ReLU(), # 17 -> 36
     #                             nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=5, stride=2), nn.ReLU()).to(self.device) # 36 -> 75
     #
-    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2), nn.LeakyReLU(), # 75 -> 35
-                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU()).to(self.device)  # 35 -> 11
-    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU(),
-                                 nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).to(self.device)
+    self.encoder = nn.Sequential(nn.Conv3d(in_channels=3, out_channels=8, kernel_size=7, stride=(1, 2, 2), dilation=(1, 1, 1)), nn.LeakyReLU(), # 75 -> 35
+                                 nn.Conv3d(in_channels=8, out_channels=4, kernel_size=5, stride=(1, 3, 3), dilation=(1, 1, 1)), nn.LeakyReLU()).to(self.device)  # 35 -> 11
+    self.decoder = nn.Sequential(nn.ConvTranspose3d(in_channels=4, out_channels=4, kernel_size=5, stride=(1, 3, 3), dilation=(1, 1, 1)), nn.LeakyReLU(),
+                                 nn.ConvTranspose3d(in_channels=4, out_channels=3, kernel_size=7, stride=(1, 2, 2), dilation=(1, 1, 1)), nn.ReLU()).to(self.device)
 
     # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=5, stride=2), nn.ReLU()).to(self.device)  # 75 -> 36
     #

@@ -96,6 +96,7 @@ class RndQD(object):
     """
     done = False
     cumulated_reward = 0
+    state = []
 
     obs = utils.obs_formatting(env_tag, self.env.reset())
     t = 0
@@ -112,21 +113,24 @@ class RndQD(object):
       t += 1
       cumulated_reward += reward
 
-    state = self.env.render(rendered=False)
-    state = torch.Tensor(state).permute(2,0,1).to(self.device)
+      # Do not save every frame, but only once every N frames
+      if t % self.params.state_recording_interval == 0:
+        state.append(self.env.render(rendered=False))
+
+    state = self.metric.subsample(torch.Tensor(np.stack(state)).permute(3, 0, 1, 2).unsqueeze(0))
 
     if self.metric_update_single_agent:
-      surprise, features = self.metric.training_step(state.unsqueeze(0))  # Input Dimensions need to be [1, input_dim]
+      surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
       self.metric_update_steps += 1
       self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
     else:
-      self.cumulated_state.append(state)
-      surprise, features = self.metric(state.unsqueeze(0))
+      self.cumulated_state.append(state[0])
+      surprise, features = self.metric(state.to(self.device))
     surprise = surprise.cpu().data.numpy()
     features = features.flatten().cpu().data.numpy()
 
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
-    agent['features'] = [features, self.metric.subsample(state.unsqueeze(0)).cpu().data.numpy()]
+    agent['features'] = [features, state.cpu().data.numpy()]
     agent['surprise'] = surprise
     agent['reward'] = cumulated_reward
 
@@ -187,7 +191,7 @@ class RndQD(object):
       self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)
       self.writer.add_scalar('Avg_generation_novelty', cs/self.pop_size)
 
-      if self.elapsed_gen % 10 == 0:
+      if self.elapsed_gen % 1 == 0:
         print('Generation {}'.format(self.elapsed_gen))
         if self.archive is not None:
           print('Archive size {}'.format(self.archive.size))
