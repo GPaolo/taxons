@@ -16,7 +16,7 @@ ex = Experiment()
 
 class Params(object):
   def __init__(self):
-    self.info = 'AE with 3d convolution for temporal dimention'
+    self.info = 'AE with 3d convolution for temporal dimension. Using the last N frames'
 
     self.exp_name = 'ae_novelty_3d'
     self.seed = 7
@@ -48,6 +48,7 @@ class Params(object):
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.state_recording_interval = 5
+    self.max_states_recorded = 20
     # ---------------------------------------------------------
 
     # Optimizer

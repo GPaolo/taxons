@@ -116,7 +116,11 @@ class RndQD(object):
       # Do not save every frame, but only once every N frames
       if t % self.params.state_recording_interval == 0:
         state.append(self.env.render(rendered=False))
+        if len(state) > self.params.max_states_recorded:
+          state = state[1:]
 
+    while len(state) < self.params.max_states_recorded:
+      state.append(state[-1])
     state = self.metric.subsample(torch.Tensor(np.stack(state)).permute(3, 0, 1, 2).unsqueeze(0))
 
     if self.metric_update_single_agent:

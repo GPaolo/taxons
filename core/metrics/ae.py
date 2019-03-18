@@ -18,7 +18,7 @@ class AutoEncoder(nn.Module):
     else:
       self.device = torch.device("cpu")
 
-    self.subsample = nn.AdaptiveAvgPool3d((20, 75, 75)).to(self.device) # 600 -> 75
+    self.subsample = nn.MaxPool3d((1, 8, 8)).to(self.device) # 600 -> 75
 
     # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.ReLU(), # 75 -> 36
     #                             nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.ReLU(), # 36 -> 17
@@ -78,3 +78,18 @@ class AutoEncoder(nn.Module):
       torch.save(save_ckpt, os.path.join(filepath, 'ckpt_ae.pth'))
     except:
       print('Cannot save autoencoder.')
+
+  def load(self, filepath):
+    try:
+      ckpt = torch.load(filepath)
+    except Exception as e:
+      print('Could not load file: {}'.format(e))
+      sys.exit()
+    try:
+      self.load_state_dict(ckpt['ae'])
+    except Exception as e:
+      print('Could not load model state dict: {}'.format(e))
+    try:
+      self.optimizer.load_state_dict(ckpt['optimizer'])
+    except Exception as e:
+      print('Could not load optimizer state dict: {}'.format(e))
