@@ -31,7 +31,7 @@ class Params(object):
     self.TARGET_FPS = 60
     self.TIME_STEP = 1.0 / self.TARGET_FPS
 
-    self.MAX_ENV_STEPS = 1000
+    self.MAX_ENV_STEPS = 500
 
     self.TORQUE_CONTROL = True
     self.TEST = True
