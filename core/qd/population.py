@@ -116,15 +116,25 @@ class Population(object):
     self.pop = pd.DataFrame(columns=['agent', 'reward', 'surprise', 'best', 'bs', 'name', 'novelty', 'features'])
     self.agent_name = 0
 
-    for agent in ckpt['Genome']:
-      self.add()
-      agent_genome = ckpt['Genome'][agent]
-      assert len(agent_genome) == len(self[-1]['agent'].genome), 'Wrong genome length. Saved {}, current {}'.format(agent_genome, self[-1]['agent'].genome)
-      self[-1]['agent'].load_genome(agent_genome, agent)
+    for agent_name in ckpt['Genome']:
+      agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'novelty': None,
+               'best': False, 'bs': None, 'name': agent_name, 'features': None}
+      agent_genome = ckpt['Genome'][agent_name]
+      assert len(agent_genome) == len(agent['agent'].genome), 'Wrong genome length. Saved {}, current {}'.format(agent_genome, self[-1]['agent'].genome)
+      agent['agent'].load_genome(agent_genome, agent_name)
       for k in range(len(agent_genome)):
-        for p in self[-1]['agent'].genome[k].params:
-          assert np.all(self[-1]['agent'].genome[k].params[p] == agent_genome[k][p]), 'Could not load {} of element {} in agent {}'.format(p, k, agent)
-      self.pop['name'].iloc[-1] = agent
+        for p in agent['agent'].genome[k].params:
+          assert np.all(agent['agent'].genome[k].params[p] == agent_genome[k][p]), 'Could not load {} of element {} in agent {}'.format(p, k, agent)
+
+
+      self.add(agent)
+      # agent_genome = ckpt['Genome'][agent]
+      # assert len(agent_genome) == len(self[-1]['agent'].genome), 'Wrong genome length. Saved {}, current {}'.format(agent_genome, self[-1]['agent'].genome)
+      # self[-1]['agent'].load_genome(agent_genome, agent)
+      # for k in range(len(agent_genome)):
+      #   for p in self[-1]['agent'].genome[k].params:
+      #     assert np.all(self[-1]['agent'].genome[k].params[p] == agent_genome[k][p]), 'Could not load {} of element {} in agent {}'.format(p, k, agent)
+      # self.pop['name'].iloc[-1] = agent
     print("Done")
 
 
