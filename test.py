@@ -37,6 +37,8 @@ class AutoEncoder(nn.Module):
     self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU(),
                                  nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).to(self.device)
 
+    self.encoder_ff = nn.Sequential(nn.Linear(484, 32), nn.LeakyReLU()).to(self.device)
+    self.decoder_ff = nn.Sequential(nn.Linear(32, 484), nn.LeakyReLU()).to(self.device)
 
     self.criterion = nn.MSELoss()
     self.learning_rate = 0.001
@@ -48,11 +50,17 @@ class AutoEncoder(nn.Module):
 
 
   def forward(self, x):
-    y = self.subsample(x)
-    shape = y.shape
-    # y = self.encoder(y.view(shape[0], -1))
-    feat = self.encoder(y)
-    y = self.decoder(feat)
+    x = self.subsample(x)
+    feat = self.encoder(x)
+
+    shape = feat.shape
+    feat = feat.view(-1, 484)
+
+    feat = self.encoder_ff(feat)
+    y = self.decoder_ff(feat)
+    y = y.view(shape)
+
+    y = self.decoder(y)
 
     return y, feat
 

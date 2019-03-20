@@ -16,9 +16,9 @@ ex = Experiment()
 
 class Params(object):
   def __init__(self):
-    self.info = 'AE with 3d convolution for temporal dimension. Using the last N frames'
+    self.info = 'AE whose feature space dimension is really small.'
 
-    self.exp_name = 'ae_novelty_3d'
+    self.exp_name = 'ae_novelty_small_feat_space'
     self.seed = 7
 
     # Environment

@@ -18,24 +18,18 @@ class AutoEncoder(nn.Module):
     else:
       self.device = torch.device("cpu")
 
-    self.subsample = nn.MaxPool3d((1, 8, 8)).to(self.device) # 600 -> 75
+    self.subsample = nn.AvgPool2d(8).to(self.device) # 600 -> 75
 
-    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=5, stride=2), nn.ReLU(), # 75 -> 36
-    #                             nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.ReLU(), # 36 -> 17
-    #                             nn.Conv2d(in_channels=8, out_channels=4, kernel_size=3, stride=2), nn.ReLU()).to(self.device) # 17 -> 15
-    #
-    # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=8, kernel_size=3, stride=2), nn.ReLU(), # 8 -> 17
-    #                             nn.ConvTranspose2d(in_channels=8, out_channels=8, kernel_size=4, stride=2), nn.ReLU(), # 17 -> 36
-    #                             nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=5, stride=2), nn.ReLU()).to(self.device) # 36 -> 75
-    #
-    self.encoder = nn.Sequential(nn.Conv3d(in_channels=3, out_channels=8, kernel_size=7, stride=(1, 2, 2), dilation=(1, 1, 1)), nn.LeakyReLU(), # 75 -> 35
-                                 nn.Conv3d(in_channels=8, out_channels=4, kernel_size=5, stride=(1, 3, 3), dilation=(1, 1, 1)), nn.LeakyReLU()).to(self.device)  # 35 -> 11
-    self.decoder = nn.Sequential(nn.ConvTranspose3d(in_channels=4, out_channels=4, kernel_size=5, stride=(1, 3, 3), dilation=(1, 1, 1)), nn.LeakyReLU(),
-                                 nn.ConvTranspose3d(in_channels=4, out_channels=3, kernel_size=7, stride=(1, 2, 2), dilation=(1, 1, 1)), nn.ReLU()).to(self.device)
+    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2), nn.LeakyReLU(), # 75 -> 35
+                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU()).to(self.device)  # 35 -> 11
 
-    # self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=4, kernel_size=5, stride=2), nn.ReLU()).to(self.device)  # 75 -> 36
-    #
-    # self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=5, stride=2), nn.ReLU()).to(self.device)
+    self.encoder_ff = nn.Sequential(nn.Linear(484, kwargs['encoding_shape']), nn.LeakyReLU()).to(self.device)
+    self.decoder_ff = nn.Sequential(nn.Linear(kwargs['encoding_shape'], 484), nn.LeakyReLU()).to(self.device)
+
+
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU(),
+                                 nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).to(self.device)
+
 
     self.criterion = nn.MSELoss()
     self.learning_rate = learning_rate
@@ -56,7 +50,15 @@ class AutoEncoder(nn.Module):
     if x.shape[-1] > 75:  # Only subsample if not done yet.
       x = self.subsample(x)
     feat = self.encoder(x)
-    y = self.decoder(feat)
+
+    shape = feat.shape
+    feat = feat.view(-1, 484)
+
+    feat = self.encoder_ff(feat)
+    y = self.decoder_ff(feat)
+    y = y.view(shape)
+
+    y = self.decoder(y)
     return y, feat
 
   def training_step(self, x):

@@ -96,7 +96,6 @@ class RndQD(object):
     """
     done = False
     cumulated_reward = 0
-    state = []
 
     obs = utils.obs_formatting(env_tag, self.env.reset())
     t = 0
@@ -114,14 +113,15 @@ class RndQD(object):
       cumulated_reward += reward
 
       # Do not save every frame, but only once every N frames
-      if t % self.params.state_recording_interval == 0:
-        state.append(self.env.render(rendered=False))
-        if len(state) > self.params.max_states_recorded:
-          state = state[1:]
+      # if t % self.params.state_recording_interval == 0:
+      #   state.append(self.env.render(rendered=False))
+      #   if len(state) > self.params.max_states_recorded:
+      #     state = state[1:]
 
-    while len(state) < self.params.max_states_recorded:
-      state.append(state[-1])
-    state = self.metric.subsample(torch.Tensor(np.stack(state)).permute(3, 0, 1, 2).unsqueeze(0))
+    # while len(state) < self.params.max_states_recorded:
+    #   state.append(state[-1])
+    state = self.env.render(rendered=False)
+    state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
 
     if self.metric_update_single_agent:
       surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
@@ -195,7 +195,7 @@ class RndQD(object):
       self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)
       self.writer.add_scalar('Avg_generation_novelty', cs/self.pop_size)
 
-      if self.elapsed_gen % 1 == 0:
+      if self.elapsed_gen % 10 == 0:
         print('Generation {}'.format(self.elapsed_gen))
         if self.archive is not None:
           print('Archive size {}'.format(self.archive.size))
