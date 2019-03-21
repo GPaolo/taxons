@@ -18,7 +18,7 @@ class Params(object):
   def __init__(self):
     self.info = 'AE whose feature space dimension is really small.'
 
-    self.exp_name = 'ae_novelty_small_feat_space'
+    self.exp_name = 'ae_small_feat_space_pareto'
     self.seed = 7
 
     # Environment
@@ -44,7 +44,7 @@ class Params(object):
     # ---------------------------------------------------------
     self.gpu = True
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 64
+    self.feature_size = 32
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.state_recording_interval = 5
@@ -53,7 +53,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto'
 
     if self.optimizer_type == 'Novelty':
       self.optimizer = optimizer.NoveltyOptimizer
@@ -66,7 +66,7 @@ class Params(object):
 
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
-  # ---------------------------------------------------------
+  # -----------------------------------------Setup----------------
 
   def _get_dict(self):
     params_dict = {key:value for key, value in self.__dict__items() if not key.startswith('__') and not callable(key)}
