@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import json
 
 class FCLayer(object):
 
@@ -114,7 +115,7 @@ def obs_formatting(env_tag, obs):
     return obs
 
 
-def show(bs_points, filepath, name=None):
+def show(bs_points, filepath, name=None, info=None):
   print('Behaviour space coverage representation.')
   limit = 1.35
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
@@ -140,7 +141,10 @@ def show(bs_points, filepath, name=None):
   else:
     with open(os.path.join(filepath, 'data.txt'), 'w') as f:
       f.write("Coverage {}%\n".format(np.count_nonzero(H)/(50*50)*100))
-      f.write("Total solutions found: {}".format(len(bs_points)))
+      f.write("Total solutions found: {}\n".format(len(bs_points)))
+      if info is not None:
+        info = json.dumps(info)
+        f.write(info)
 
     plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
   print('Plot saved in {}'.format(filepath))

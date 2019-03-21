@@ -176,33 +176,38 @@ class NoveltySearch(object):
 if __name__ == '__main__':
   env = gym.make(env_tag)
 
-  env.seed()
-  np.random.seed()
+  seeds = [10, 7, 9, 42, 2]
 
-  filepath = os.path.join(utils.get_projectpath(), 'baselines', 'ns')
+  for iteration, seed in enumerate(seeds):
+    print('Running with seed: {}'.format(seed))
+    random.seed(seed)
+    env.seed(seed)
+    np.random.seed(seed)
 
-  ns = NoveltySearch(env, filepath, pop_size=100, obs_shape=6, action_shape=2)
-  try:
-    ns.evolve(500)
-  except KeyboardInterrupt:
-    print('User Interruption')
+    filepath = os.path.join(utils.get_projectpath(), 'baselines', 'ns_{}'.format(iteration))
 
-  bs_points = np.concatenate(ns.archive['bs'].values)
-  utils.show(bs_points, ns.filepath, 'NS_{}_{}'.format(ns.elapsed_gen, env_tag))
-  print(ns.archive['name'].values)
+    ns = NoveltySearch(env, filepath, pop_size=100, obs_shape=6, action_shape=2)
+    try:
+      ns.evolve(500)
+    except KeyboardInterrupt:
+      print('User Interruption')
 
-  print('Testing result according to best reward.')
-  rewards = ns.archive['reward'].sort_values(ascending=False)
-  for idx in range(ns.archive.size):
-    tested = ns.archive[rewards.iloc[idx:idx + 1].index.values[0]]
-    print()
-    print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
-    done = False
-    ts = 0
-    obs = utils.obs_formatting(env_tag, ns.env.reset())
-    while not done and ts < 1000:
-      ns.env.render()
-      action = utils.action_formatting(env_tag, tested['agent'](ts))
-      obs, reward, done, info = ns.env.step(action)
-      obs = utils.obs_formatting(env_tag, obs)
-      ts += 1
+    bs_points = np.concatenate(ns.archive['bs'].values)
+    utils.show(bs_points, ns.filepath, 'NS_{}_{}'.format(ns.elapsed_gen, env_tag), info={'Generation':500, 'Seed':seed})
+    print(ns.archive['name'].values)
+
+    # print('Testing result according to best reward.')
+    # rewards = ns.archive['reward'].sort_values(ascending=False)
+    # for idx in range(ns.archive.size):
+    #   tested = ns.archive[rewards.iloc[idx:idx + 1].index.values[0]]
+    #   print()
+    #   print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
+    #   done = False
+    #   ts = 0
+    #   obs = utils.obs_formatting(env_tag, ns.env.reset())
+    #   while not done and ts < 1000:
+    #     ns.env.render()
+    #     action = utils.action_formatting(env_tag, tested['agent'](ts))
+    #     obs, reward, done, info = ns.env.step(action)
+    #     obs = utils.obs_formatting(env_tag, obs)
+    #     ts += 1
