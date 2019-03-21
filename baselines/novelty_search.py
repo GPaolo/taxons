@@ -9,7 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os
 # env_tag = 'MountainCarContinuous-v0'
-env_tag = 'Billiard-v0'
+env_tag = 'BilliardHard-v0'
 
 
 class NoveltySearch(object):
@@ -142,7 +142,7 @@ class NoveltySearch(object):
       obs = utils.obs_formatting(env_tag, obs)
       cumulated_reward += reward
       t += 1
-    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    agent['bs'] = np.array([[obs[0][2], obs[0][3]]])
     agent['reward'] = cumulated_reward
 
   def evolve(self, gen=1000):

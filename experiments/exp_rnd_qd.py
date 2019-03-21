@@ -24,7 +24,7 @@ class Params(object):
     # Environment
     # ---------------------------------------------------------
     self.action_shape = 2
-    self.env_tag = 'Billiard-v0'  # MountainCarContinuous-v0'
+    self.env_tag = 'BilliardHard-v0'  # MountainCarContinuous-v0'
     # ---------------------------------------------------------
 
     # QD
