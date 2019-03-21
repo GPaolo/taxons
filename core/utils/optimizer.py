@@ -72,12 +72,12 @@ class ParetoOptimizer(BaseOptimizer):
     """
     # MEASURE AGENT NOVELTY
     for agent_idx in range(self.pop.size):
-      bs_point = self.pop[agent_idx]['features']
+      bs_point = self.pop[agent_idx]['features'][0]
 
-      bs_space = np.stack(self.pop['features'].values)
+      bs_space = np.stack([a[0] for a in self.pop['features'].values])
       bs_space = np.delete(bs_space, agent_idx, axis=0)
       if self.archive.size > 0:
-        archive_bs_space = np.stack(self.archive['features'].values)
+        archive_bs_space = np.stack([a[0] for a in self.archive['features'].values])
         bs_space = np.concatenate([bs_space, archive_bs_space])
       # Get distances
       diff = np.atleast_2d(bs_space - bs_point)
@@ -110,10 +110,10 @@ class ParetoOptimizer(BaseOptimizer):
         for idx in is_pareto:
           self.archive.add(self.pop.copy(idx, with_data=True))
       else: # add only the non dominated
-        arch_costs = np.array([np.stack(self.archive['surprise'].values), np.stack(self.archive['reward'].values)]).transpose()
+        arch_costs = np.array([np.stack(self.archive['surprise'].values), np.stack(self.archive['novelty'].values)]).transpose()
         for idx in is_pareto:
           if self.pop[idx]['name'] not in self.archive['name'].values: # Add an element in the archive only if not present already
-            costs = np.array([self.pop[idx]['surprise'], self.pop[idx]['reward']])
+            costs = np.array([self.pop[idx]['surprise'], self.pop[idx]['novelty']])
             if np.any(np.any(costs > arch_costs, axis=1)): # TODO Invece di fare cosi potrei ricalcolare il pareto front dell'archivio+quello da aggiungere e vedere se ci sta. Se ci sta lo aggiungo
               self.archive.add(self.pop.copy(idx, with_data=True))
               self.pop[idx]['best'] = True
@@ -134,7 +134,7 @@ class ParetoOptimizer(BaseOptimizer):
 
     # Mutate pop that are not pareto optima
     for a in self.pop:
-      if np.random.random() <= self.mutation_rate and not a['best']:
+      if np.random.random() <= self.mutation_rate:
         a['agent'].mutate()
         a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
         self.pop.agent_name += 1

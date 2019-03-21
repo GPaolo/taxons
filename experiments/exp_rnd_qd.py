@@ -16,9 +16,9 @@ ex = Experiment()
 
 class Params(object):
   def __init__(self):
-    self.info = 'Metric with AE. The metric is updated once per gen. AE is deep. Novelty metric and the archive features are reupdated very gen'
+    self.info = 'AE with 3d convolution for temporal dimension. Using the last N frames'
 
-    self.exp_name = 'ae_deep_surprise_reupdated_feat'
+    self.exp_name = 'ae_novelty_3d'
     self.seed = 7
 
     # Environment
@@ -47,11 +47,13 @@ class Params(object):
     self.feature_size = 64
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
+    self.state_recording_interval = 5
+    self.max_states_recorded = 20
     # ---------------------------------------------------------
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
 
     if self.optimizer_type == 'Novelty':
       self.optimizer = optimizer.NoveltyOptimizer
