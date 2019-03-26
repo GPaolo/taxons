@@ -171,8 +171,8 @@ if __name__ == '__main__':
   #     if not norm:
   #       a = a.astype(np.int)
   #
-      # ax[i, j].imshow(a)
-      # plt.imshow(a)
+  # ax[i, j].imshow(a)
+  # plt.imshow(a)
   # plt.show()
 
   # fig, ax = plt.subplots(1)
@@ -182,7 +182,7 @@ if __name__ == '__main__':
   #a = a.cpu().data.numpy()
   #if not norm:
   #  a = a.astype(np.int)
-  # ax.imshow(x[20])
+  # ax.imshow(x[19])
   #
   #test = test[0].permute(1,2,0)
   #test = test.cpu().data.numpy()
@@ -193,18 +193,17 @@ if __name__ == '__main__':
   #print(ll)
   # plt.show()
   ae_model = AutoEncoder()
-  ae_model.load('/home/giuseppe/src/rnd_qd/experiments/ae_deep_novelty_reupdated_fea/models/ckpt_ae.pth')
+  ae_model.load('/home/giuseppe/src/rnd_qd/experiments/ae_small_feat_space_novelty/models/ckpt_ae.pth')
 
   # archive = population.Population(agent=agents.DMPAgent, pop_size=0, shapes={'dof': 2, 'degree': 5})
   # archive.load_pop('/home/giuseppe/src/rnd_qd/experiments/ae_deep_novelty_reupdated_fea/models/qd_archive.pkl')
 
   pop = population.Population(agent=agents.DMPAgent, pop_size=0, shapes={'dof': 2, 'degree': 5})
-  pop.load_pop('/home/giuseppe/src/rnd_qd/experiments/ae_deep_novelty_reupdated_fea/models/qd_pop.pkl')
+  pop.load_pop('/home/giuseppe/src/rnd_qd/experiments/ae_small_feat_space_novelty/models/qd_pop.pkl')
 
   # Evaluate agents bs points
   # ----------------------------------------------------------------
-  i = 0
-  for agent in pop:
+  for i, agent in enumerate(pop):
     if i % 50 == 0:
       print('Evaluating agent {}'.format(i))
     done = False
@@ -224,11 +223,10 @@ if __name__ == '__main__':
     bs_point = bs_point .flatten().cpu().data.numpy()
 
     agent['features'] = [bs_point]
-    i += 1
   # ----------------------------------------------------------------
 
   # Calculate New point bs
-  a = torch.Tensor(x[19]).permute(2, 0, 1).unsqueeze(0)
+  a = torch.Tensor(x[0]).permute(2, 0, 1).unsqueeze(0)
   _, bs_point = ae_model(a)
   bs_point = bs_point.flatten().cpu().data.numpy()
 
@@ -239,7 +237,7 @@ if __name__ == '__main__':
   # Get distances
   diff = np.atleast_2d(bs_space - bs_point)
   dists = np.sqrt(np.sum(diff * diff, axis=1))
-  k = 5
+  k = 1
   if len(dists) <= k:  # Should never happen
     idx = list(range(len(dists)))
     k = len(idx)
@@ -252,6 +250,25 @@ if __name__ == '__main__':
     scale = np.array(list(range(k)))/k
     scale = scale / np.sum(scale)
     return scale
+
+  selected = pop[:k]
+
+  done = False
+  ts = 0
+  obs = utils.obs_formatting(env_tag, env.reset())
+  while not done:
+    env.render()
+    agent_input = ts
+    action = utils.action_formatting(env_tag, selected.loc[0]['agent'](agent_input))
+    obs, reward, done, info = env.step(action)
+    obs = utils.obs_formatting(env_tag, obs)
+    ts += 1
+
+  state = env.render(rendered=False)
+  fig, ax = plt.subplots(2)
+  ax[0].imshow(state)
+  ax[1].imshow(x[20])
+  plt.show()
 
 
 

@@ -9,7 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os
 # env_tag = 'MountainCarContinuous-v0'
-env_tag = 'BilliardHard-v0'
+env_tag = 'Billiard-v0'
 
 
 class NoveltySearch(object):
@@ -142,7 +142,7 @@ class NoveltySearch(object):
       obs = utils.obs_formatting(env_tag, obs)
       cumulated_reward += reward
       t += 1
-    agent['bs'] = np.array([[obs[0][2], obs[0][3]]])
+    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
 
   def evolve(self, gen=1000):
@@ -194,7 +194,7 @@ if __name__ == '__main__':
 
     bs_points = np.concatenate(ns.archive['bs'].values)
     utils.show(bs_points, ns.filepath, 'NS_{}_{}'.format(ns.elapsed_gen, env_tag), info={'Generation':500, 'Seed':seed})
-    print(ns.archive['name'].values)
+    #print(ns.archive['name'].values)
 
     # print('Testing result according to best reward.')
     # rewards = ns.archive['reward'].sort_values(ascending=False)

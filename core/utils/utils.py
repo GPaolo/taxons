@@ -139,7 +139,7 @@ def show(bs_points, filepath, name=None, info=None):
   if name is None:
     plt.savefig(os.path.join(filepath, 'behaviour.pdf'))
   else:
-    with open(os.path.join(filepath, 'data.txt'), 'w') as f:
+    with open(os.path.join(filepath, 'data.txt'), 'a+') as f:
       f.write("Coverage {}%\n".format(np.count_nonzero(H)/(50*50)*100))
       f.write("Total solutions found: {}\n".format(len(bs_points)))
       if info is not None:
