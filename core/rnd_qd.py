@@ -145,11 +145,19 @@ class RndQD(object):
     while the AE learns)
     :return:
     """
-    # TODO this one should be done batch wise! Instead of a for loop, put all the states in a tensor and do a single pass
-    for agent in self.archive:
-      state = torch.Tensor(agent['features'][1]).to(self.device)
+    if not len(self.archive) == 0:
+      feats = self.archive['features'].values
+      state = torch.Tensor(np.concatenate([f[1] for f in feats])).to(self.device)
       _, feature = self.metric(state)
-      agent['features'][0] = feature.flatten().cpu().data.numpy()
+
+      for agent, feat in zip(self.archive, feature):
+        agent['features'][0] = feat.flatten().cpu().data.numpy()
+
+
+    # for agent in self.archive:
+    #   state = torch.Tensor(agent['features'][1]).to(self.device)
+    #   _, feature = self.metric(state)
+    #   agent['features'][0] = feature.flatten().cpu().data.numpy()
 
   def update_metric(self):
     """
