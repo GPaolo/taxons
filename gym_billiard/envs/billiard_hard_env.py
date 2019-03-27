@@ -6,7 +6,6 @@ from gym_billiard.utils import physics, parameters
 import logging
 logger = logging.getLogger(__name__)
 
-# TODO implement negative reward for arm touching ball 1
 # TODO implement logger
 
 class BilliardHardEnv(gym.Env):

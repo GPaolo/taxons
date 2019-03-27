@@ -123,12 +123,13 @@ class RndQD(object):
     state = self.env.render(rendered=False)
     state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
 
-    if self.metric_update_single_agent:
+    if self.metric_update_single_agent and self.params.update_metric:
       surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
       self.metric_update_steps += 1
       self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
     else:
-      self.cumulated_state.append(state[0])
+      if self.params.update_metric:
+        self.cumulated_state.append(state[0])
       surprise, features = self.metric(state.to(self.device))
     surprise = surprise.cpu().data.numpy()
     features = features.flatten().cpu().data.numpy()
@@ -184,12 +185,12 @@ class RndQD(object):
         if max_rew < a['reward']:
           max_rew = a['reward']
 
-      if not self.params.optimizer_type == 'Surprise':
+      if self.params.update_metric and not self.params.optimizer_type == 'Surprise':
         self.update_archive_feat()
       self.opt.step()
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
-      if not self.metric_update_single_agent:
+      if self.params.update_metric and not self.metric_update_single_agent:
         self.update_metric()
 
       self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)

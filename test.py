@@ -48,9 +48,19 @@ class AutoEncoder(nn.Module):
     self.to(self.device)
     self.criterion.to(self.device)
 
+  def _get_surprise(self, x):
+    if x.shape[-1] > 75:  # Only subsample if not done yet.
+      x = self.subsample(x)
+    y, feat = self.forward(x)
+    loss = self.criterion(x, y)
+    return loss, feat
+
+  def __call__(self, x):
+    return self._get_surprise(x)
 
   def forward(self, x):
-    x = self.subsample(x)
+    if x.shape[-1] > 75:  # Only subsample if not done yet.
+      x = self.subsample(x)
     feat = self.encoder(x)
 
     shape = feat.shape
@@ -61,7 +71,6 @@ class AutoEncoder(nn.Module):
     y = y.view(shape)
 
     y = self.decoder(y)
-
     return y, feat
 
   def train_ae(self, x):
@@ -96,6 +105,11 @@ if __name__ == '__main__':
   env = gym.make(env_tag)
   #
   env.reset()
+
+  seed = 2
+  env.seed(seed)
+  np.random.seed(seed)
+  torch.manual_seed(seed)
   #state = env.render(rendered=False)
   #
   # with open('/home/giuseppe/src/rnd_qd/input_img.npy', 'rb') as f:
@@ -153,7 +167,7 @@ if __name__ == '__main__':
   #  writer.add_scalar('loss', loss, k)
 
   # print(x.shape)
-  # fig, ax = plt.subplots(7, 3)
+  fig, ax = plt.subplots(7, 3)
 
   #writer.export_scalars_to_json("./all_scalars.json")
   #writer.close()
@@ -161,19 +175,21 @@ if __name__ == '__main__':
   # b = net(test.unsqueeze(0))
   # b = b[0].permute(1, 2, 3, 0)
   #
-  # for i in range(7):
-  #   for j in range(3):
-  #     k = i+j
+  k = 0
+  for i in range(7):
+    for j in range(3):
   #     #b = net(x[k:k+1])
-  #     a = x[k]
+      a = x[k]
   #     #a = a.permute(1, 2, 0)
   #     a = a.cpu().data.numpy()
   #     if not norm:
   #       a = a.astype(np.int)
   #
-  # ax[i, j].imshow(a)
+      ax[i, j].imshow(a)
+      ax[i, j].set_title(k)
+      k += 1
   # plt.imshow(a)
-  # plt.show()
+  plt.show()
 
   # fig, ax = plt.subplots(1)
   #b = net(test)
@@ -199,7 +215,7 @@ if __name__ == '__main__':
   # archive.load_pop('/home/giuseppe/src/rnd_qd/experiments/ae_deep_novelty_reupdated_fea/models/qd_archive.pkl')
 
   pop = population.Population(agent=agents.DMPAgent, pop_size=0, shapes={'dof': 2, 'degree': 5})
-  pop.load_pop('/home/giuseppe/src/rnd_qd/experiments/ae_small_feat_space_novelty/models/qd_pop.pkl')
+  pop.load_pop('/home/giuseppe/src/rnd_qd/experiments/ae_small_feat_space_novelty/models/qd_archive.pkl')
 
   # Evaluate agents bs points
   # ----------------------------------------------------------------
@@ -218,57 +234,67 @@ if __name__ == '__main__':
       t += 1
 
     state = env.render(rendered=False)
-    state = torch.Tensor(state).permute(2, 0, 1).unsqueeze(0)
-    _, bs_point = ae_model(state)
+    state = ae_model.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
+    surprise, bs_point = ae_model(state)
     bs_point = bs_point .flatten().cpu().data.numpy()
+
+    # print('Agent {}: surprise {}'.format(i, surprise))
 
     agent['features'] = [bs_point]
   # ----------------------------------------------------------------
 
   # Calculate New point bs
-  a = torch.Tensor(x[0]).permute(2, 0, 1).unsqueeze(0)
-  _, bs_point = ae_model(a)
-  bs_point = bs_point.flatten().cpu().data.numpy()
+  x_image = 0
+  for x_image in range(23):
+    # x_image = int(input("Choose the x:"))
+    print("X: {}".format(x_image))
+    goal = torch.Tensor(x[x_image]).permute(2, 0, 1).unsqueeze(0)
+    surprise, bs_point = ae_model(goal)
+    bs_point = bs_point.flatten().cpu().data.numpy()
+    print('Target point surprise {}'.format(surprise))
 
   # Get N closest agents
   # ----------------------------------------------------------------
-  bs_space = np.stack([a[0] for a in pop['features'].values])
+    bs_space = np.stack([a[0] for a in pop['features'].values])
 
   # Get distances
-  diff = np.atleast_2d(bs_space - bs_point)
-  dists = np.sqrt(np.sum(diff * diff, axis=1))
-  k = 1
-  if len(dists) <= k:  # Should never happen
-    idx = list(range(len(dists)))
-    k = len(idx)
-  else:
-    idx = np.argpartition(dists, k)  # Get 15 nearest neighs
+    diff = np.atleast_2d(bs_space - bs_point)
+    dists = np.sqrt(np.sum(diff * diff, axis=1))
+    print('Min distance {}'.format(np.min(dists)))
+    k = 1
+    if len(dists) <= k:  # Should never happen
+      idx = list(range(len(dists)))
+      k = len(idx)
+    else:
+      idx = np.argpartition(dists, k)  # Get 15 nearest neighs
 
-  mean_k_dist = np.mean(dists[idx[:k]])
+    mean_k_dist = np.mean(dists[idx[:k]])
+    print('Mean K distance {}'.format(mean_k_dist))
 
-  def get_scaling(k):
-    scale = np.array(list(range(k)))/k
-    scale = scale / np.sum(scale)
-    return scale
+    def get_scaling(k):
+      scale = np.array(list(range(k)))/k
+      scale = scale / np.sum(scale)
+      return scale
 
-  selected = pop[:k]
+    selected = pop[idx[:k]]
+    print("Selected agent {}".format(idx[:k]))
 
-  done = False
-  ts = 0
-  obs = utils.obs_formatting(env_tag, env.reset())
-  while not done:
-    env.render()
-    agent_input = ts
-    action = utils.action_formatting(env_tag, selected.loc[0]['agent'](agent_input))
-    obs, reward, done, info = env.step(action)
-    obs = utils.obs_formatting(env_tag, obs)
-    ts += 1
+    done = False
+    ts = 0
+    obs = utils.obs_formatting(env_tag, env.reset())
+    while not done:
+      env.render()
+      agent_input = ts
+      action = utils.action_formatting(env_tag, selected.iloc[0]['agent'](agent_input))
+      obs, reward, done, info = env.step(action)
+      obs = utils.obs_formatting(env_tag, obs)
+      ts += 1
 
-  state = env.render(rendered=False)
-  fig, ax = plt.subplots(2)
-  ax[0].imshow(state)
-  ax[1].imshow(x[20])
-  plt.show()
+    state = env.render(rendered=False)
+    fig, ax = plt.subplots(2)
+    ax[0].imshow(state)
+    ax[1].imshow(x[x_image])
+    plt.show()
 
 
 

@@ -18,7 +18,7 @@ class Params(object):
   def __init__(self):
     self.info = 'AE whose feature space dimension is really small.'
 
-    self.exp_name = 'ae_small_feat_space_novelty_long'
+    self.exp_name = 'ae_small_feat_space_no_ae_update'
     self.seed = [10, 7, 9, 42, 2]
 
     # Environment
@@ -29,7 +29,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 1000
+    self.generations = 500
     self.pop_size = 100
     self.use_archive = True
 
@@ -49,11 +49,12 @@ class Params(object):
     self.per_agent_update = False
     self.state_recording_interval = 5
     self.max_states_recorded = 20
+    self.update_metric = True
     # ---------------------------------------------------------
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
 
     if self.optimizer_type == 'Novelty':
       self.optimizer = optimizer.NoveltyOptimizer
