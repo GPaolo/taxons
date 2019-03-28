@@ -1,25 +1,23 @@
 # Created by Giuseppe Paolo 
 # Date: 15/02/19
 
-from sacred import Experiment
 from core import rnd_qd
 import gym, torch
 import gym_billiard
 import numpy as np
 from core.utils import utils, optimizer
-from sacred.observers import FileStorageObserver
 import os
 import json
-
-ex = Experiment()
 
 
 class Params(object):
   def __init__(self):
     self.info = 'AE whose feature space dimension is really small.'
 
-    self.exp_name = 'ae_small_feat_space_no_ae_update'
-    self.seed = [10, 7, 9, 42, 2]
+    self.exp_name = 'test_improvements'
+    # Save Path
+    self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
+    self.seed = 7
 
     # Environment
     # ---------------------------------------------------------
@@ -29,7 +27,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 500
+    self.generations = 10
     self.pop_size = 100
     self.use_archive = True
 
@@ -54,7 +52,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto'
 
     if self.optimizer_type == 'Novelty':
       self.optimizer = optimizer.NoveltyOptimizer
@@ -63,41 +61,52 @@ class Params(object):
     elif self.optimizer_type == 'Pareto':
       self.optimizer = optimizer.ParetoOptimizer
     # ---------------------------------------------------------
-
-
-    # Save Path
-    self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
   # -----------------------------------------Setup----------------
 
   def _get_dict(self):
-    params_dict = {key:value for key, value in self.__dict__items() if not key.startswith('__') and not callable(key)}
+    params_dict = {key:value for key, value in self.__dict__.items() if not key.startswith('__') and not callable(key)}
+    del params_dict['optimizer']
+    params_dict['seed'] = params_dict['_seed']
+    del params_dict['_seed']
     return params_dict
   # ---------------------------------------------------------
 
   def save(self):
-    if not os.path.exists(self.save_path):
-      os.mkdir(self.save_path)
+    # if not os.path.exists(self.save_path):
+    os.makedirs(self.save_path, exist_ok=True)
     with open(os.path.join(self.save_path, 'params.json'), 'w') as f:
       json.dump(self._get_dict(), f, indent=4)
+  # ---------------------------------------------------------
+
+  # Seed Property
+  # ---------------------------------------------------------
+  @property
+  def seed(self):
+    return self._seed
+
+  @seed.setter
+  def seed(self, seed):
+    self._seed = seed
+    self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name, str(self.seed))
   # ---------------------------------------------------------
 # ---------------------------------------------------------
 
 
-@ex.config
-def config():
-  params = Params()
-  ex.observers.append(FileStorageObserver.create(params.save_path))
+if __name__ == "__main__":
+  # seeds = [10, 7, 9, 42, 2]
+  seeds = [10, 7]
 
+  for seed in seeds:
+    print('Training with seed {}'.format(seed))
 
-@ex.automain
-def main(params):
-
-  for seed in params.seed:
+    params = Params()
     env = gym.make(params.env_tag)
 
+    params.seed = seed
     env.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+    params.save()
 
     if not os.path.exists(params.save_path):
       os.mkdir(params.save_path)
@@ -109,6 +118,7 @@ def main(params):
       print('User Interruption.')
 
     evolver.save()
+    params.save()
 
     if evolver.archive is None:
       pop = evolver.population
