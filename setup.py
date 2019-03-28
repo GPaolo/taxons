@@ -12,6 +12,7 @@ setup(author='Giuseppe Paolo',
             'box2d',
             'sacred',
             'pyjson',
-            'pathos'
+            'pathos',
+            'mujoco-py<2.1,>=2.0'
       ]
 )
