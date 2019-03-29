@@ -41,6 +41,7 @@ class BaseAgent(metaclass=ABCMeta):
   def load_genome(self, genome):
     raise NotImplementedError
 
+
 class FFNeuralAgent(BaseAgent):
 
   def __init__(self, shapes, mutation_distr=None):

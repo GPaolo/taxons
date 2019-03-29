@@ -165,12 +165,14 @@ def split_array(a, wanted_parts=1):
   length = len(a)
   return [a[i * length // wanted_parts : (i+1) * length // wanted_parts] for i in range(wanted_parts)]
 
+
 def fun(f, q_in, q_out):
   while True:
     i, x = q_in.get()
     if i is None:
       break
     q_out.put((i, f(x)))
+
 
 def parmap(f, X, nprocs=mp.cpu_count()):
   q_in = mp.Queue(1)

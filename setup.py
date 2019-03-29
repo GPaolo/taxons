@@ -11,8 +11,8 @@ setup(author='Giuseppe Paolo',
             'pygame',
             'box2d',
             'sacred',
-            'tensorboardX',
             'pyjson',
-            'tensorboard'
+            'pathos',
+            'mujoco-py<2.1,>=2.0'
       ]
 )

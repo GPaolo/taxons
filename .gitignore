@@ -15,3 +15,6 @@ runs/*
 *.pth
 *.pkl
 *.txt
+*.out
+*/MUJOCO_LOG.TXT
+*.lock

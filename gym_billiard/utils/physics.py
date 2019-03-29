@@ -5,7 +5,6 @@ from gym_billiard.utils import parameters
 from pprint import pprint
 
 
-# TODO implement different initial arm positions
 # TODO implement checks on balls spawning positions (not in holes or on arm or overlapped'
 
 # Extend polygon shape with drawing function

@@ -7,10 +7,10 @@ import gym, torch
 import gym_billiard
 import os, threading, sys, traceback
 import matplotlib
-from tensorboardX import SummaryWriter
+
 import multiprocessing as mp
-env_tag = 'Billiard-v0'
-# env_tag = 'MountainCarContinuous-v0'
+
+import json
 
 
 class RndQD(object):
@@ -27,9 +27,9 @@ class RndQD(object):
     self.agents_shapes = self.params.agent_shapes
     self.agent_name = self.params.qd_agent
 
-    self.writer = SummaryWriter(self.save_path)
     self.metric_update_steps = 0
     self.metric_update_single_agent = self.params.per_agent_update
+    self.logs = {'Generation':[], 'Avg gen surprise':[], 'Max reward':[], 'Archive size':[], }
 
     if self.agent_name == 'Neural':
       agent_type = agents.FFNeuralAgent
@@ -60,6 +60,7 @@ class RndQD(object):
 
     self.END = False
     self.thread = threading.Thread(target=self._control_interface)
+    self.thread.daemon = True
     self.thread.start()
 
     self.pool = mp.Pool()
@@ -78,30 +79,35 @@ class RndQD(object):
     print('If you want to stop training, press q.')
     matplotlib.use('agg')
     while True:
-      action = input(' ')
-      if action == 's':
-        try:
-          if self.archive is not None:
-            bs_points = np.concatenate(self.archive['bs'].values)
-          else:
-            bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-          utils.show(bs_points, filepath=self.save_path)
-        except BaseException as e:
-          ex_type, ex_value, ex_traceback = sys.exc_info()
-          trace_back = traceback.extract_tb(ex_traceback)
-          stack_trace = list()
-          for trace in trace_back:
-            stack_trace.append(
-              "File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
-          print('Cannot show progress due to {}: {}'.format(ex_type.__name__, ex_value))
-          print(stack_trace[0])
-      elif action == 'q':
-        print('Quitting training...')
-        self.END = True
+      try:
+        action = input(' ')
+        if action == 's':
+          try:
+            if self.archive is not None:
+              bs_points = np.concatenate(self.archive['bs'].values)
+            else:
+              bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
+            utils.show(bs_points, filepath=self.save_path)
+          except BaseException as e:
+            ex_type, ex_value, ex_traceback = sys.exc_info()
+            trace_back = traceback.extract_tb(ex_traceback)
+            stack_trace = list()
+            for trace in trace_back:
+              stack_trace.append(
+                "File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+            print('Cannot show progress due to {}: {}'.format(ex_type.__name__, ex_value))
+            print(stack_trace[0])
+        elif action == 'q':
+          print('Quitting training...')
+          self.END = True
+          break
+      except KeyboardInterrupt:
+        print('BYE')
+        break
 
   # TODO make this run in parallel
   @staticmethod
-  def evaluate_agent(agent_env):
+  def evaluate_agent(self, agent_env):
     """
     This function evaluates the agent in the environment. This function should be run in parallel
     :param agent: agent to evaluate
@@ -110,7 +116,7 @@ class RndQD(object):
     done = False
     cumulated_reward = 0
 
-    obs = utils.obs_formatting(env_tag, agent_env[1].reset())
+    obs = utils.obs_formatting(self.params.env_tag, agent_env[1].reset())
     t = 0
     while not done:
       if agent_env[3] == 'Neural':
@@ -118,10 +124,11 @@ class RndQD(object):
       elif agent_env[3] == 'DMP':
         agent_input = t
 
-      action = utils.action_formatting(env_tag, agent_env[0]['agent'](agent_input))
+      action = utils.action_formatting(self.params.env_tag, agent_env[0]['agent'](agent_input))
 
       obs, reward, done, info = agent_env[1].step(action)
-      obs = utils.obs_formatting(env_tag, obs)
+      obs = utils.obs_formatting(self.params.env_tag, obs)
+
       t += 1
       cumulated_reward += reward
 
@@ -157,6 +164,13 @@ class RndQD(object):
     state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
     self.cumulated_state.append(state[0])
     surprise, features = self.metric(state.to(self.device))
+    if self.metric_update_single_agent and self.params.update_metric:
+      surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
+      self.metric_update_steps += 1
+    else:
+      if self.params.update_metric:
+        self.cumulated_state.append(state[0])
+      surprise, features = self.metric(state.to(self.device))
     surprise = surprise.cpu().data.numpy()
     features = features.flatten().cpu().data.numpy()
 
@@ -171,11 +185,19 @@ class RndQD(object):
     while the AE learns)
     :return:
     """
-    # TODO this one should be done batch wise! Instead of a for loop, put all the states in a tensor and do a single pass
-    for agent in self.archive:
-      state = torch.Tensor(agent['features'][1]).to(self.device)
+    if not len(self.archive) == 0:
+      feats = self.archive['features'].values
+      state = torch.Tensor(np.concatenate([f[1] for f in feats])).to(self.device)
       _, feature = self.metric(state)
-      agent['features'][0] = feature.flatten().cpu().data.numpy()
+
+      for agent, feat in zip(self.archive, feature):
+        agent['features'][0] = feat.flatten().cpu().data.numpy()
+
+
+    # for agent in self.archive:
+    #   state = torch.Tensor(agent['features'][1]).to(self.device)
+    #   _, feature = self.metric(state)
+    #   agent['features'][0] = feature.flatten().cpu().data.numpy()
 
   def update_metric(self):
     """
@@ -189,7 +211,6 @@ class RndQD(object):
     for data in mini_batches:
       cum_surprise.append(self.metric.training_step(data))
       self.metric_update_steps += 1
-      self.writer.add_scalar('novelty', cum_surprise[-1][0], self.metric_update_steps)
 
     features = torch.cat([cs[1] for cs in cum_surprise])
     self.cumulated_state = []
@@ -212,22 +233,13 @@ class RndQD(object):
         if max_rew < a['reward']:
           max_rew = a['reward']
 
-      # for a in self.population:
-      #   self.evaluate_agent(a)
-      #   cs += a['surprise']
-      #   if max_rew < a['reward']:
-      #     max_rew = a['reward']
-
-      if not self.params.optimizer_type == 'Surprise':
+      if self.params.update_metric and not self.params.optimizer_type == 'Surprise':
         self.update_archive_feat()
       self.opt.step()
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
-      if not self.metric_update_single_agent:
+      if self.params.update_metric and not self.metric_update_single_agent:
         self.update_metric()
-
-      self.writer.add_scalar('Archive_size', self.archive.size, self.elapsed_gen)
-      self.writer.add_scalar('Avg_generation_novelty', cs/self.pop_size)
 
       if self.elapsed_gen % 10 == 0:
         print('Generation {}'.format(self.elapsed_gen))
@@ -236,6 +248,11 @@ class RndQD(object):
         print('Average generation surprise {}'.format(cs/self.pop_size))
         print('Max reward {}'.format(max_rew))
         print()
+
+      self.logs['Generation'].append(self.elapsed_gen)
+      self.logs['Avg gen surprise'].append(cs/self.pop_size)
+      self.logs['Max reward'].append(max_rew)
+      self.logs['Archive size'].append(self.archive.size)
 
       if self.END:
         print('Quitting.')
@@ -253,7 +270,6 @@ class RndQD(object):
     self.archive.save_pop(save_subf, 'archive')
     self.metric.save(save_subf)
 
-    self.writer.export_scalars_to_json(os.path.join(self.save_path, "scalars_log.json"))
-    self.writer.close()
-
+    with open(os.path.join(self.save_path, 'logs.json'), 'w') as f:
+      json.dump(self.logs, f, indent=4)
     print('Done')

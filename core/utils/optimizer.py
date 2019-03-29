@@ -118,7 +118,6 @@ class ParetoOptimizer(BaseOptimizer):
               self.archive.add(self.pop.copy(idx, with_data=True))
               self.pop[idx]['best'] = True
 
-    # TODO NB: un'altra cosa che potrei fare e' far riprodurre solo quelli che aggiungo all'archivio.
 
     # Create new gen by substituting random agents with copies of the best ones.
     # (Also the best ones can be subst, effectively reducing the amount of dead agents)
