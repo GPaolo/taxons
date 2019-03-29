@@ -31,19 +31,19 @@ class BilliardEnv(gym.Env):
 
     # Ball XY positions can be between -1.5 and 1.5
     ball_os = spaces.Box(low=np.array([-self.params.TABLE_SIZE[0]/2., -self.params.TABLE_SIZE[1]/2.]),
-                         high=np.array([self.params.TABLE_SIZE[0]/2., self.params.TABLE_SIZE[1]/2.]))
+                         high=np.array([self.params.TABLE_SIZE[0]/2., self.params.TABLE_SIZE[1]/2.]), dtype=np.float32)
 
     # Arm joint can have positons:
     # Joint 0: [-Pi/2, Pi/2]
     # Joint 1: [-Pi, Pi]
-    joints_angle = spaces.Box(low=np.array([-np.pi/2, -np.pi]), high=np.array([np.pi/2, np.pi]))
-    joints_vel = spaces.Box(low=np.array([-50, -50]), high=np.array([50, 50]))
+    joints_angle = spaces.Box(low=np.array([-np.pi/2, -np.pi]), high=np.array([np.pi/2, np.pi]), dtype=np.float32)
+    joints_vel = spaces.Box(low=np.array([-50, -50]), high=np.array([50, 50]), dtype=np.float32)
 
     self.observation_space = spaces.Tuple([ball_os, joints_angle, joints_vel])
 
     # Actions are torques on joints and open/close of arm grip.
     # Joint torques can be between [-1, 1]
-    self.action_space = spaces.Box(low=np.array([-1., -1.]), high=np.array([1., 1.]))
+    self.action_space = spaces.Box(low=np.array([-1., -1.]), high=np.array([1., 1.]), dtype=np.float32)
 
     self.seed(seed)
 

@@ -2,14 +2,11 @@ import numpy as np
 from core.metrics import rnd, ae
 from core.qd import population, agents
 from core.utils import utils
-from core.utils import optimizer
 import gym, torch
 import gym_billiard
 import os, threading, sys, traceback
 import matplotlib
-
-import multiprocessing as mp
-
+import multiprocessing.dummy as mp
 import json
 
 
@@ -106,7 +103,6 @@ class RndQD(object):
         break
 
   # TODO make this run in parallel
-  @staticmethod
   def evaluate_agent(self, agent_env):
     """
     This function evaluates the agent in the environment. This function should be run in parallel
@@ -119,9 +115,9 @@ class RndQD(object):
     obs = utils.obs_formatting(self.params.env_tag, agent_env[1].reset())
     t = 0
     while not done:
-      if agent_env[3] == 'Neural':
+      if self.agent_name == 'Neural':
         agent_input = obs
-      elif agent_env[3] == 'DMP':
+      elif self.agent_name == 'DMP':
         agent_input = t
 
       action = utils.action_formatting(self.params.env_tag, agent_env[0]['agent'](agent_input))
@@ -159,11 +155,9 @@ class RndQD(object):
     agent_env[0]['reward'] = cumulated_reward
     return state
 
-
   def update_agent(self, state, agent):
     state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
-    self.cumulated_state.append(state[0])
-    surprise, features = self.metric(state.to(self.device))
+
     if self.metric_update_single_agent and self.params.update_metric:
       surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
       self.metric_update_steps += 1
@@ -177,7 +171,6 @@ class RndQD(object):
     agent['features'] = [features, state.cpu().data.numpy()]
     agent['surprise'] = surprise
     return surprise
-
 
   def update_archive_feat(self):
     """
@@ -227,8 +220,8 @@ class RndQD(object):
       cs = 0
       max_rew = -np.inf
 
-      states = utils.parmap(self.evaluate_agent, zip(self.population, self.env, self.agent_name))
-      for s, a in zip(states, agents):
+      states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
+      for s, a in zip(states, self.population):
         cs += self.update_agent(s, a)
         if max_rew < a['reward']:
           max_rew = a['reward']
