@@ -92,16 +92,17 @@ def config():
 def main(params):
 
   for seed in params.seed:
-    env = gym.make(params.env_tag)
+    envs = [gym.make(params.env_tag) for i in range(params.pop_size)]
 
-    env.seed(seed)
+    for env in envs:
+      env.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
 
     if not os.path.exists(params.save_path):
       os.mkdir(params.save_path)
 
-    evolver = rnd_qd.RndQD(env=env, parameters=params)
+    evolver = rnd_qd.RndQD(env=envs, parameters=params)
     try:
       evolver.train(params.generations)
     except KeyboardInterrupt:

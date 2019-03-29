@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import json
+import multiprocessing as mp
 
 class FCLayer(object):
 
@@ -163,3 +164,27 @@ def get_projectpath():
 def split_array(a, wanted_parts=1):
   length = len(a)
   return [a[i * length // wanted_parts : (i+1) * length // wanted_parts] for i in range(wanted_parts)]
+
+def fun(f, q_in, q_out):
+  while True:
+    i, x = q_in.get()
+    if i is None:
+      break
+    q_out.put((i, f(x)))
+
+def parmap(f, X, nprocs=mp.cpu_count()):
+  q_in = mp.Queue(1)
+  q_out = mp.Queue()
+
+  proc = [mp.Process(target=fun, args=(f, q_in, q_out))
+            for _ in range(nprocs)]
+  for p in proc:
+    p.daemon = True
+    p.start()
+
+  sent = [q_in.put((i, x)) for i, x in enumerate(X)]
+  [q_in.put((None, None)) for _ in range(nprocs)]
+  res = [q_out.get() for _ in range(len(sent))]
+
+  [p.join() for p in proc]
+  return [x for i, x in sorted(res)]

@@ -8,6 +8,7 @@ import gym_billiard
 import os, threading, sys, traceback
 import matplotlib
 from tensorboardX import SummaryWriter
+import multiprocessing as mp
 env_tag = 'Billiard-v0'
 # env_tag = 'MountainCarContinuous-v0'
 
@@ -61,6 +62,17 @@ class RndQD(object):
     self.thread = threading.Thread(target=self._control_interface)
     self.thread.start()
 
+    self.pool = mp.Pool()
+
+  # Need these two functions to remove pool from the dict
+  def __getstate__(self):
+    self_dict = self.__dict__.copy()
+    del self_dict['pool']
+    return self_dict
+
+  def __setstate__(self, state):
+    self.__dict__.update(state)
+
   def _control_interface(self):
     print('If you want to show the progress, press s.')
     print('If you want to stop training, press q.')
@@ -88,7 +100,8 @@ class RndQD(object):
         self.END = True
 
   # TODO make this run in parallel
-  def evaluate_agent(self, agent):
+  @staticmethod
+  def evaluate_agent(agent_env):
     """
     This function evaluates the agent in the environment. This function should be run in parallel
     :param agent: agent to evaluate
@@ -97,17 +110,17 @@ class RndQD(object):
     done = False
     cumulated_reward = 0
 
-    obs = utils.obs_formatting(env_tag, self.env.reset())
+    obs = utils.obs_formatting(env_tag, agent_env[1].reset())
     t = 0
     while not done:
-      if self.agent_name == 'Neural':
+      if agent_env[3] == 'Neural':
         agent_input = obs
-      elif self.agent_name == 'DMP':
+      elif agent_env[3] == 'DMP':
         agent_input = t
 
-      action = utils.action_formatting(env_tag, agent['agent'](agent_input))
+      action = utils.action_formatting(env_tag, agent_env[0]['agent'](agent_input))
 
-      obs, reward, done, info = self.env.step(action)
+      obs, reward, done, info = agent_env[1].step(action)
       obs = utils.obs_formatting(env_tag, obs)
       t += 1
       cumulated_reward += reward
@@ -120,23 +133,37 @@ class RndQD(object):
 
     # while len(state) < self.params.max_states_recorded:
     #   state.append(state[-1])
-    state = self.env.render(rendered=False)
-    state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
+    state = agent_env[1].render(rendered=False)
+    # state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
 
-    if self.metric_update_single_agent:
-      surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
-      self.metric_update_steps += 1
-      self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
-    else:
-      self.cumulated_state.append(state[0])
-      surprise, features = self.metric(state.to(self.device))
+    # if self.metric_update_single_agent:
+    #   surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
+    #   self.metric_update_steps += 1
+    #   self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
+    # else:
+    #   self.cumulated_state.append(state[0])
+    #   surprise, features = self.metric(state.to(self.device))
+    # surprise = surprise.cpu().data.numpy()
+    # features = features.flatten().cpu().data.numpy()
+
+    agent_env[0]['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    # agent['features'] = [features, state.cpu().data.numpy()]
+    # agent['surprise'] = surprise
+    agent_env[0]['reward'] = cumulated_reward
+    return state
+
+
+  def update_agent(self, state, agent):
+    state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
+    self.cumulated_state.append(state[0])
+    surprise, features = self.metric(state.to(self.device))
     surprise = surprise.cpu().data.numpy()
     features = features.flatten().cpu().data.numpy()
 
-    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['features'] = [features, state.cpu().data.numpy()]
     agent['surprise'] = surprise
-    agent['reward'] = cumulated_reward
+    return surprise
+
 
   def update_archive_feat(self):
     """
@@ -178,11 +205,18 @@ class RndQD(object):
     for self.elapsed_gen in range(steps):
       cs = 0
       max_rew = -np.inf
-      for a in self.population:
-        self.evaluate_agent(a)
-        cs += a['surprise']
+
+      states = utils.parmap(self.evaluate_agent, zip(self.population, self.env, self.agent_name))
+      for s, a in zip(states, agents):
+        cs += self.update_agent(s, a)
         if max_rew < a['reward']:
           max_rew = a['reward']
+
+      # for a in self.population:
+      #   self.evaluate_agent(a)
+      #   cs += a['surprise']
+      #   if max_rew < a['reward']:
+      #     max_rew = a['reward']
 
       if not self.params.optimizer_type == 'Surprise':
         self.update_archive_feat()
