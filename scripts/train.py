@@ -16,10 +16,12 @@ if __name__ == "__main__":
   seeds = [10, 7, 9, 42, 2]
   total_train_time = 0
 
+  params = parameters.Params()
+  print('Experiment description\n{]'.format(params.info))
+
   for seed in seeds:
     print('\nTraining with seed {}'.format(seed))
 
-    params = parameters.Params()
     if params.parallel:
       envs = [gym.make(params.env_tag) for i in range(params.pop_size)]
     else:
