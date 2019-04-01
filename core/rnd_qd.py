@@ -59,8 +59,9 @@ class RndQD(object):
     self.thread = threading.Thread(target=self._control_interface)
     self.thread.daemon = True
     self.thread.start()
+    if self.params.parallel:
 
-    self.pool = mp.Pool()
+      self.pool = mp.Pool()
 
   # Need these two functions to remove pool from the dict
   def __getstate__(self):
@@ -212,10 +213,12 @@ class RndQD(object):
     """
     self.elapsed_gen = 0
     for self.elapsed_gen in range(steps):
-      cs = 0
-      max_rew = -np.inf
-
-      states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
+      if self.params.parallel:
+        states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
+      else:
+        states = []
+        for agent in self.population:
+          states.append(self.evaluate_agent((agent, self.env[0])))
       states = np.stack(states)
       avg_gen_surprise = np.mean(self.update_agents(states))
       max_rew = np.max(self.population['reward'].values)
@@ -237,7 +240,7 @@ class RndQD(object):
         print()
 
       self.logs['Generation'].append(self.elapsed_gen)
-      self.logs['Avg gen surprise'].append(cs/self.pop_size)
+      self.logs['Avg gen surprise'].append(avg_gen_surprise)
       self.logs['Max reward'].append(max_rew)
       self.logs['Archive size'].append(self.archive.size)
 

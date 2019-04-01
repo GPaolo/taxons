@@ -20,7 +20,10 @@ if __name__ == "__main__":
     print('\nTraining with seed {}'.format(seed))
 
     params = parameters.Params()
-    envs = [gym.make(params.env_tag) for i in range(params.pop_size)]
+    if params.parallel:
+      envs = [gym.make(params.env_tag) for i in range(params.pop_size)]
+    else:
+      envs = [gym.make(params.env_tag)]
 
     params.seed = seed
     for env in envs:
