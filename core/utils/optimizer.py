@@ -109,6 +109,7 @@ class ParetoOptimizer(BaseOptimizer):
       if self.archive.size == 0: # First step, so copy all the pareto
         for idx in is_pareto:
           self.archive.add(self.pop.copy(idx, with_data=True))
+          self.pop[idx]['best'] = True
       else: # add only the non dominated
         arch_costs = np.array([np.stack(self.archive['surprise'].values), np.stack(self.archive['novelty'].values)]).transpose()
         for idx in is_pareto:

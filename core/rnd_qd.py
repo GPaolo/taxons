@@ -102,7 +102,6 @@ class RndQD(object):
         print('BYE')
         break
 
-  # TODO make this run in parallel
   def evaluate_agent(self, agent_env):
     """
     This function evaluates the agent in the environment. This function should be run in parallel
@@ -155,21 +154,22 @@ class RndQD(object):
     agent_env[0]['reward'] = cumulated_reward
     return state
 
-  def update_agent(self, state, agent):
-    state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
+  def update_agents(self, states):
+    states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
 
-    if self.metric_update_single_agent and self.params.update_metric:
-      surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
-      self.metric_update_steps += 1
-    else:
-      if self.params.update_metric:
-        self.cumulated_state.append(state[0])
-      surprise, features = self.metric(state.to(self.device))
-    surprise = surprise.cpu().data.numpy()
-    features = features.flatten().cpu().data.numpy()
+    # if self.metric_update_single_agent and self.params.update_metric:
+    #   surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
+    #   self.metric_update_steps += 1
+    # else:
+    if self.params.update_metric:
+      self.cumulated_state = states
+    surprise, features = self.metric(states.to(self.device))
+    surprise = surprise.cpu().data.numpy() # Has dimension [pop_size]
+    features = features.cpu().data.numpy()
 
-    agent['features'] = [features, state.cpu().data.numpy()]
-    agent['surprise'] = surprise
+    for agent, state, feat, surpr in zip(self.population, states, features, surprise):
+      agent['features'] = [feat, state.cpu().data.numpy()]
+      agent['surprise'] = surpr
     return surprise
 
   def update_archive_feat(self):
@@ -180,7 +180,7 @@ class RndQD(object):
     """
     if not len(self.archive) == 0:
       feats = self.archive['features'].values
-      state = torch.Tensor(np.concatenate([f[1] for f in feats])).to(self.device)
+      state = torch.Tensor([f[1] for f in feats]).to(self.device)
       _, feature = self.metric(state)
 
       for agent, feat in zip(self.archive, feature):
@@ -197,17 +197,12 @@ class RndQD(object):
     This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
     """
-    self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
-    cum_surprise = []
+    # self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
     # Split the batch in 3 minibatches to have better learning
-    mini_batches = utils.split_array(self.cumulated_state, wanted_parts=3)
+    mini_batches = utils.split_array(self.cumulated_state.to(self.device), wanted_parts=3)
     for data in mini_batches:
-      cum_surprise.append(self.metric.training_step(data))
+      self.metric.training_step(data)
       self.metric_update_steps += 1
-
-    features = torch.cat([cs[1] for cs in cum_surprise])
-    self.cumulated_state = []
-    return cum_surprise[-1][0], features
 
   def train(self, steps=10000):
     """
@@ -221,10 +216,9 @@ class RndQD(object):
       max_rew = -np.inf
 
       states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
-      for s, a in zip(states, self.population):
-        cs += self.update_agent(s, a)
-        if max_rew < a['reward']:
-          max_rew = a['reward']
+      states = np.stack(states)
+      avg_gen_surprise = np.mean(self.update_agents(states))
+      max_rew = np.max(self.population['reward'].values)
 
       if self.params.update_metric and not self.params.optimizer_type == 'Surprise':
         self.update_archive_feat()
@@ -238,7 +232,7 @@ class RndQD(object):
         print('Generation {}'.format(self.elapsed_gen))
         if self.archive is not None:
           print('Archive size {}'.format(self.archive.size))
-        print('Average generation surprise {}'.format(cs/self.pop_size))
+        print('Average generation surprise {}'.format(avg_gen_surprise))
         print('Max reward {}'.format(max_rew))
         print()
 
