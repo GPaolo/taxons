@@ -7,18 +7,18 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'AE whose feature space dimension is really small.'
+    self.info = 'Testing ANT MUJOCO environment'
 
-    self.exp_name = 'test_improvements'
+    self.exp_name = 'test_mujoco'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = True
+    self.parallel = False
 
     # Environment
     # ---------------------------------------------------------
     self.action_shape = 2
-    self.env_tag = 'Billiard-v0'  # MountainCarContinuous-v0'
+    self.env_tag = 'Ant-v2'  # MountainCarContinuous-v0'
     # ---------------------------------------------------------
 
     # QD
@@ -31,7 +31,7 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': 2, 'degree': 5}
+      self.agent_shapes = {'dof': 8, 'degree': 5}
     # ---------------------------------------------------------
 
     # Metric

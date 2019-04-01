@@ -17,7 +17,7 @@ if __name__ == "__main__":
   total_train_time = 0
 
   params = parameters.Params()
-  print('Experiment description\n{]'.format(params.info))
+  print('Experiment description\n{}'.format(params.info))
 
   for seed in seeds:
     print('\nTraining with seed {}'.format(seed))

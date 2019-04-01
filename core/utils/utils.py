@@ -112,6 +112,8 @@ def obs_formatting(env_tag, obs):
     return np.array([np.concatenate(obs)])
   elif env_tag == 'BilliardHard-v0':
     return np.array([np.concatenate(obs)])
+  elif env_tag == 'Ant-v2':
+    return np.array([obs[13:27]])
   else:
     return obs
 

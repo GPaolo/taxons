@@ -10,9 +10,10 @@ setup(author='Giuseppe Paolo',
             'gym',
             'pygame',
             'box2d',
+            'box2d-py',
             'sacred',
             'pyjson',
-            'pathos',
+            'pandas',
             'mujoco-py<2.1,>=2.0'
       ]
 )

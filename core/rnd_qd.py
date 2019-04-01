@@ -136,7 +136,7 @@ class RndQD(object):
 
     # while len(state) < self.params.max_states_recorded:
     #   state.append(state[-1])
-    state = agent_env[1].render(rendered=False)
+    state = agent_env[1].render(mode='rgb_array')
     # state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
 
     # if self.metric_update_single_agent:
