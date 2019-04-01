@@ -34,7 +34,7 @@ class PhysicsSim(object):
     else:
       self.params = params
 
-    pprint('Parameters: {}'.format(vars(self.params)))
+    # pprint('Parameters: {}'.format(vars(self.params)))
 
     # Create physic simulator
     self.world = b2.b2World(gravity=(0, 0), doSleep=True)

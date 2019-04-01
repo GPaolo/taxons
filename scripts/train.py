@@ -8,19 +8,23 @@ import numpy as np
 from core.utils import utils
 import os
 from scripts import parameters
+import time
+from datetime import timedelta
 
 
 if __name__ == "__main__":
   seeds = [10, 7, 9, 42, 2]
+  total_train_time = 0
 
   for seed in seeds:
-    print('Training with seed {}'.format(seed))
+    print('\nTraining with seed {}'.format(seed))
 
     params = parameters.Params()
-    env = gym.make(params.env_tag)
+    envs = [gym.make(params.env_tag) for i in range(params.pop_size)]
 
     params.seed = seed
-    env.seed(seed)
+    for env in envs:
+      env.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     params.save()
@@ -28,11 +32,14 @@ if __name__ == "__main__":
     if not os.path.exists(params.save_path):
       os.mkdir(params.save_path)
 
-    evolver = rnd_qd.RndQD(env=env, parameters=params)
+    evolver = rnd_qd.RndQD(env=envs, parameters=params)
+    start_time = time.monotonic()
     try:
       evolver.train(params.generations)
     except KeyboardInterrupt:
       print('User Interruption.')
+    end_time = time.monotonic()
+    total_train_time += (end_time-start_time)
 
     evolver.save()
     params.save()
@@ -49,6 +56,8 @@ if __name__ == "__main__":
     else:
       bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
     utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
+
+  print('Total training time: \n{}'.format(timedelta(seconds=total_train_time)))
 
   # print('Testing result according to best reward.')
   # rewards = pop['reward'].sort_values(ascending=False)

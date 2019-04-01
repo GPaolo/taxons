@@ -32,7 +32,7 @@ class AutoEncoder(nn.Module):
                                  nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).to(self.device)
 
 
-    self.criterion = nn.MSELoss()
+    self.criterion = nn.MSELoss(reduction='none')
     self.learning_rate = learning_rate
     self.zero_grad()
     self.optimizer = optim.Adam(self.parameters(), self.learning_rate, weight_decay=1e-5)
@@ -45,6 +45,10 @@ class AutoEncoder(nn.Module):
       x = self.subsample(x)
     y, feat = self.forward(x)
     loss = self.criterion(x, y)
+    # Make mean along all the dimensions except the batch one
+    dims = list(range(1, len(loss.shape)))
+    loss = torch.mean(loss, dim=dims)
+
     return loss, feat
 
   def forward(self, x):
@@ -65,6 +69,7 @@ class AutoEncoder(nn.Module):
   def training_step(self, x):
     self.optimizer.zero_grad()
     novelty, feat = self._get_surprise(x)
+    novelty = torch.mean(novelty)
     novelty.backward()
     self.optimizer.step()
     return novelty, feat
