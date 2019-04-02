@@ -32,7 +32,7 @@ class FCLayer(object):
 
 
 class DMPExp(object):
-  def __init__(self, num_basis_func=20, name='dmp'):
+  def __init__(self, num_basis_func=20, name='dmp', **kwargs):
     self.num_basis_func = num_basis_func
     self.mu = np.abs(np.random.randn(self.num_basis_func))
     self.sigma = np.random.uniform(size=self.num_basis_func)
@@ -52,7 +52,7 @@ class DMPExp(object):
 
   @property
   def params(self):
-    return {'mu': self.mu, 'sigma': self.sigma, 'w': self.w, 'a_x': self.a_x, 'tau': self.tau}
+    return {'mu': self.mu, 'sigma': self.sigma, 'w': self.w, 'a_x': self.a_x, 'tau': self.tau, 'name':self.name}
 
   @staticmethod
   def basis_function(x, mu, sigma):
@@ -67,7 +67,7 @@ class DMPExp(object):
 
 
 class DMPPoly(object):
-  def __init__(self, degree=3, name='dmp'):
+  def __init__(self, degree=3, name='dmp', **kwargs):
     self.degree = degree
     self.w = np.random.randn(self.degree+1)
     self.scale = 100
@@ -82,7 +82,48 @@ class DMPPoly(object):
 
   @property
   def params(self):
-    return {'w': self.w, 'degree':self.degree, 'scale':self.scale}
+    return {'w': self.w, 'degree':self.degree, 'scale':self.scale, 'name':self.name}
+
+
+class DMPSin(object):
+  def __init__(self, name='dmp', **kwargs):
+    self.name = name
+    self.amplitude = np.random.randn()
+    self.period = np.random.uniform(0, 5)
+
+  def __call__(self, t):
+    x = self.amplitude * np.sin(2*np.pi*t/self.period)
+    return x
+
+  @property
+  def params(self):
+    return {'period': self.period, 'amplitude': self.amplitude, 'name':self.name}
+
+  @property
+  def period(self):
+    return self.__period
+
+  @period.setter
+  def period(self, x):
+    if x > 5:
+      self.__period = 5
+    elif x < .5:
+      self.__period = .5
+    else:
+      self.__period = x
+
+  @property
+  def amplitude(self):
+    return self.__amplitude
+
+  @amplitude.setter
+  def amplitude(self, x):
+    if x > 5:
+      self.__amplitude = 5
+    elif x < -5:
+      self.__amplitude = -5
+    else:
+      self.__amplitude = x
 
 
 def action_formatting(env_tag, action):

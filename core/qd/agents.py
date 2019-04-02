@@ -102,10 +102,9 @@ class DMPAgent(BaseAgent):
 
     self.genome = []
     self.dof = shapes['dof']
-    self.degree = shapes['degree']
 
-    for i in range(self.dof):
-      self.genome.append(utils.DMPPoly(self.degree, 'dmp{}'.format(i)))
+    for i, key in zip(list(range(self.dof)), shapes):
+      self.genome.append(utils.DMPSin(**shapes, name='dmp{}'.format(i)))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)
@@ -118,8 +117,17 @@ class DMPAgent(BaseAgent):
 
   def mutate(self):
     for dmp in self.genome:
-      dmp.w = dmp.w + self.mutation_operator(dmp.w.shape[0])
-      dmp.scale = dmp.scale + self.mutation_operator()
+      for param_name in dmp.params:
+        if param_name == 'name':
+          continue
+        try:
+          new_value = dmp.params[param_name] + self.mutation_operator(dmp.params[param_name].shape[0])
+        except AttributeError:
+          new_value = dmp.params[param_name] + self.mutation_operator()
+        setattr(dmp, param_name, new_value)
+
+        # dmp.w = dmp.w + self.mutation_operator(dmp.w.shape[0])
+        # dmp.scale = dmp.scale + self.mutation_operator()
 
   def load_genome(self, params, agent):
     for p, g in zip(params, self.genome):
