@@ -126,7 +126,7 @@ class BilliardEnv(gym.Env):
 
     if mode=='human':
       self.screen.fill(pygame.color.THECOLORS["white"])
-    elif mode=='rbg_array':
+    elif mode=='rgb_array':
       capture = pygame.Surface((self.params.DISPLAY_SIZE[0], self.params.DISPLAY_SIZE[1]))
 
     # Draw holes. This are just drawn, but are not simulated.

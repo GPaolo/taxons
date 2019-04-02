@@ -7,7 +7,7 @@ import gym_billiard
 import os, threading, sys, traceback
 import matplotlib
 import multiprocessing.dummy as mp
-import json
+import simplejson as json
 
 
 class RndQD(object):
@@ -48,7 +48,7 @@ class RndQD(object):
       self.device = torch.device('cpu')
 
     if self.params.metric == 'AE':
-      self.metric = ae.AutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
+      self.metric = ae.FFAutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
@@ -121,42 +121,27 @@ class RndQD(object):
         agent_input = t
 
       action = utils.action_formatting(self.params.env_tag, agent_env[0]['agent'](agent_input))
-
       obs, reward, done, info = agent_env[1].step(action)
       obs = utils.obs_formatting(self.params.env_tag, obs)
-
       t += 1
       cumulated_reward += reward
 
-      # Do not save every frame, but only once every N frames
-      # if t % self.params.state_recording_interval == 0:
-      #   state.append(self.env.render(rendered=False))
-      #   if len(state) > self.params.max_states_recorded:
-      #     state = state[1:]
-
-    # while len(state) < self.params.max_states_recorded:
-    #   state.append(state[-1])
-    state = agent_env[1].render(mode='rgb_array')
-    # state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
-
-    # if self.metric_update_single_agent:
-    #   surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
-    #   self.metric_update_steps += 1
-    #   self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
-    # else:
-    #   self.cumulated_state.append(state[0])
-    #   surprise, features = self.metric(state.to(self.device))
-    # surprise = surprise.cpu().data.numpy()
-    # features = features.flatten().cpu().data.numpy()
-
-    agent_env[0]['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    if self.params.env_tag == 'Ant-v2':
+      state = obs[0]
+      agent_env[0]['bs'] = np.array(agent_env[1].env.data.qpos[:2]) # xy position of CoM of the robot
+    else:
+      state = agent_env[1].render(mode='rgb_array')
+      agent_env[0]['bs'] = np.array([[obs[0][0], obs[0][1]]])
     # agent['features'] = [features, state.cpu().data.numpy()]
     # agent['surprise'] = surprise
     agent_env[0]['reward'] = cumulated_reward
     return state
 
   def update_agents(self, states):
-    states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
+    try: # FFAE does not have any subsampling
+      states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
+    except AttributeError:
+      states = torch.Tensor(states)
 
     # if self.metric_update_single_agent and self.params.update_metric:
     #   surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
@@ -231,7 +216,7 @@ class RndQD(object):
       if self.params.update_metric and not self.metric_update_single_agent:
         self.update_metric()
 
-      if self.elapsed_gen % 10 == 0:
+      if self.elapsed_gen % 1 == 0:
         print('Generation {}'.format(self.elapsed_gen))
         if self.archive is not None:
           print('Archive size {}'.format(self.archive.size))
@@ -240,9 +225,9 @@ class RndQD(object):
         print()
 
       self.logs['Generation'].append(self.elapsed_gen)
-      self.logs['Avg gen surprise'].append(avg_gen_surprise)
-      self.logs['Max reward'].append(max_rew)
-      self.logs['Archive size'].append(self.archive.size)
+      self.logs['Avg gen surprise'].append(str(avg_gen_surprise))
+      self.logs['Max reward'].append(str(max_rew))
+      self.logs['Archive size'].append(str(self.archive.size))
 
       if self.END:
         print('Quitting.')

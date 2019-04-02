@@ -17,13 +17,13 @@ class Params(object):
 
     # Environment
     # ---------------------------------------------------------
-    self.action_shape = 2
+    self.action_shape = 8
     self.env_tag = 'Ant-v2'  # MountainCarContinuous-v0'
     # ---------------------------------------------------------
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 10
+    self.generations = 2
     self.pop_size = 100
     self.use_archive = True
 
@@ -31,14 +31,14 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': 8, 'degree': 5}
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5}
     # ---------------------------------------------------------
 
     # Metric
     # ---------------------------------------------------------
     self.gpu = True
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 32
+    self.feature_size = 5
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.state_recording_interval = 5
@@ -48,7 +48,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------

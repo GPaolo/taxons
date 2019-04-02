@@ -12,7 +12,7 @@ setup(author='Giuseppe Paolo',
             'box2d',
             'box2d-py',
             'sacred',
-            'pyjson',
+            'simplejson',
             'pandas',
             'mujoco-py<2.1,>=2.0'
       ]
