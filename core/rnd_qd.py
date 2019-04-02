@@ -239,10 +239,10 @@ class RndQD(object):
         print('Max reward {}'.format(max_rew))
         print()
 
-      self.logs['Generation'].append(self.elapsed_gen)
-      self.logs['Avg gen surprise'].append(avg_gen_surprise)
-      self.logs['Max reward'].append(max_rew)
-      self.logs['Archive size'].append(self.archive.size)
+      self.logs['Generation'].append(str(self.elapsed_gen))
+      self.logs['Avg gen surprise'].append(str(avg_gen_surprise))
+      self.logs['Max reward'].append(str(max_rew))
+      self.logs['Archive size'].append(str(self.archive.size))
 
       if self.END:
         print('Quitting.')

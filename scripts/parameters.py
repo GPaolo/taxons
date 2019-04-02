@@ -23,7 +23,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 10
+    self.generations = 500
     self.pop_size = 100
     self.use_archive = True
 
@@ -31,7 +31,7 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': 8, 'degree': 5}
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5}
     # ---------------------------------------------------------
 
     # Metric
@@ -48,7 +48,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------

@@ -17,11 +17,20 @@ class NoveltySearch(object):
     self.obs_space = obs_shape
     self.max_arch_len = 100000
     self.action_space = action_shape
-    self.pop = population.Population(agent=agents.DMPAgent,
-                                     shapes={'dof':2, 'degree':3},
+    self.agent_type = 'DMP'
+
+    if self.agent_type == 'DMP':
+      agent = agents.DMPAgent
+      shapes = {'dof':2, 'degree':5}
+    elif self.agent_type == 'Neural':
+      agent = agents.FFNeuralAgent
+      shapes = {'input_shape': 6, 'output_shape': 2}
+
+    self.pop = population.Population(agent=agent,
+                                     shapes=shapes,
                                      pop_size=pop_size)
-    self.archive = population.Population(agent=agents.DMPAgent,
-                                         shapes={'dof':2, 'degree':3},
+    self.archive = population.Population(agent=agent,
+                                         shapes=shapes,
                                          pop_size=0)
     self.env = env
     self.min_dist = 0.5
@@ -137,7 +146,10 @@ class NoveltySearch(object):
     obs = utils.obs_formatting(env_tag, self.env.reset())
     t = 0
     while not done:
-      action = utils.action_formatting(env_tag, agent['agent'](t))
+      if self.agent_type == 'DMP':
+        action = utils.action_formatting(env_tag, agent['agent'](t))
+      elif self.agent_type == 'Neural':
+        action = utils.action_formatting(env_tag, agent['agent'](obs))
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
       cumulated_reward += reward
