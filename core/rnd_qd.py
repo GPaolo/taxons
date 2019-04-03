@@ -60,13 +60,13 @@ class RndQD(object):
     self.thread.daemon = True
     self.thread.start()
     if self.params.parallel:
-
       self.pool = mp.Pool()
 
   # Need these two functions to remove pool from the dict
   def __getstate__(self):
     self_dict = self.__dict__.copy()
     del self_dict['pool']
+    del self_dict['thread']
     return self_dict
 
   def __setstate__(self, state):

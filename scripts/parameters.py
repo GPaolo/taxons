@@ -7,18 +7,18 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Testing ANT MUJOCO environment'
+    self.info = 'AE with neural agents and surprise metric'
 
-    self.exp_name = 'test_mujoco'
+    self.exp_name = 'ae_neural_surprise'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = False
+    self.parallel = True
 
     # Environment
     # ---------------------------------------------------------
     self.action_shape = 2
-    self.env_tag = 'Ant-v2'  # MountainCarContinuous-v0'
+    self.env_tag = 'Billiard-v0'  # MountainCarContinuous-v0'
     # ---------------------------------------------------------
 
     # QD
@@ -27,7 +27,7 @@ class Params(object):
     self.pop_size = 100
     self.use_archive = True
 
-    self.qd_agent = 'DMP'  # 'DMP
+    self.qd_agent = 'Neural'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
@@ -48,7 +48,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------
