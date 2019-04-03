@@ -23,7 +23,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 2
+    self.generations = 500
     self.pop_size = 100
     self.use_archive = True
 

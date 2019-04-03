@@ -47,6 +47,8 @@ class RndQD(object):
     else:
       self.device = torch.device('cpu')
 
+    print("Using device: {}".format(self.device))
+
     if self.params.metric == 'AE':
       self.metric = ae.FFAutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:
@@ -85,7 +87,11 @@ class RndQD(object):
               bs_points = np.concatenate(self.archive['bs'].values)
             else:
               bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-            utils.show(bs_points, filepath=self.save_path)
+            if self.params.env_tag == 'Ant-v2':
+              limit = 10
+            else:
+              limit = 1.35
+            utils.show(bs_points, filepath=self.save_path, limit=limit)
           except BaseException as e:
             ex_type, ex_value, ex_traceback = sys.exc_info()
             trace_back = traceback.extract_tb(ex_traceback)
@@ -128,7 +134,7 @@ class RndQD(object):
 
     if self.params.env_tag == 'Ant-v2':
       state = obs[0]
-      agent_env[0]['bs'] = np.array(agent_env[1].env.data.qpos[:2]) # xy position of CoM of the robot
+      agent_env[0]['bs'] = np.array([agent_env[1].env.data.qpos[:2]]) # xy position of CoM of the robot
     else:
       state = agent_env[1].render(mode='rgb_array')
       agent_env[0]['bs'] = np.array([[obs[0][0], obs[0][1]]])

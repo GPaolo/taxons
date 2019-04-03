@@ -14,6 +14,7 @@ from datetime import timedelta
 
 if __name__ == "__main__":
   seeds = [10, 7, 9, 42, 2]
+  seeds = [10]
   total_train_time = 0
 
   params = parameters.Params()
@@ -60,7 +61,10 @@ if __name__ == "__main__":
       bs_points = np.concatenate(evolver.archive['bs'].values)
     else:
       bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
-    utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
+    utils.show(bs_points,
+               filepath=params.save_path,
+               name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag),
+               limit=10)
 
   print('Total training time: \n{}'.format(timedelta(seconds=total_train_time)))
 

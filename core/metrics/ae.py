@@ -9,10 +9,10 @@ import os
 import sys
 
 
-class AutoEncoder(nn.Module):
+class ConvAutoEncoder(nn.Module):
 
   def __init__(self, device=None, learning_rate=0.01, **kwargs):
-    super(AutoEncoder, self).__init__()
+    super(ConvAutoEncoder, self).__init__()
 
     if device is not None:
       self.device = device

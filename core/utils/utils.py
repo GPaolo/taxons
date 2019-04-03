@@ -159,13 +159,12 @@ def obs_formatting(env_tag, obs):
     return obs
 
 
-def show(bs_points, filepath, name=None, info=None):
+def show(bs_points, filepath, name=None, info=None, limit=1.35):
   print('Behaviour space coverage representation.')
-  limit = 1.35
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.rcParams["patch.force_edgecolor"] = True
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
-  axes[0].set_title('Ball position')
+  axes[0].set_title('Final position')
   axes[0].scatter(pts[0], pts[1])
   axes[0].set_xlim(-limit, limit)
   axes[0].set_ylim(-limit, limit)
