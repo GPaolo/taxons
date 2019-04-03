@@ -18,3 +18,4 @@ runs/*
 *.out
 */MUJOCO_LOG.TXT
 *.lock
+.env
