@@ -56,7 +56,6 @@ def main(seed, params):
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
   utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
-  return evolver
 
 if __name__ == "__main__":
   seeds = [10, 7, 9, 42, 2]
@@ -76,15 +75,16 @@ if __name__ == "__main__":
     end_time = time.monotonic()
     total_train_time += (end_time - start_time)
   else:
+    end = False
     for seed, par in zip(seeds, params):
       start_time = time.monotonic()
       try:
         results = main(seed, par)
       except KeyboardInterrupt:
-        pass
+        end = True
       end_time = time.monotonic()
       total_train_time += (end_time - start_time)
-
+      if end: break
   # for res in results:
   #   utils.show(res[0], res[1], res[2])
 

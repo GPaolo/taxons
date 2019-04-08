@@ -7,6 +7,7 @@ import gym_billiard
 import os, threading, sys, traceback
 import matplotlib
 import json
+import gc
 
 
 class RndQD(object):
@@ -224,7 +225,7 @@ class RndQD(object):
       self.logs['Avg gen surprise'].append(str(avg_gen_surprise))
       self.logs['Max reward'].append(str(max_rew))
       self.logs['Archive size'].append(str(self.archive.size))
-
+      gc.collect()
       if self.END:
         print('Seed {} - Quitting.'.format(self.params.seed))
         break

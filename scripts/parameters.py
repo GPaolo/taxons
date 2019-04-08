@@ -13,7 +13,7 @@ class Params(object):
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = False
+    self.parallel = True
 
     # Environment
     # ---------------------------------------------------------
