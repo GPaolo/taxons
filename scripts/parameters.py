@@ -7,13 +7,13 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'AE with neural agents and surprise metric'
+    self.info = 'test time it takes between parallel and not parallel'
 
-    self.exp_name = 'ae_neural_surprise'
+    self.exp_name = 'test_speed'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = True
+    self.parallel = False
 
     # Environment
     # ---------------------------------------------------------
@@ -36,7 +36,7 @@ class Params(object):
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = True
+    self.gpu = False
     self.metric = 'AE'  # 'RND'
     self.feature_size = 32
     self.learning_rate = 0.0001 # 0.0001 for RND
@@ -48,7 +48,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------

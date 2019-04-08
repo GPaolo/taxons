@@ -6,7 +6,6 @@ import gym, torch
 import gym_billiard
 import os, threading, sys, traceback
 import matplotlib
-import multiprocessing.dummy as mp
 import json
 
 
@@ -56,11 +55,9 @@ class RndQD(object):
     self.cumulated_state = []
 
     self.END = False
-    self.thread = threading.Thread(target=self._control_interface)
-    self.thread.daemon = True
-    self.thread.start()
-    if self.params.parallel:
-      self.pool = mp.Pool()
+    # self.thread = threading.Thread(target=self._control_interface)
+    # self.thread.daemon = True
+    # self.thread.start()
 
   # Need these two functions to remove pool from the dict
   def __getstate__(self):
@@ -103,7 +100,7 @@ class RndQD(object):
         print('BYE')
         break
 
-  def evaluate_agent(self, agent_env):
+  def evaluate_agent(self, agent):
     """
     This function evaluates the agent in the environment. This function should be run in parallel
     :param agent: agent to evaluate
@@ -112,7 +109,7 @@ class RndQD(object):
     done = False
     cumulated_reward = 0
 
-    obs = utils.obs_formatting(self.params.env_tag, agent_env[1].reset())
+    obs = utils.obs_formatting(self.params.env_tag, self.env.reset())
     t = 0
     while not done:
       if self.agent_name == 'Neural':
@@ -120,39 +117,16 @@ class RndQD(object):
       elif self.agent_name == 'DMP':
         agent_input = t
 
-      action = utils.action_formatting(self.params.env_tag, agent_env[0]['agent'](agent_input))
+      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
 
-      obs, reward, done, info = agent_env[1].step(action)
+      obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(self.params.env_tag, obs)
 
       t += 1
       cumulated_reward += reward
-
-      # Do not save every frame, but only once every N frames
-      # if t % self.params.state_recording_interval == 0:
-      #   state.append(self.env.render(rendered=False))
-      #   if len(state) > self.params.max_states_recorded:
-      #     state = state[1:]
-
-    # while len(state) < self.params.max_states_recorded:
-    #   state.append(state[-1])
-    state = agent_env[1].render(mode='rgb_array')
-    # state = self.metric.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0))
-
-    # if self.metric_update_single_agent:
-    #   surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
-    #   self.metric_update_steps += 1
-    #   self.writer.add_scalar('surprise', surprise, self.metric_update_steps)
-    # else:
-    #   self.cumulated_state.append(state[0])
-    #   surprise, features = self.metric(state.to(self.device))
-    # surprise = surprise.cpu().data.numpy()
-    # features = features.flatten().cpu().data.numpy()
-
-    agent_env[0]['bs'] = np.array([[obs[0][0], obs[0][1]]])
-    # agent['features'] = [features, state.cpu().data.numpy()]
-    # agent['surprise'] = surprise
-    agent_env[0]['reward'] = cumulated_reward
+    state = self.env.render(mode='rgb_array')
+    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    agent['reward'] = cumulated_reward
     return state
 
   def update_agents(self, states):
@@ -213,12 +187,12 @@ class RndQD(object):
     """
     self.elapsed_gen = 0
     for self.elapsed_gen in range(steps):
-      if self.params.parallel:
-        states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
-      else:
-        states = []
-        for agent in self.population:
-          states.append(self.evaluate_agent((agent, self.env[0])))
+      # if self.params.parallel:
+      #   states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
+      # else:
+      states = []
+      for agent in self.population:
+        states.append(self.evaluate_agent(agent))
       states = np.stack(states)
       avg_gen_surprise = np.mean(self.update_agents(states))
       max_rew = np.max(self.population['reward'].values)
@@ -232,11 +206,11 @@ class RndQD(object):
         self.update_metric()
 
       if self.elapsed_gen % 10 == 0:
-        print('Generation {}'.format(self.elapsed_gen))
+        print('Seed {} - Generation {}'.format(self.params.seed, self.elapsed_gen))
         if self.archive is not None:
-          print('Archive size {}'.format(self.archive.size))
-        print('Average generation surprise {}'.format(avg_gen_surprise))
-        print('Max reward {}'.format(max_rew))
+          print('Seed {} - Archive size {}'.format(self.params.seed, self.archive.size))
+        print('Seed {} - Average generation surprise {}'.format(self.params.seed, avg_gen_surprise))
+        print('Seed {} - Max reward {}'.format(self.params.seed, max_rew))
         print()
 
       self.logs['Generation'].append(str(self.elapsed_gen))
@@ -245,21 +219,21 @@ class RndQD(object):
       self.logs['Archive size'].append(str(self.archive.size))
 
       if self.END:
-        print('Quitting.')
+        print('Seed {} - Quitting.'.format(self.params.seed))
         break
 
   def save(self):
     save_subf = os.path.join(self.save_path, 'models')
-    print('Saving...')
+    print('Seed {} - Saving...'.format(self.params.seed))
     if not os.path.exists(save_subf):
       try:
         os.makedirs(os.path.abspath(save_subf))
       except:
-        print('Cannot create save folder.')
+        print('Seed {} - Cannot create save folder.'.format(self.params.seeds))
     self.population.save_pop(save_subf, 'pop')
     self.archive.save_pop(save_subf, 'archive')
     self.metric.save(save_subf)
 
     with open(os.path.join(self.save_path, 'logs.json'), 'w') as f:
       json.dump(self.logs, f, indent=4)
-    print('Done')
+    print('Seed {} - Done'.format(self.params.seed))
