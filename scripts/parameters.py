@@ -27,7 +27,7 @@ class Params(object):
     self.pop_size = 100
     self.use_archive = True
 
-    self.qd_agent = 'Neural'  # 'DMP
+    self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 6, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':

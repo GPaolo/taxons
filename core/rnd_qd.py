@@ -55,50 +55,52 @@ class RndQD(object):
     self.cumulated_state = []
 
     self.END = False
+    self.elapsed_gen = 0
+
     # self.thread = threading.Thread(target=self._control_interface)
     # self.thread.daemon = True
     # self.thread.start()
 
   # Need these two functions to remove pool from the dict
-  def __getstate__(self):
-    self_dict = self.__dict__.copy()
-    del self_dict['pool']
-    del self_dict['thread']
-    return self_dict
-
-  def __setstate__(self, state):
-    self.__dict__.update(state)
-
-  def _control_interface(self):
-    print('If you want to show the progress, press s.')
-    print('If you want to stop training, press q.')
-    matplotlib.use('agg')
-    while True:
-      try:
-        action = input(' ')
-        if action == 's':
-          try:
-            if self.archive is not None:
-              bs_points = np.concatenate(self.archive['bs'].values)
-            else:
-              bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-            utils.show(bs_points, filepath=self.save_path)
-          except BaseException as e:
-            ex_type, ex_value, ex_traceback = sys.exc_info()
-            trace_back = traceback.extract_tb(ex_traceback)
-            stack_trace = list()
-            for trace in trace_back:
-              stack_trace.append(
-                "File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
-            print('Cannot show progress due to {}: {}'.format(ex_type.__name__, ex_value))
-            print(stack_trace[0])
-        elif action == 'q':
-          print('Quitting training...')
-          self.END = True
-          break
-      except KeyboardInterrupt:
-        print('BYE')
-        break
+  # def __getstate__(self):
+  #   self_dict = self.__dict__.copy()
+  #   del self_dict['pool']
+  #   del self_dict['thread']
+  #   return self_dict
+  #
+  # def __setstate__(self, state):
+  #   self.__dict__.update(state)
+  #
+  # def _control_interface(self):
+  #   print('If you want to show the progress, press s.')
+  #   print('If you want to stop training, press q.')
+  #   matplotlib.use('agg')
+  #   while True:
+  #     try:
+  #       action = input(' ')
+  #       if action == 's':
+  #         try:
+  #           if self.archive is not None:
+  #             bs_points = np.concatenate(self.archive['bs'].values)
+  #           else:
+  #             bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
+  #           utils.show(bs_points, filepath=self.save_path)
+  #         except BaseException as e:
+  #           ex_type, ex_value, ex_traceback = sys.exc_info()
+  #           trace_back = traceback.extract_tb(ex_traceback)
+  #           stack_trace = list()
+  #           for trace in trace_back:
+  #             stack_trace.append(
+  #               "File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+  #           print('Cannot show progress due to {}: {}'.format(ex_type.__name__, ex_value))
+  #           print(stack_trace[0])
+  #       elif action == 'q':
+  #         print('Quitting training...')
+  #         self.END = True
+  #         break
+  #     except KeyboardInterrupt:
+  #       print('BYE')
+  #       break
 
   def evaluate_agent(self, agent):
     """
@@ -185,7 +187,6 @@ class RndQD(object):
     :param steps: number of update steps (or generations)
     :return:
     """
-    self.elapsed_gen = 0
     for self.elapsed_gen in range(steps):
       # if self.params.parallel:
       #   states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
@@ -212,6 +213,12 @@ class RndQD(object):
         print('Seed {} - Average generation surprise {}'.format(self.params.seed, avg_gen_surprise))
         print('Seed {} - Max reward {}'.format(self.params.seed, max_rew))
         print()
+
+      if self.archive is not None:
+        bs_points = np.concatenate(self.archive['bs'].values)
+      else:
+        bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
+      utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen})
 
       self.logs['Generation'].append(str(self.elapsed_gen))
       self.logs['Avg gen surprise'].append(str(avg_gen_surprise))

@@ -1,8 +1,9 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import os
 import json
-import multiprocessing as mp
+import traceback
 
 class FCLayer(object):
 
@@ -119,7 +120,7 @@ def obs_formatting(env_tag, obs):
 
 
 def show(bs_points, filepath, name=None, info=None):
-  print('Behaviour space coverage representation.')
+  # print('Behaviour space coverage representation.')
   limit = 1.35
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.rcParams["patch.force_edgecolor"] = True
@@ -137,9 +138,8 @@ def show(bs_points, filepath, name=None, info=None):
   axes[1].set_ylim(-limit, limit)
   plt.colorbar(cax, ax=axes[1])
 
-  print('Coverage: {}%'.format(np.count_nonzero(H)/(50*50)*100))
-
   if name is None:
+    fig.suptitle("Generation {} - Coverage {}%\n".format(info['gen'], np.count_nonzero(H)/(50*50)*100), fontsize=16)
     plt.savefig(os.path.join(filepath, 'behaviour.pdf'))
   else:
     with open(os.path.join(filepath, 'data.txt'), 'a+') as f:
@@ -150,7 +150,7 @@ def show(bs_points, filepath, name=None, info=None):
         f.write(info)
 
     plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
-  print('Plot saved in {}'.format(filepath))
+    print('Plot saved in {}'.format(filepath))
   plt.close(fig)
 
 

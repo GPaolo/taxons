@@ -12,6 +12,7 @@ import time
 from datetime import timedelta
 import pathos
 from pathos.pools import ProcessPool
+import traceback
 
 
 def main(seed, params):
@@ -33,6 +34,9 @@ def main(seed, params):
     evolver.train(params.generations)
   except KeyboardInterrupt:
     print('Seed {} - User Interruption.'.format(seed))
+  except Exception as e:
+    print("Seed {} - EXCEPTION: {}".format(seed, traceback.format_exc()))
+
   end_time = time.monotonic()
   total_train_time += (end_time - start_time)
 
@@ -45,13 +49,14 @@ def main(seed, params):
     pop = evolver.archive
   print('Seed {} - Total generations: {}'.format(seed, evolver.elapsed_gen))
   print('Seed {} - Archive length {}'.format(seed, pop.size))
+  print('Seed {} - Training time {}'.format(seed, timedelta(seconds=total_train_time)))
 
   if evolver.archive is not None:
     bs_points = np.concatenate(evolver.archive['bs'].values)
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
   utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
-
+  return evolver
 
 if __name__ == "__main__":
   seeds = [10, 7, 9, 42, 2]
@@ -59,18 +64,29 @@ if __name__ == "__main__":
 
   params = [parameters.Params() for i in range(len(seeds))]
   print('Experiment description\n{}'.format(params[0].info))
+  if params[0].parallel:
+    nodes = min(len(seeds), pathos.threading.cpu_count())
+    print('Creating {} threads...'.format(nodes))
+    pool = ProcessPool(nodes=nodes)
+    start_time = time.monotonic()
+    try:
+      results = pool.map(main, seeds, params)
+    except KeyboardInterrupt:
+      pass
+    end_time = time.monotonic()
+    total_train_time += (end_time - start_time)
+  else:
+    for seed, par in zip(seeds, params):
+      start_time = time.monotonic()
+      try:
+        results = main(seed, par)
+      except KeyboardInterrupt:
+        pass
+      end_time = time.monotonic()
+      total_train_time += (end_time - start_time)
 
-  nodes = min(len(seeds), pathos.threading.cpu_count())
-  print('Creating {} threads...'.format(nodes))
-  pool = ProcessPool(nodes=nodes)
-  start_time = time.monotonic()
-  try:
-    results = pool.map(main, seeds, params)
-  except KeyboardInterrupt:
-    pass
-  end_time = time.monotonic()
-  total_train_time += (end_time - start_time)
-
+  # for res in results:
+  #   utils.show(res[0], res[1], res[2])
 
   # for seed in seeds:
   #   print('\nTraining with seed {}'.format(seed))
@@ -115,9 +131,7 @@ if __name__ == "__main__":
   #     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
   #   utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
 
-
-
-  print('Total training time: \n{}'.format(timedelta(seconds=total_train_time)))
+  print('\nTotal training time: \n{}\n'.format(timedelta(seconds=total_train_time)))
 
   # print('Testing result according to best reward.')
   # rewards = pop['reward'].sort_values(ascending=False)
