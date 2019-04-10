@@ -115,18 +115,13 @@ class RndQD(object):
     obs = utils.obs_formatting(self.params.env_tag, self.env.reset())
     t = 0
     while not done:
-      if self.agent_name == 'Neural':
-        agent_input = obs
-      elif self.agent_name == 'DMP':
-        agent_input = t
-
+      agent_input = t
       action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
-
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(self.params.env_tag, obs)
-
       t += 1
       cumulated_reward += reward
+
     state = self.env.render(mode='rgb_array')
     agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
@@ -134,11 +129,6 @@ class RndQD(object):
 
   def update_agents(self, states):
     states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
-
-    # if self.metric_update_single_agent and self.params.update_metric:
-    #   surprise, features = self.metric.training_step(state.to(self.device))  # Input Dimensions need to be [1, input_dim]
-    #   self.metric_update_steps += 1
-    # else:
     if self.params.update_metric:
       self.cumulated_state = states
     surprise, features = self.metric(states.to(self.device))
@@ -164,18 +154,11 @@ class RndQD(object):
       for agent, feat in zip(self.archive, feature):
         agent['features'][0] = feat.flatten().cpu().data.numpy()
 
-
-    # for agent in self.archive:
-    #   state = torch.Tensor(agent['features'][1]).to(self.device)
-    #   _, feature = self.metric(state)
-    #   agent['features'][0] = feature.flatten().cpu().data.numpy()
-
   def update_metric(self):
     """
     This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
     """
-    # self.cumulated_state = torch.stack(self.cumulated_state).to(self.device)
     # Split the batch in 3 minibatches to have better learning
     mini_batches = utils.split_array(self.cumulated_state.to(self.device), wanted_parts=3)
     for data in mini_batches:
@@ -189,9 +172,6 @@ class RndQD(object):
     :return:
     """
     for self.elapsed_gen in range(steps):
-      # if self.params.parallel:
-      #   states = self.pool.map(self.evaluate_agent, zip(self.population, self.env))
-      # else:
       states = []
       for agent in self.population:
         states.append(self.evaluate_agent(agent))

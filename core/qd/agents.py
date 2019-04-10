@@ -60,19 +60,20 @@ class FFNeuralAgent(BaseAgent):
     self.fc1 = utils.FCLayer(self.input_shape, 16, 'fc1')
     self.fc2 = utils.FCLayer(16, 32, 'fc2')
     self.fc3 = utils.FCLayer(32, 32, 'fc3')
-    self.fc4 = utils.FCLayer(32, 32, 'fc4')
-    self.fc5 = utils.FCLayer(32, 16, 'fc5')
-    self.fc6 = utils.FCLayer(16, self.output_shape, 'fc6')
+    self.fc4 = utils.FCLayer(32, 16, 'fc4')
+    self.fc5 = utils.FCLayer(16, self.output_shape, 'fc5')
 
-    self.genome = [self.fc1, self.fc2, self.fc3, self.fc4, self.fc5, self.fc6]
+    self.genome = [self.fc1, self.fc2, self.fc3, self.fc4, self.fc5]
 
   def evaluate(self, x):
+    if not len(np.shape(x)) > 1:
+      x = np.array([x])
+    x = x/500
     x = np.tanh(self.fc1(x))
     x = np.tanh(self.fc2(x))
     x = np.tanh(self.fc3(x))
     x = np.tanh(self.fc4(x))
     x = np.tanh(self.fc5(x))
-    x = np.tanh(self.fc6(x))
     return x
 
   def __call__(self, x):
