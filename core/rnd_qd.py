@@ -26,7 +26,7 @@ class RndQD(object):
 
     self.metric_update_steps = 0
     self.metric_update_single_agent = self.params.per_agent_update
-    self.logs = {'Generation':[], 'Avg gen surprise':[], 'Max reward':[], 'Archive size':[], }
+    self.logs = {'Generation':[], 'Avg gen surprise':[], 'Max reward':[], 'Archive size':[], 'Coverage':[]}
 
     if self.agent_name == 'Neural':
       agent_type = agents.FFNeuralAgent
@@ -208,6 +208,7 @@ class RndQD(object):
         self.update_metric()
 
       if self.elapsed_gen % 10 == 0:
+        gc.collect()
         print('Seed {} - Generation {}'.format(self.params.seed, self.elapsed_gen))
         if self.archive is not None:
           print('Seed {} - Archive size {}'.format(self.params.seed, self.archive.size))
@@ -219,13 +220,13 @@ class RndQD(object):
         bs_points = np.concatenate(self.archive['bs'].values)
       else:
         bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-      utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen})
+      coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen})
 
       self.logs['Generation'].append(str(self.elapsed_gen))
       self.logs['Avg gen surprise'].append(str(avg_gen_surprise))
       self.logs['Max reward'].append(str(max_rew))
       self.logs['Archive size'].append(str(self.archive.size))
-      gc.collect()
+      self.logs['Coverage'].append(str(coverage))
       if self.END:
         print('Seed {} - Quitting.'.format(self.params.seed))
         break

@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'test time it takes between parallel and not parallel'
+    self.info = 'Testing if by training the metric also when evaluating from the archive can improve performances with surprise'
 
-    self.exp_name = 'test_speed'
+    self.exp_name = 'Train_AE_also_with_archive'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7

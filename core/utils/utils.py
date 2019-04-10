@@ -138,12 +138,13 @@ def show(bs_points, filepath, name=None, info=None):
   axes[1].set_ylim(-limit, limit)
   plt.colorbar(cax, ax=axes[1])
 
+  coverage = np.count_nonzero(H)/(50*50)*100
   if name is None:
-    fig.suptitle("Generation {} - Coverage {}%\n".format(info['gen'], np.count_nonzero(H)/(50*50)*100), fontsize=16)
+    fig.suptitle("Generation {} - Coverage {}%\n".format(info['gen'], coverage), fontsize=16)
     plt.savefig(os.path.join(filepath, 'behaviour.pdf'))
   else:
     with open(os.path.join(filepath, 'data.txt'), 'a+') as f:
-      f.write("Coverage {}%\n".format(np.count_nonzero(H)/(50*50)*100))
+      f.write("Coverage {}%\n".format(coverage))
       f.write("Total solutions found: {}\n".format(len(bs_points)))
       if info is not None:
         info = json.dumps(info)
@@ -152,6 +153,7 @@ def show(bs_points, filepath, name=None, info=None):
     plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
     print('Plot saved in {}'.format(filepath))
   plt.close(fig)
+  return coverage
 
 
 def get_projectpath():
