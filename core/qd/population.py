@@ -93,8 +93,7 @@ class Population(object):
     save_ckpt['Genome'] = {}
 
     for a in self:
-      genome = a['agent'].get_genome()
-      save_ckpt['Genome'][a['name']] = [l.params for l in genome]
+      save_ckpt['Genome'][a['name']] = a['agent'].genome
     try:
       with open(os.path.join(filepath, 'qd_{}.pkl'.format(name)), 'wb') as file:
         pkl.dump(save_ckpt, file)

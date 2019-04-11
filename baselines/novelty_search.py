@@ -146,10 +146,7 @@ class NoveltySearch(object):
     obs = utils.obs_formatting(env_tag, self.env.reset())
     t = 0
     while not done:
-      if self.agent_type == 'DMP':
-        action = utils.action_formatting(env_tag, agent['agent'](t))
-      elif self.agent_type == 'Neural':
-        action = utils.action_formatting(env_tag, agent['agent'](obs))
+      action = utils.action_formatting(env_tag, agent['agent'](t))
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(env_tag, obs)
       cumulated_reward += reward

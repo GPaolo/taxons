@@ -19,14 +19,17 @@ class BaseAgent(metaclass=ABCMeta):
       self.mutation_operator = normal
     else:
       self.mutation_operator = mutation_distr
-
-    self.genome = None
+    self.action_len = 0
+    self._genome = []
 
   def evaluate(self, x):
     raise NotImplementedError
 
-  def get_genome(self):
-    return self.genome
+  @property
+  def genome(self):
+    gen = [l.params for l in self._genome]
+    gen.append(self.action_len)
+    return gen
 
   def mutate(self):
     raise NotImplementedError
@@ -38,7 +41,7 @@ class BaseAgent(metaclass=ABCMeta):
     '''
     return deepcopy(self)
 
-  def load_genome(self, genome):
+  def load_genome(self, genome, agent_name):
     raise NotImplementedError
 
 
@@ -57,23 +60,19 @@ class FFNeuralAgent(BaseAgent):
     self.input_shape = shapes['input_shape']
     self.output_shape = shapes['output_shape']
 
-    self.fc1 = utils.FCLayer(self.input_shape, 16, 'fc1')
-    self.fc2 = utils.FCLayer(16, 32, 'fc2')
-    self.fc3 = utils.FCLayer(32, 32, 'fc3')
-    self.fc4 = utils.FCLayer(32, 16, 'fc4')
-    self.fc5 = utils.FCLayer(16, self.output_shape, 'fc5')
-
-    self.genome = [self.fc1, self.fc2, self.fc3, self.fc4, self.fc5]
+    self.action_len = np.random.randint(low=0, high=500)
+    self._genome = [utils.FCLayer(self.input_shape, 16, 'fc1'),
+                    utils.FCLayer(16, 32, 'fc2'),
+                    utils.FCLayer(32, 16, 'fc3'),
+                    utils.FCLayer(16, self.output_shape, 'fc4')]
 
   def evaluate(self, x):
     if not len(np.shape(x)) > 1:
       x = np.array([x])
     x = x/500
-    x = np.tanh(self.fc1(x))
-    x = np.tanh(self.fc2(x))
-    x = np.tanh(self.fc3(x))
-    x = np.tanh(self.fc4(x))
-    x = np.tanh(self.fc5(x))
+    for l in self._genome[:-1]:
+      x = np.cos(l(x))
+    x = np.tanh(self._genome[-1](x))
     return x
 
   def __call__(self, x):
@@ -84,12 +83,18 @@ class FFNeuralAgent(BaseAgent):
     Mutates the genome of the agent. It does not return anything. The mutation is internal.
     :return:
     '''
-    for l in self.genome:
-      l.w = l.w + self.mutation_operator(l.w.shape[0], l.w.shape[1])
-      l.bias = l.bias + self.mutation_operator(l.bias.shape[0], l.bias.shape[1])
+    for l in self._genome:
+      self._mutate_layer(l)
+    self.action_len = self.action_len + self.mutation_operator()
+
+  def _mutate_layer(self, layer):
+    layer.w = layer.w + self.mutation_operator(layer.w.shape[0], layer.w.shape[1])
+    layer.bias = layer.bias + self.mutation_operator(layer.bias.shape[0], layer.bias.shape[1])
 
   def load_genome(self, params, agent_name):
-    for p, g in zip(params, self.genome):
+    self.action_len = params[-1] # the last is the action lenght
+
+    for p, g in zip(params[:-1], self._genome):
       assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for layer {} of agent {}'.format(self.name, agent_name)
       assert np.all(np.shape(g.bias) == np.shape(p['bias'])), 'Wrong shape of bias for layer {} of agent {}'.format(self.name, agent_name)
       g.w = p['w']
@@ -101,16 +106,17 @@ class DMPAgent(BaseAgent):
   def __init__(self, shapes, mutation_distr=None):
     super(DMPAgent, self).__init__(mutation_distr)
 
-    self.genome = []
     self.dof = shapes['dof']
     self.degree = shapes['degree']
+    self.action_len = np.random.randint(low=0, high=500)
 
+    self._genome = []
     for i in range(self.dof):
-      self.genome.append(utils.DMPPoly(self.degree, 'dmp{}'.format(i)))
+      self._genome.append(utils.DMPPoly(self.degree, 'dmp{}'.format(i)))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)
-    for i, dmp in enumerate(self.genome):
+    for i, dmp in enumerate(self._genome):
       output[i] = dmp(x)
     return [output]
 
@@ -118,12 +124,15 @@ class DMPAgent(BaseAgent):
     return self.evaluate(x)
 
   def mutate(self):
-    for dmp in self.genome:
+    for dmp in self._genome:
       dmp.w = dmp.w + self.mutation_operator(dmp.w.shape[0])
       dmp.scale = dmp.scale + self.mutation_operator()
+    self.action_len = self.action_len + self.mutation_operator()
 
   def load_genome(self, params, agent):
-    for p, g in zip(params, self.genome):
+    self.action_len = params[-1]  # the last is the action lenght
+
+    for p, g in zip(params[:-1], self._genome):
       assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for dmp {} of agent {}'.format(self.name, agent)
       g.w = p['w']
       g.scale = p['scale']
@@ -156,6 +165,9 @@ if __name__ == '__main__':
   # for k in range(ts):
     # f = agent.genome[0].basis_function(k, 0, 0.1)
     # a.append(f)
+  for k in range(ts):
+    f = agent(k)
+    a.append(f[0])
   agent.mutate()
   for k in range(ts):
     f = agent(k)
@@ -168,6 +180,6 @@ if __name__ == '__main__':
   ax1 = fig.add_subplot(111)
 
   ax1.plot(list(range(ts)), b)
-  # ax1.plot(list(range(ts)), b)
+  ax1.plot(list(range(ts)), a)
   plt.show()
 
