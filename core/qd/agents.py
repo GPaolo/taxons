@@ -31,6 +31,20 @@ class BaseAgent(metaclass=ABCMeta):
     gen.append(self.action_len)
     return gen
 
+  @property
+  def action_len(self):
+    return self._action_len
+
+  @action_len.setter
+  def action_len(self, l):
+    if l < 0:
+      self._action_len = 0
+    elif l > 1:
+      self._action_len = 1
+    else:
+      self._action_len = l
+
+
   def mutate(self):
     raise NotImplementedError
 
@@ -60,7 +74,7 @@ class FFNeuralAgent(BaseAgent):
     self.input_shape = shapes['input_shape']
     self.output_shape = shapes['output_shape']
 
-    self.action_len = np.random.randint(low=0, high=500)
+    self.action_len = np.random.uniform()
     self._genome = [utils.FCLayer(self.input_shape, 16, 'fc1'),
                     utils.FCLayer(16, 32, 'fc2'),
                     utils.FCLayer(32, 16, 'fc3'),
@@ -68,12 +82,15 @@ class FFNeuralAgent(BaseAgent):
 
   def evaluate(self, x):
     if not len(np.shape(x)) > 1:
-      x = np.array([x])
-    x = x/500
+      output = np.array([x])
+    output = output/500
     for l in self._genome[:-1]:
-      x = np.cos(l(x))
-    x = np.tanh(self._genome[-1](x))
-    return x
+      output = np.cos(l(output))
+    output = np.tanh(self._genome[-1](output))
+
+    if x/500 > self.action_len:
+      output = np.zeros_like(output)
+    return output
 
   def __call__(self, x):
     return self.evaluate(x)
@@ -108,7 +125,7 @@ class DMPAgent(BaseAgent):
 
     self.dof = shapes['dof']
     self.degree = shapes['degree']
-    self.action_len = np.random.randint(low=0, high=500)
+    self.action_len = np.random.uniform()
 
     self._genome = []
     for i in range(self.dof):
@@ -118,6 +135,9 @@ class DMPAgent(BaseAgent):
     output = np.zeros(self.dof)
     for i, dmp in enumerate(self._genome):
       output[i] = dmp(x)
+
+    if x/500 > self.action_len:
+      output = np.zeros(self.dof)
     return [output]
 
   def __call__(self, x):
@@ -141,7 +161,7 @@ class DMPAgent(BaseAgent):
 
 
 if __name__ == '__main__':
-  agent = DMPAgent({'dof':1, 'degree':3})
+  agent = FFNeuralAgent({'input_shape':1, 'output_shape':1})
   import gym, gym_billiard
 
   env = gym.make('Billiard-v0')
