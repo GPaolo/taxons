@@ -13,6 +13,7 @@ from datetime import timedelta
 import pathos
 from pathos.pools import ProcessPool
 import traceback
+import gc
 
 
 def main(seed, params):
@@ -58,33 +59,37 @@ def main(seed, params):
   utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
 
 if __name__ == "__main__":
-  seeds = [10, 7, 9, 42, 2]
+  multiseeds = [[11, 59, 3, 6, 4, 18], [13, 1, 22, 34, 99, 43], [100, 15, 66, 10, 7, 9], [42, 2]]
   total_train_time = 0
 
-  params = [parameters.Params() for i in range(len(seeds))]
-  print('Experiment description\n{}'.format(params[0].info))
-  if params[0].parallel:
-    nodes = min(len(seeds), pathos.threading.cpu_count()-1)
-    print('Creating {} threads...'.format(nodes))
-    pool = ProcessPool(nodes=nodes)
-    start_time = time.monotonic()
-    try:
-      results = pool.map(main, seeds, params)
-    except KeyboardInterrupt:
-      pass
-    end_time = time.monotonic()
-    total_train_time += (end_time - start_time)
-  else:
-    end = False
-    for seed, par in zip(seeds, params):
+  for seeds in multiseeds:
+    params = [parameters.Params() for i in range(len(seeds))]
+    print('Experiment description\n{}'.format(params[0].info))
+    if params[0].parallel:
+      nodes = min(len(seeds), pathos.threading.cpu_count()-1)
+      print('Creating {} threads...'.format(nodes))
+      pool = ProcessPool(nodes=nodes)
       start_time = time.monotonic()
       try:
-        results = main(seed, par)
+        results = pool.map(main, seeds, params)
       except KeyboardInterrupt:
-        end = True
+        pass
       end_time = time.monotonic()
       total_train_time += (end_time - start_time)
-      if end: break
+      pool.terminate()
+      pool.join()
+    else:
+      end = False
+      for seed, par in zip(seeds, params):
+        start_time = time.monotonic()
+        try:
+          results = main(seed, par)
+        except KeyboardInterrupt:
+          end = True
+        end_time = time.monotonic()
+        total_train_time += (end_time - start_time)
+        if end: break
+    gc.collect()
   # for res in results:
   #   utils.show(res[0], res[1], res[2])
 
