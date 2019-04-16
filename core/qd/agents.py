@@ -11,15 +11,15 @@ class BaseAgent(metaclass=ABCMeta):
     '''
     if mutation_distr is None:
       # Define normal distr with sigma and mu
-      self.sigma = 0.2
-      self.mu = 0
+      self.sigma = 0.1
+      self.mu = 0.
       def normal(*args):
         return self.sigma * np.random.randn(*args) + self.mu
 
       self.mutation_operator = normal
     else:
       self.mutation_operator = mutation_distr
-    self.action_len = 0
+    self.action_len = 0.
     self._genome = []
 
   def evaluate(self, x):
@@ -37,10 +37,10 @@ class BaseAgent(metaclass=ABCMeta):
 
   @action_len.setter
   def action_len(self, l):
-    if l < 0:
-      self._action_len = 0
-    elif l > 1:
-      self._action_len = 1
+    if l < 0.:
+      self._action_len = 0.
+    elif l > 1.:
+      self._action_len = 1.
     else:
       self._action_len = l
 
@@ -83,12 +83,12 @@ class FFNeuralAgent(BaseAgent):
   def evaluate(self, x):
     if not len(np.shape(x)) > 1:
       output = np.array([x])
-    output = output/500
+    output = output/500.
     for l in self._genome[:-1]:
       output = np.cos(l(output))
     output = np.tanh(self._genome[-1](output))
 
-    if x/500 > self.action_len:
+    if x/500. > self.action_len:
       output = np.zeros_like(output)
     return output
 
@@ -136,7 +136,7 @@ class DMPAgent(BaseAgent):
     for i, dmp in enumerate(self._genome):
       output[i] = dmp(x)
 
-    if x/500 > self.action_len:
+    if x/500. > self.action_len:
       output = np.zeros(self.dof)
     return [output]
 

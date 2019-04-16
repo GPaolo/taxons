@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Testing if by training the metric also when evaluating from the archive can improve performances with surprise'
+    self.info = 'Train AE with speed control and novelty on 20 seeds'
 
-    self.exp_name = 'Train_AE_also_with_archive'
+    self.exp_name = 'AE_Novelty_Speed_Control'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -27,7 +27,7 @@ class Params(object):
     self.pop_size = 100
     self.use_archive = True
 
-    self.qd_agent = 'Neural'  # 'DMP
+    self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
