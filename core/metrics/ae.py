@@ -19,7 +19,9 @@ class ConvAutoEncoder(nn.Module):
     else:
       self.device = torch.device("cpu")
 
-    self.subsample = nn.MaxPool2d(8).to(self.device) # 600 -> 75
+    self.subsample = nn.Sequential(nn.AdaptiveAvgPool2d(300),
+                                   nn.AvgPool2d(2),
+                                   nn.AvgPool2d(2)).to(self.device) # 600 -> 75
 
     self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2), nn.LeakyReLU(), # 75 -> 35
                                  nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU()).to(self.device)  # 35 -> 11

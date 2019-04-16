@@ -50,7 +50,7 @@ class RndQD(object):
     print("Using device: {}".format(self.device))
 
     if self.params.metric == 'AE':
-      self.metric = ae.FFAutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
+      self.metric = ae.ConvAutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
@@ -132,11 +132,10 @@ class RndQD(object):
       t += 1
       cumulated_reward += reward
 
+    state = agent_env[1].render(mode='rgb_array')
     if self.params.env_tag == 'Ant-v2':
-      state = obs[0]
       agent_env[0]['bs'] = np.array([agent_env[1].env.data.qpos[:2]]) # xy position of CoM of the robot
     else:
-      state = agent_env[1].render(mode='rgb_array')
       agent_env[0]['bs'] = np.array([[obs[0][0], obs[0][1]]])
     # agent['features'] = [features, state.cpu().data.numpy()]
     # agent['surprise'] = surprise
