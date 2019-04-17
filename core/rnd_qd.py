@@ -47,7 +47,7 @@ class RndQD(object):
     else:
       self.device = torch.device('cpu')
 
-    print("Using device: {}".format(self.device))
+    print("Seed {} - Using device: {}".format(self.params.seed, self.device))
 
     if self.params.metric == 'AE':
       self.metric = ae.ConvAutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
@@ -208,7 +208,7 @@ class RndQD(object):
         limit = 10
       else:
         limit = 1.35
-      coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen}, limit=limit)
+      coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen, 'seed':self.params.seed}, limit=limit)
 
       self.logs['Generation'].append(str(self.elapsed_gen))
       self.logs['Avg gen surprise'].append(str(avg_gen_surprise))
@@ -218,6 +218,7 @@ class RndQD(object):
       if self.END:
         print('Seed {} - Quitting.'.format(self.params.seed))
         break
+    gc.collect()
 
   def save(self):
     save_subf = os.path.join(self.save_path, 'models')

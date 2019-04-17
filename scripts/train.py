@@ -56,7 +56,7 @@ def main(seed, params):
     bs_points = np.concatenate(evolver.archive['bs'].values)
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
-  utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag))
+  utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag), info={'seed':seed})
 
 if __name__ == "__main__":
   multiseeds = [[11, 59, 3, 6, 4, 18], [13, 1, 22, 34, 99, 43], [100, 15, 66, 10, 7, 9], [42, 2]]
@@ -68,16 +68,17 @@ if __name__ == "__main__":
     if params[0].parallel:
       nodes = min(len(seeds), pathos.threading.cpu_count()-1)
       print('Creating {} threads...'.format(nodes))
-      pool = ProcessPool(nodes=nodes)
-      start_time = time.monotonic()
-      try:
-        results = pool.map(main, seeds, params)
-      except KeyboardInterrupt:
-        pass
-      end_time = time.monotonic()
+      # pool = ProcessPool(nodes=nodes)
+      with ProcessPool(nodes=nodes) as pool:
+        start_time = time.monotonic()
+        try:
+          results = pool.map(main, seeds, params)
+        except KeyboardInterrupt:
+          pass
+        end_time = time.monotonic()
       total_train_time += (end_time - start_time)
-      pool.terminate()
-      pool.join()
+      # pool.terminate()
+      # pool.join()
     else:
       end = False
       for seed, par in zip(seeds, params):

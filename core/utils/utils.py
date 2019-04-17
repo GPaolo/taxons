@@ -161,7 +161,7 @@ def obs_formatting(env_tag, obs):
 
 
 def show(bs_points, filepath, name=None, info=None, limit=1.35):
-  print('Behaviour space coverage representation.')
+  print('Seed {} - Behaviour space coverage representation.'.format(info['seed']))
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.rcParams["patch.force_edgecolor"] = True
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
@@ -187,11 +187,11 @@ def show(bs_points, filepath, name=None, info=None, limit=1.35):
       f.write("Coverage {}%\n".format(coverage))
       f.write("Total solutions found: {}\n".format(len(bs_points)))
       if info is not None:
-        info = json.dumps(info)
-        f.write(info)
+        inf = json.dumps(info)
+        f.write(inf)
 
     plt.savefig(os.path.join(filepath, '{}.pdf'.format(name)))
-    print('Plot saved in {}'.format(filepath))
+    print('Seed {} - Plot saved in {}'.format(info['seed'], filepath))
   plt.close(fig)
   return coverage
 
