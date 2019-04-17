@@ -19,3 +19,4 @@ runs/*
 */MUJOCO_LOG.TXT
 *.lock
 .env
+.png

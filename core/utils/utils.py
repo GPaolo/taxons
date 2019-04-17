@@ -33,7 +33,7 @@ class FCLayer(object):
 
 
 class DMPExp(object):
-  def __init__(self, num_basis_func=20, name='dmp'):
+  def __init__(self, num_basis_func=20, name='dmp', **kwargs):
     self.num_basis_func = num_basis_func
     self.mu = np.abs(np.random.randn(self.num_basis_func))
     self.sigma = np.random.uniform(size=self.num_basis_func)
@@ -53,7 +53,7 @@ class DMPExp(object):
 
   @property
   def params(self):
-    return {'mu': self.mu, 'sigma': self.sigma, 'w': self.w, 'a_x': self.a_x, 'tau': self.tau}
+    return {'mu': self.mu, 'sigma': self.sigma, 'w': self.w, 'a_x': self.a_x, 'tau': self.tau, 'name':self.name}
 
   @staticmethod
   def basis_function(x, mu, sigma):
@@ -68,8 +68,8 @@ class DMPExp(object):
 
 
 class DMPPoly(object):
-  def __init__(self, degree=3, name='dmp'):
-    self.degree = degree
+  def __init__(self, name='dmp', **kwargs):
+    self.degree = kwargs['degree']
     self.w = np.random.randn(self.degree+1)
     self.scale = 100
     self.name = name
@@ -83,7 +83,48 @@ class DMPPoly(object):
 
   @property
   def params(self):
-    return {'w': self.w, 'degree':self.degree, 'scale':self.scale}
+    return {'w': self.w, 'scale':self.scale, 'name':self.name}
+
+
+class DMPSin(object):
+  def __init__(self, name='dmp', **kwargs):
+    self.name = name
+    self.amplitude = np.random.randn()
+    self.period = np.random.uniform(0, 5)
+
+  def __call__(self, t):
+    x = self.amplitude * np.sin(2*np.pi*t/self.period)
+    return x
+
+  @property
+  def params(self):
+    return {'period': self.period, 'amplitude': self.amplitude, 'name':self.name}
+
+  @property
+  def period(self):
+    return self.__period
+
+  @period.setter
+  def period(self, x):
+    if x > 5:
+      self.__period = 5
+    elif x < .5:
+      self.__period = .5
+    else:
+      self.__period = x
+
+  @property
+  def amplitude(self):
+    return self.__amplitude
+
+  @amplitude.setter
+  def amplitude(self, x):
+    if x > 5:
+      self.__amplitude = 5
+    elif x < -5:
+      self.__amplitude = -5
+    else:
+      self.__amplitude = x
 
 
 def action_formatting(env_tag, action):
@@ -119,13 +160,12 @@ def obs_formatting(env_tag, obs):
     return obs
 
 
-def show(bs_points, filepath, name=None, info=None):
-  # print('Behaviour space coverage representation.')
-  limit = 1.35
+def show(bs_points, filepath, name=None, info=None, limit=1.35):
+  print('Behaviour space coverage representation.')
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.rcParams["patch.force_edgecolor"] = True
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
-  axes[0].set_title('Ball position')
+  axes[0].set_title('Final position')
   axes[0].scatter(pts[0], pts[1])
   axes[0].set_xlim(-limit, limit)
   axes[0].set_ylim(-limit, limit)

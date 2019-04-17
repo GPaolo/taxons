@@ -17,8 +17,7 @@ class Params(object):
 
     # Environment
     # ---------------------------------------------------------
-    self.action_shape = 2
-    self.env_tag = 'Billiard-v0'  # MountainCarContinuous-v0'
+    self.env_tag = 'Ant-v2'  # MountainCarContinuous-v0'
     # ---------------------------------------------------------
 
     # QD
@@ -26,6 +25,7 @@ class Params(object):
     self.generations = 500
     self.pop_size = 100
     self.use_archive = True
+    self.mutation_rate = 0.5
 
     self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
@@ -38,7 +38,7 @@ class Params(object):
     # ---------------------------------------------------------
     self.gpu = False
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 32
+    self.feature_size = 5
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.state_recording_interval = 5
@@ -98,5 +98,16 @@ class Params(object):
       self.optimizer = optimizer.SurpriseOptimizer
     elif self.optimizer_type == 'Pareto':
       self.optimizer = optimizer.ParetoOptimizer
+  # ---------------------------------------------------------
+
+  # Select action size
+  @property
+  def action_shape(self):
+    if 'Ant' in self.env_tag:
+      return 8
+    elif 'Billiard' in self.env_tag:
+      return 2
+    elif 'MountainCar' in self.env_tag:
+      return 2
   # ---------------------------------------------------------
 # ---------------------------------------------------------

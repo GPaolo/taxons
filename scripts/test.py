@@ -48,7 +48,7 @@ if __name__ == "__main__":
     device = torch.device('cpu')
 
   if params.metric == 'AE':
-    selector = ae.AutoEncoder(device=device, encoding_shape=params.feature_size)
+    selector = ae.ConvAutoEncoder(device=device, encoding_shape=params.feature_size)
     selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
   elif params.metric == 'RND':
     selector = rnd.RND(params.feature_size)

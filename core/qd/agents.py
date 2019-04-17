@@ -44,7 +44,6 @@ class BaseAgent(metaclass=ABCMeta):
     else:
       self._action_len = l
 
-
   def mutate(self):
     raise NotImplementedError
 
@@ -124,12 +123,12 @@ class DMPAgent(BaseAgent):
     super(DMPAgent, self).__init__(mutation_distr)
 
     self.dof = shapes['dof']
-    self.degree = shapes['degree']
+    self.shapes = shapes
     self.action_len = np.random.uniform()
 
     self._genome = []
     for i in range(self.dof):
-      self._genome.append(utils.DMPPoly(self.degree, 'dmp{}'.format(i)))
+      self._genome.append(utils.DMPSin('dmp{}'.format(i), **shapes))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)
@@ -145,8 +144,14 @@ class DMPAgent(BaseAgent):
 
   def mutate(self):
     for dmp in self._genome:
-      dmp.w = dmp.w + self.mutation_operator(dmp.w.shape[0])
-      dmp.scale = dmp.scale + self.mutation_operator()
+      for param_name in dmp.params:
+        if param_name == 'name':
+          continue
+        try:
+          new_value = dmp.params[param_name] + self.mutation_operator(dmp.params[param_name].shape[0])
+        except AttributeError:
+          new_value = dmp.params[param_name] + self.mutation_operator()
+        setattr(dmp, param_name, new_value)
     self.action_len = self.action_len + self.mutation_operator()
 
   def load_genome(self, params, agent):
@@ -161,7 +166,7 @@ class DMPAgent(BaseAgent):
 
 
 if __name__ == '__main__':
-  agent = FFNeuralAgent({'input_shape':1, 'output_shape':1})
+  agent = DMPAgent({'degree':5, 'dof':1})
   import gym, gym_billiard
 
   env = gym.make('Billiard-v0')

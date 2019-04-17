@@ -47,12 +47,14 @@ class RndQD(object):
     else:
       self.device = torch.device('cpu')
 
+    print("Using device: {}".format(self.device))
+
     if self.params.metric == 'AE':
-      self.metric = ae.AutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
+      self.metric = ae.ConvAutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
-    self.opt = self.params.optimizer(self.population, archive=self.archive)
+    self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate)
     self.cumulated_state = []
 
     self.END = False
@@ -121,9 +123,11 @@ class RndQD(object):
       obs = utils.obs_formatting(self.params.env_tag, obs)
       t += 1
       cumulated_reward += reward
-
     state = self.env.render(mode='rgb_array')
-    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    if 'Ant' in self.params.env_tag:
+      agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
+    else:
+      agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
     return state
 
@@ -200,7 +204,11 @@ class RndQD(object):
         bs_points = np.concatenate(self.archive['bs'].values)
       else:
         bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-      coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen})
+      if 'Ant' in self.params.env_tag:
+        limit = 10
+      else:
+        limit = 1.35
+      coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen}, limit=limit)
 
       self.logs['Generation'].append(str(self.elapsed_gen))
       self.logs['Avg gen surprise'].append(str(avg_gen_surprise))
