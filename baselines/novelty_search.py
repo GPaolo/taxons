@@ -9,19 +9,19 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os
 # env_tag = 'MountainCarContinuous-v0'
-env_tag = 'Billiard-v0'
+env_tag = 'Ant-v2'
 
 
 class NoveltySearch(object):
-  def __init__(self, env, filepath, obs_shape=6, action_shape=2, pop_size=50):
+  def __init__(self, env, filepath, obs_shape=6, action_shape=8, pop_size=50):
     self.obs_space = obs_shape
     self.max_arch_len = 100000
     self.action_space = action_shape
     self.pop = population.Population(agent=agents.DMPAgent,
-                                     shapes={'dof':2, 'degree':3},
+                                     shapes={'dof':self.action_space, 'degree':5},
                                      pop_size=pop_size)
     self.archive = population.Population(agent=agents.DMPAgent,
-                                         shapes={'dof':2, 'degree':3},
+                                         shapes={'dof':self.action_space, 'degree':5},
                                          pop_size=0)
     self.env = env
     self.min_dist = 0.5
@@ -42,8 +42,12 @@ class NoveltySearch(object):
       action = input(' ')
       if action == 's':
         try:
+          if 'Ant' in env_tag:
+            limit = 10
+          else:
+            limit = 1.35
           bs_points = np.concatenate(self.archive['bs'].values)
-          utils.show(bs_points, self.filepath)
+          utils.show(bs_points, self.filepath, limit=limit)
         except:
           print('Cannot show progress now.')
 
@@ -92,7 +96,7 @@ class NoveltySearch(object):
         new_gen.append(self.pop.copy(i))
         self.pop[i]['best'] = True
 
-    else:
+    else: # Adaptive distance
       for agent_idx in range(self.pop.size):
         if self.pop[agent_idx]['best'] and self.pop[agent_idx]['name'] not in self.archive['name'].values:
           if len(self.archive) >= self.max_arch_len: # If archive is full, replace a random element
@@ -101,7 +105,7 @@ class NoveltySearch(object):
           else:
             self.archive.add(self.pop.copy(agent_idx, with_data=True))
           self.novel_in_gen += 1
-
+        # Randomly choose an agent to add to the archive
         elif np.random.uniform() <= 0.005 and self.pop[agent_idx]['name'] not in self.archive['name'].values:
           if len(self.archive) >= self.max_arch_len:
             replaced = random.randint(0, len(self.archive)-1)
@@ -142,7 +146,10 @@ class NoveltySearch(object):
       obs = utils.obs_formatting(env_tag, obs)
       cumulated_reward += reward
       t += 1
-    agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    if 'Ant' in env_tag:
+      agent['bs'] = np.array([env.env.data.qpos[:2]]) # xy position of CoM of the robot
+    else:
+      agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
 
   def evolve(self, gen=1000):
@@ -186,7 +193,7 @@ if __name__ == '__main__':
 
     filepath = os.path.join(utils.get_projectpath(), 'baselines', 'ns_{}'.format(iteration))
 
-    ns = NoveltySearch(env, filepath, pop_size=100, obs_shape=6, action_shape=2)
+    ns = NoveltySearch(env, filepath, pop_size=100, obs_shape=6, action_shape=8)
     try:
       ns.evolve(500)
     except KeyboardInterrupt:

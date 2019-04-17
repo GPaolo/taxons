@@ -54,7 +54,7 @@ class RndQD(object):
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
-    self.opt = self.params.optimizer(self.population, archive=self.archive)
+    self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate)
     self.cumulated_state = []
 
     self.END = False
@@ -87,7 +87,7 @@ class RndQD(object):
               bs_points = np.concatenate(self.archive['bs'].values)
             else:
               bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-            if self.params.env_tag == 'Ant-v2':
+            if 'Ant' in self.params.env_tag:
               limit = 10
             else:
               limit = 1.35
@@ -133,7 +133,7 @@ class RndQD(object):
       cumulated_reward += reward
 
     state = agent_env[1].render(mode='rgb_array')
-    if self.params.env_tag == 'Ant-v2':
+    if 'Ant' in self.params.env_tag:
       agent_env[0]['bs'] = np.array([agent_env[1].env.data.qpos[:2]]) # xy position of CoM of the robot
     else:
       agent_env[0]['bs'] = np.array([[obs[0][0], obs[0][1]]])
@@ -176,12 +176,6 @@ class RndQD(object):
 
       for agent, feat in zip(self.archive, feature):
         agent['features'][0] = feat.flatten().cpu().data.numpy()
-
-
-    # for agent in self.archive:
-    #   state = torch.Tensor(agent['features'][1]).to(self.device)
-    #   _, feature = self.metric(state)
-    #   agent['features'][0] = feature.flatten().cpu().data.numpy()
 
   def update_metric(self):
     """

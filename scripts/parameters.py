@@ -26,6 +26,7 @@ class Params(object):
     self.generations = 500
     self.pop_size = 100
     self.use_archive = True
+    self.mutation_rate = 0.5
 
     self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
