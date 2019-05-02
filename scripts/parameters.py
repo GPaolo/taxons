@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Train AE with speed control and novelty on 20 seeds'
+    self.info = 'Train AE in mujoco and novelty on 20 seeds'
 
-    self.exp_name = 'AE_Novelty_Speed_Control'
+    self.exp_name = 'AE_Novelty_mujoco'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -22,7 +22,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 2
+    self.generations = 500
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.5

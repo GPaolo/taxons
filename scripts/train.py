@@ -48,7 +48,7 @@ def main(seed, params):
     pop = evolver.population
   else:
     pop = evolver.archive
-  print('Seed {} - Total generations: {}'.format(seed, evolver.elapsed_gen))
+  print('Seed {} - Total generations: {}'.format(seed, evolver.elapsed_gen+1))
   print('Seed {} - Archive length {}'.format(seed, pop.size))
   print('Seed {} - Training time {}'.format(seed, timedelta(seconds=total_train_time)))
 
@@ -56,7 +56,14 @@ def main(seed, params):
     bs_points = np.concatenate(evolver.archive['bs'].values)
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
-  utils.show(bs_points, filepath=params.save_path, name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag), info={'seed':seed})
+  if 'Ant' in params.env_tag:
+    limit = 10
+  else:
+    limit = 1.35
+  utils.show(bs_points, filepath=params.save_path,
+             name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag),
+             info={'seed':seed},
+             limit=limit)
 
 if __name__ == "__main__":
   multiseeds = [[11, 59, 3, 6, 4, 18], [13, 1, 22, 34, 99, 43], [100, 15, 66, 10, 7, 9], [42, 2]]
