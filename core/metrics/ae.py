@@ -11,7 +11,7 @@ import sys
 
 class ConvAutoEncoder(nn.Module):
 
-  def __init__(self, device=None, learning_rate=0.01, **kwargs):
+  def __init__(self, device=None, learning_rate=0.001, **kwargs):
     super(ConvAutoEncoder, self).__init__()
 
     if device is not None:
@@ -23,15 +23,16 @@ class ConvAutoEncoder(nn.Module):
                                    nn.AvgPool2d(2),
                                    nn.AvgPool2d(2)).to(self.device) # 600 -> 75
 
-    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2), nn.LeakyReLU(), # 75 -> 35
-                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU()).to(self.device)  # 35 -> 11
+    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2, bias=False), nn.LeakyReLU(), # 75 -> 35
+                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3, bias=False), nn.LeakyReLU()).to(self.device)  # 35 -> 11
 
-    self.encoder_ff = nn.Sequential(nn.Linear(484, kwargs['encoding_shape']), nn.LeakyReLU()).to(self.device)
-    self.decoder_ff = nn.Sequential(nn.Linear(kwargs['encoding_shape'], 484), nn.LeakyReLU()).to(self.device)
+    self.encoder_ff = nn.Sequential(nn.Linear(484, 128), nn.LeakyReLU(),
+                                    nn.Linear(128, kwargs['encoding_shape'], bias=False), nn.LeakyReLU()).to(self.device)
+    self.decoder_ff = nn.Sequential(nn.Linear(kwargs['encoding_shape'], 484, bias=False), nn.LeakyReLU()).to(self.device)
 
 
-    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3), nn.LeakyReLU(),
-                                 nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2), nn.ReLU()).to(self.device)
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3, bias=False), nn.LeakyReLU(),
+                                 nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2, bias=False), nn.ReLU()).to(self.device)
 
 
     self.criterion = nn.MSELoss(reduction='none')

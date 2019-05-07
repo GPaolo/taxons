@@ -9,15 +9,15 @@ class Params(object):
   def __init__(self):
     self.info = 'Train AE in mujoco and novelty on 20 seeds'
 
-    self.exp_name = 'AE_Novelty_mujoco'
+    self.exp_name = 'TEST_AE'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = True
+    self.parallel = False
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'Ant-v2'  # MountainCarContinuous-v0'
+    self.env_tag = "Billiard-v0", #'Ant-v2'  # MountainCarContinuous-v0'
     # ---------------------------------------------------------
 
     # QD
@@ -38,7 +38,7 @@ class Params(object):
     # ---------------------------------------------------------
     self.gpu = False
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 5
+    self.feature_size = 32
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.state_recording_interval = 5
