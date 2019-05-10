@@ -23,17 +23,17 @@ class ConvAutoEncoder(nn.Module):
                                    nn.AvgPool2d(2),
                                    nn.AvgPool2d(2)).to(self.device) # 600 -> 75
 
-    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2, bias=False), nn.LeakyReLU(), # 75 -> 35
-                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3, bias=False), nn.LeakyReLU()).to(self.device)  # 35 -> 11
+    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2, bias=False), nn.LeakyReLU(),  # 75 -> 35
+                                 nn.Conv2d(in_channels=8, out_channels=16, kernel_size=5, stride=3, bias=False), nn.LeakyReLU(),  # 35 -> 11
+                                 nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5, bias=False), nn.LeakyReLU(), # 11 -> 7
+                                 nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5, bias=False), nn.LeakyReLU(), # 7 -> 3
+                                 nn.Conv2d(in_channels=32, out_channels=kwargs['encoding_shape'], kernel_size=3, bias=False), nn.LeakyReLU()).to(self.device)  # 3 -> 1
 
-    self.encoder_ff = nn.Sequential(nn.Linear(484, 128), nn.LeakyReLU(),
-                                    nn.Linear(128,  kwargs['encoding_shape'], bias=False), nn.LeakyReLU()).to(self.device)
-    self.decoder_ff = nn.Sequential(nn.Linear(kwargs['encoding_shape'], 484, bias=False), nn.LeakyReLU()).to(self.device)
-
-
-    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3, bias=False), nn.LeakyReLU(),
-                                 nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2, bias=False), nn.ReLU()).to(self.device)
-
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=kwargs['encoding_shape'], out_channels=32, kernel_size=3, bias=False), nn.LeakyReLU(),  # 1 -> 3
+                                 nn.ConvTranspose2d(in_channels=32, out_channels=32, kernel_size=5, bias=False), nn.LeakyReLU(),  # 3 -> 7
+                                 nn.ConvTranspose2d(in_channels=32, out_channels=16, kernel_size=5, bias=False), nn.LeakyReLU(),  # 7 -> 11
+                                 nn.ConvTranspose2d(in_channels=16, out_channels=8, kernel_size=5, stride=3, bias=False), nn.LeakyReLU(), # 11 -> 35
+                                 nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=7, stride=2, bias=False), nn.LeakyReLU()).to(self.device)  # 35 -> 75
 
     self.criterion = nn.MSELoss(reduction='none')
     self.learning_rate = learning_rate
@@ -43,42 +43,34 @@ class ConvAutoEncoder(nn.Module):
     self.to(self.device)
     self.criterion.to(self.device)
 
-  def _get_surprise(self, x):
-    if x.shape[-1] > 75:  # Only subsample if not done yet.
-      x = self.subsample(x)
-    y, feat = self.forward(x)
-    loss = self.criterion(x, y)
-    # Make mean along all the dimensions except the batch one
-    dims = list(range(1, len(loss.shape)))
-    loss = torch.mean(loss, dim=dims)
-
-    return loss, feat
-
   def forward(self, x):
     if x.shape[-1] > 75:  # Only subsample if not done yet.
       x = self.subsample(x)
+    feat, y = self._get_reconstruction(x)
+
+    rec_error = self.criterion(x, y)
+    # Make mean along all the dimensions except the batch one
+    dims = list(range(1, len(rec_error.shape)))
+    rec_error = torch.mean(rec_error, dim=dims)
+
+    return rec_error, feat, y
+
+  def _get_reconstruction(self, x):
+    if x.shape[-1] > 75:  # Only subsample if not done yet.
+      x = self.subsample(x)
     feat = self.encoder(x)
+    y = self.decoder(feat)
 
-    shape = feat.shape
-    feat = feat.view(-1, 484)
-
-    feat = self.encoder_ff(feat)
-    y = self.decoder_ff(feat)
-    y = y.view(shape)
-
-    y = self.decoder(y)
-    return y, feat
+    feat = torch.squeeze(feat)
+    return feat, y
 
   def training_step(self, x):
     self.optimizer.zero_grad()
-    novelty, feat = self._get_surprise(x)
+    novelty, feat, y = self.forward(x)
     novelty = torch.mean(novelty)
     novelty.backward()
     self.optimizer.step()
-    return novelty, feat
-
-  def __call__(self, x):
-    return self._get_surprise(x)
+    return novelty, feat, y
 
   def save(self, filepath):
     save_ckpt = {

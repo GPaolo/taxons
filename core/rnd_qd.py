@@ -135,7 +135,7 @@ class RndQD(object):
     states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
     if self.params.update_metric:
       self.cumulated_state = states
-    surprise, features = self.metric(states.to(self.device))
+    surprise, features, _ = self.metric(states.to(self.device))
     surprise = surprise.cpu().data.numpy() # Has dimension [pop_size]
     features = features.cpu().data.numpy()
 
@@ -153,7 +153,7 @@ class RndQD(object):
     if not len(self.archive) == 0:
       feats = self.archive['features'].values
       state = torch.Tensor([f[1] for f in feats]).to(self.device)
-      _, feature = self.metric(state)
+      _, feature, _ = self.metric(state)
 
       for agent, feat in zip(self.archive, feature):
         agent['features'][0] = feat.flatten().cpu().data.numpy()
