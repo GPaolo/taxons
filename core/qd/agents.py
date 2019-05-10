@@ -128,7 +128,7 @@ class DMPAgent(BaseAgent):
 
     self._genome = []
     for i in range(self.dof):
-      self._genome.append(utils.DMPSin('dmp{}'.format(i), **shapes))
+      self._genome.append(utils.DMPPoly('dmp{}'.format(i), **shapes))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)

@@ -17,7 +17,7 @@ class Params(object):
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = "Billiard-v0", #'Ant-v2'  # MountainCarContinuous-v0'
+    self.env_tag = 'Billiard-v0'#"Billiard-v0" #'Ant-v2'  # MountainCarContinuous-v0'
     # ---------------------------------------------------------
 
     # QD
@@ -25,7 +25,7 @@ class Params(object):
     self.generations = 500
     self.pop_size = 100
     self.use_archive = True
-    self.mutation_rate = 0.5
+    self.mutation_rate = 0.9
 
     self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
@@ -36,10 +36,10 @@ class Params(object):
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = False
+    self.gpu = True
     self.metric = 'AE'  # 'RND'
     self.feature_size = 32
-    self.learning_rate = 0.0001 # 0.0001 for RND
+    self.learning_rate = 0.001 # 0.0001 for RND
     self.per_agent_update = False
     self.state_recording_interval = 5
     self.max_states_recorded = 20

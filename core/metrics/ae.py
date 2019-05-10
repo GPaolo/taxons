@@ -27,7 +27,7 @@ class ConvAutoEncoder(nn.Module):
                                  nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3, bias=False), nn.LeakyReLU()).to(self.device)  # 35 -> 11
 
     self.encoder_ff = nn.Sequential(nn.Linear(484, 128), nn.LeakyReLU(),
-                                    nn.Linear(128, kwargs['encoding_shape'], bias=False), nn.LeakyReLU()).to(self.device)
+                                    nn.Linear(128,  kwargs['encoding_shape'], bias=False), nn.LeakyReLU()).to(self.device)
     self.decoder_ff = nn.Sequential(nn.Linear(kwargs['encoding_shape'], 484, bias=False), nn.LeakyReLU()).to(self.device)
 
 

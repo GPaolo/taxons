@@ -33,8 +33,8 @@ class FCLayer(object):
 
 
 class DMPExp(object):
-  def __init__(self, num_basis_func=20, name='dmp', **kwargs):
-    self.num_basis_func = num_basis_func
+  def __init__(self, name='dmp', **kwargs):
+    self.num_basis_func = kwargs['degree']
     self.mu = np.abs(np.random.randn(self.num_basis_func))
     self.sigma = np.random.uniform(size=self.num_basis_func)
     self.w = np.random.randn(self.num_basis_func)
