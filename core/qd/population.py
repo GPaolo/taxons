@@ -122,8 +122,11 @@ class Population(object):
       assert len(agent_genome) == len(agent['agent'].genome), 'Wrong genome length. Saved {}, current {}'.format(agent_genome, self[-1]['agent'].genome)
       agent['agent'].load_genome(agent_genome, agent_name)
       for k in range(len(agent_genome)):
-        for p in agent['agent'].genome[k].params:
-          assert np.all(agent['agent'].genome[k].params[p] == agent_genome[k][p]), 'Could not load {} of element {} in agent {}'.format(p, k, agent)
+        try:
+          for p in agent['agent'].genome[k]:
+            assert np.all(agent['agent'].genome[k][p] == agent_genome[k][p]), 'Could not load {} of element {} in agent {}'.format(p, k, agent)
+        except TypeError: #TODO this is because the action len is stored as a float in the list. Might have to put it into a dict so don't have to do the exception
+          assert agent['agent'].genome[k] == agent_genome[k], 'Could not load action_len of element {} in agent {}'.format(p, k, agent)
 
 
       self.add(agent)

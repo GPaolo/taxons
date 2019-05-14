@@ -123,7 +123,7 @@ class RndQD(object):
       obs = utils.obs_formatting(self.params.env_tag, obs)
       t += 1
       cumulated_reward += reward
-    state = self.env.render(mode='rgb_array')
+    state = self.env.render(mode='rgb_array')/255.
     if 'Ant' in self.params.env_tag:
       agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
     else:
@@ -166,8 +166,9 @@ class RndQD(object):
     # Split the batch in 3 minibatches to have better learning
     mini_batches = utils.split_array(self.cumulated_state.to(self.device), wanted_parts=3)
     for data in mini_batches:
-      self.metric.training_step(data)
+      _, f, _ = self.metric.training_step(data)
       self.metric_update_steps += 1
+    return f
 
   def train(self, steps=10000):
     """
@@ -189,8 +190,9 @@ class RndQD(object):
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
       if self.params.update_metric and not self.metric_update_single_agent:
-        self.update_metric()
+        f = self.update_metric()
 
+      print(f[2])
       if self.elapsed_gen % 10 == 0:
         gc.collect()
         print('Seed {} - Generation {}'.format(self.params.seed, self.elapsed_gen))

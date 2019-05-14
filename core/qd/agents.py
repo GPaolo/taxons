@@ -11,7 +11,7 @@ class BaseAgent(metaclass=ABCMeta):
     '''
     if mutation_distr is None:
       # Define normal distr with sigma and mu
-      self.sigma = 0.1
+      self.sigma = 0.05
       self.mu = 0.
       def normal(*args):
         return self.sigma * np.random.randn(*args) + self.mu
@@ -159,8 +159,8 @@ class DMPAgent(BaseAgent):
 
     for p, g in zip(params[:-1], self._genome):
       assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for dmp {} of agent {}'.format(self.name, agent)
-      g.w = p['w']
-      g.scale = p['scale']
+      g.w = deepcopy(p['w'])
+      g.scale = deepcopy(p['scale'])
 
 
 

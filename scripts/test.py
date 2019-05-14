@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/test_improvements/10'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/TEST_AE_16/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -42,6 +42,7 @@ if __name__ == "__main__":
 
   # Load metric
   # -----------------------------------------------
+  print('Loading metric...')
   if params.gpu:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   else:
@@ -59,6 +60,7 @@ if __name__ == "__main__":
 
   # Load archive
   # -----------------------------------------------
+  print('Loading agents...')
   if params.qd_agent == 'Neural':
     agent_type = agents.FFNeuralAgent
   elif params.qd_agent == 'DMP':
@@ -86,9 +88,9 @@ if __name__ == "__main__":
       obs = utils.obs_formatting(params.env_tag, obs)
       t += 1
 
-    state = env.render(rendered=False)
+    state = env.render(mode='rgb_array')/255.
     state = selector.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0).to(device))
-    surprise, bs_point = selector(state)
+    surprise, bs_point, y = selector(state)
     bs_point = bs_point.flatten().cpu().data.numpy()
     agent['features'] = [bs_point]
   # -----------------------------------------------
@@ -109,7 +111,7 @@ if __name__ == "__main__":
   for target in x_image:
     # Get new target BS point
     goal = torch.Tensor(x[target]).permute(2, 0, 1).unsqueeze(0).to(device)
-    surprise, bs_point = selector(goal)
+    surprise, bs_point, _ = selector(goal/255.)
     bs_point = bs_point.flatten().cpu().data.numpy()
     print('Target point surprise {}'.format(surprise))
 
@@ -149,7 +151,7 @@ if __name__ == "__main__":
       obs = utils.obs_formatting(params.env_tag, obs)
       ts += 1
 
-    state = env.render(rendered=False)
+    state = env.render(mode='rgb_array')/255.
     fig, ax = plt.subplots(2)
     ax[0].imshow(state)
     ax[1].imshow(x[target])

@@ -151,7 +151,7 @@ class BilliardEnv(gym.Env):
       color = [0, 0, 0]
       obj_name = body.userData['name']
       if obj_name == 'ball0':
-        color = [0, 0, 180, 255]
+        color = [0, 0, 255]
       elif obj_name in ['link0', 'link1']:
         color = [100, 100, 100]
         if mode=='rgb_array':

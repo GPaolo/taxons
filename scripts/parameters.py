@@ -9,7 +9,7 @@ class Params(object):
   def __init__(self):
     self.info = 'Train AE in mujoco and novelty on 20 seeds'
 
-    self.exp_name = 'TEST_AE'
+    self.exp_name = 'TEST_AE_32'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -41,8 +41,6 @@ class Params(object):
     self.feature_size = 32
     self.learning_rate = 0.001 # 0.0001 for RND
     self.per_agent_update = False
-    self.state_recording_interval = 5
-    self.max_states_recorded = 20
     self.update_metric = True
     # ---------------------------------------------------------
 
