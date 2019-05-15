@@ -127,8 +127,18 @@ class DMPAgent(BaseAgent):
     self.action_len = np.random.uniform()
 
     self._genome = []
+    if shapes['type'] == 'poly':
+      _dmp = utils.DMPPoly
+    elif shapes['type'] == 'exp':
+      _dmp = utils.DMPExp
+    elif shapes['type'] == 'sin':
+      _dmp = utils.DMPSin
+    else:
+      print('Wrong DMP chosen')
+      raise ValueError
+
     for i in range(self.dof):
-      self._genome.append(utils.DMPPoly('dmp{}'.format(i), **shapes))
+      self._genome.append(_dmp('dmp{}'.format(i), **shapes))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)

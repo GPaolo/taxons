@@ -211,7 +211,7 @@ if __name__ == "__main__":
 
   if params.metric == 'AE':
     selector = ae.ConvAutoEncoder(device=device, encoding_shape=params.feature_size)
-    selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
+    selector.load(os.path.join(load_path, 'models/ckpt/ckpt_ae.pth'))
   elif params.metric == 'RND':
     selector = rnd.RND(params.feature_size)
     selector.load(os.path.join(load_path, 'models/ckpt_rnd.pth'))
@@ -221,20 +221,45 @@ if __name__ == "__main__":
   x[x==180] = 255
   images = torch.Tensor(x).permute(0, 3, 1, 2) / 255.
 
-  uu = 1
-  _, a, y = selector(images[uu:uu+1])
-  print()
-  print(a)
+  test_lim = 10
+
+  aa = []
+  for uu in range(test_lim):
+  # uu = 2
+    _, a, y = selector(images[uu:uu+1])
+    print()
+    print(a)
+    aa.append(a.cpu().detach().numpy())
+
+  aa_diff = np.zeros((test_lim,test_lim))
+
+  # diff = np.atleast_2d(bs_space - bs_point)
+  # dists = np.sqrt(np.sum(diff * diff, axis=1))
+
+  for ii in range(test_lim):
+    for jj in range(test_lim):
+      d = aa[ii] - aa[jj]
+      aa_diff[ii,jj] = np.sqrt(np.sum(d*d))
+
+  print(aa_diff)
 
   import matplotlib.pyplot as plt
+
+
+  fig, ax = plt.subplots(1,test_lim)
+  for uu in range(test_lim):
+    ax[uu].imshow(x[uu])
+
+  plt.show()
+
+  uu = 2
+  _, a, y = selector(images[uu:uu + 1])
   y = y.permute(0, 2, 3, 1)[0]
-
-  fig, ax = plt.subplots(2)
+  fig, ax = plt.subplots(1, 2)
   ax[0].imshow(x[uu])
-
-
 
   img = np.array(y.cpu().data*255)
   img = img.astype('int32')
   ax[1].imshow(img)
   plt.show()
+

@@ -34,19 +34,14 @@ class ConvAutoEncoder(nn.Module):
     #                              nn.ConvTranspose2d(in_channels=32, out_channels=16, kernel_size=5, bias=False), nn.LeakyReLU(),  # 7 -> 11
     #                              nn.ConvTranspose2d(in_channels=16, out_channels=8, kernel_size=5, stride=3, bias=False), nn.LeakyReLU(), # 11 -> 35
     #                              nn.ConvTranspose2d(in_channels=8, out_channels=3, kernel_size=7, stride=2, bias=False), nn.LeakyReLU()).to(self.device)  # 35 -> 75
-    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2, bias=False),
-                                 nn.LeakyReLU(),  # 75 -> 35
-                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3, bias=False),
-                                 nn.LeakyReLU()).to(self.device)  # 35 -> 11
-    self.encoder_ff = nn.Sequential(nn.Linear(484, 128), nn.LeakyReLU(),
-                                    nn.Linear(128, kwargs['encoding_shape'], bias=False), nn.LeakyReLU()).to(
-      self.device)
-    self.decoder_ff = nn.Sequential(nn.Linear(kwargs['encoding_shape'], 484, bias=False), nn.LeakyReLU()).to(
-      self.device)
-    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3, bias=False),
-                                nn.LeakyReLU(),
-                                nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2, bias=False),
-                                nn.ReLU()).to(self.device)
+    self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=8, kernel_size=7, stride=2, bias=False), nn.LeakyReLU(),  # 75 -> 35
+                                 nn.Conv2d(in_channels=8, out_channels=4, kernel_size=5, stride=3, bias=False), nn.LeakyReLU()).to(self.device)  # 35 -> 11
+
+    self.encoder_ff = nn.Sequential(nn.Linear(484, kwargs['encoding_shape']), nn.LeakyReLU()).to(self.device)
+    self.decoder_ff = nn.Sequential(nn.Linear(kwargs['encoding_shape'], 484, bias=False), nn.LeakyReLU()).to(self.device)
+
+    self.decoder = nn.Sequential(nn.ConvTranspose2d(in_channels=4, out_channels=4, kernel_size=5, stride=3, bias=False), nn.LeakyReLU(),
+                                nn.ConvTranspose2d(in_channels=4, out_channels=3, kernel_size=7, stride=2, bias=False), nn.ReLU()).to(self.device)
 
     self.criterion = nn.MSELoss(reduction='none')
     self.learning_rate = learning_rate
@@ -88,15 +83,8 @@ class ConvAutoEncoder(nn.Module):
     self.optimizer.zero_grad()
     novelty, feat, y = self.forward(x)
 
-    rho = 0.05
-    feat_avg = torch.mean(feat, dim=0)
-    # sparseness = torch.sum(rho*torch.log(rho/feat_avg) + (1-rho)*torch.log((1-rho)/(1-feat_avg)))
-    # print("Sparseness {}".format(sparseness))
-
     novelty = torch.mean(novelty)
     novelty.backward()
-    # loss = sparseness + novelty
-    # loss.backward()
     self.optimizer.step()
     return novelty, feat, y
 

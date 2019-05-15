@@ -25,20 +25,20 @@ class Params(object):
     self.generations = 500
     self.pop_size = 100
     self.use_archive = True
-    self.mutation_rate = 0.9
+    self.mutation_rate = 0.5
 
     self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5}
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'}
     # ---------------------------------------------------------
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = True
+    self.gpu = False
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 32
+    self.feature_size = 16
     self.learning_rate = 0.001 # 0.0001 for RND
     self.per_agent_update = False
     self.update_metric = True

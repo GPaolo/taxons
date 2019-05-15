@@ -163,6 +163,11 @@ class RndQD(object):
     This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
     """
+    # if not len(self.archive) == 0:
+    #   feats = self.archive['features'].values
+    #   archive_state = torch.Tensor([f[1] for f in feats])
+    #   self.cumulated_state = torch.cat([self.cumulated_state, archive_state])
+
     # Split the batch in 3 minibatches to have better learning
     mini_batches = utils.split_array(self.cumulated_state.to(self.device), wanted_parts=3)
     for data in mini_batches:
@@ -200,6 +205,9 @@ class RndQD(object):
           print('Seed {} - Archive size {}'.format(self.params.seed, self.archive.size))
         print('Seed {} - Average generation surprise {}'.format(self.params.seed, avg_gen_surprise))
         print('Seed {} - Max reward {}'.format(self.params.seed, max_rew))
+        print('Saving checkpoint...')
+        self.save(ckpt=True)
+        print("Done")
         print()
 
       if self.archive is not None:
@@ -222,8 +230,12 @@ class RndQD(object):
         break
     gc.collect()
 
-  def save(self):
-    save_subf = os.path.join(self.save_path, 'models')
+  def save(self, ckpt=False):
+    if ckpt:
+      folder = 'models/ckpt'
+    else:
+      folder = 'models'
+    save_subf = os.path.join(self.save_path, folder)
     print('Seed {} - Saving...'.format(self.params.seed))
     if not os.path.exists(save_subf):
       try:
