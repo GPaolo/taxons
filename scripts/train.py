@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
   for seeds in multiseeds:
     params = [parameters.Params() for i in range(len(seeds))]
-    print('Experiment description\n{}'.format(params[0].info))
+    print('Experiment description:\n{}'.format(params[0].info))
     if params[0].parallel:
       nodes = min(len(seeds), pathos.threading.cpu_count()-1)
       print('Creating {} threads...'.format(nodes))

@@ -208,3 +208,8 @@ def get_projectpath():
 def split_array(a, wanted_parts=1):
   length = len(a)
   return [a[i * length // wanted_parts : (i+1) * length // wanted_parts] for i in range(wanted_parts)]
+
+
+def rgb2gray(img):
+  gray = 0.2989 * img[:,:,0] + 0.5870 * img[:,:,1] + 0.1140 * img[:,:,2]
+  return np.expand_dims(gray, -1)

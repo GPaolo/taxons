@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/TEST_AE_32/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/TEST_AE_norm/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -221,11 +221,17 @@ if __name__ == "__main__":
   x[x==180] = 255
   images = torch.Tensor(x).permute(0, 3, 1, 2) / 255.
 
+  E = torch.mean(images, dim=0)
+  V = torch.var(images, dim=0)
+  print(E.shape)
+  print(V.shape)
+
+  images = (images - E)#    bn(images)
+
   test_lim = 10
 
   aa = []
   for uu in range(test_lim):
-  # uu = 2
     _, a, y = selector(images[uu:uu+1])
     print()
     print(a)
@@ -233,8 +239,7 @@ if __name__ == "__main__":
 
   aa_diff = np.zeros((test_lim,test_lim))
 
-  # diff = np.atleast_2d(bs_space - bs_point)
-  # dists = np.sqrt(np.sum(diff * diff, axis=1))
+
 
   for ii in range(test_lim):
     for jj in range(test_lim):
@@ -256,7 +261,7 @@ if __name__ == "__main__":
   _, a, y = selector(images[uu:uu + 1])
   y = y.permute(0, 2, 3, 1)[0]
   fig, ax = plt.subplots(1, 2)
-  ax[0].imshow(x[uu])
+  ax[0].imshow(images.permute(0,2,3,1).cpu().data[uu])
 
   img = np.array(y.cpu().data*255)
   img = img.astype('int32')

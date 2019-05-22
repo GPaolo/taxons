@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Train AE in mujoco and novelty on 20 seeds'
+    self.info = 'Train AE with input data centered'
 
-    self.exp_name = 'TEST_AE_32'
+    self.exp_name = 'TEST_AE_norm'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -36,10 +36,10 @@ class Params(object):
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = False
+    self.gpu = True
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 16
-    self.learning_rate = 0.001 # 0.0001 for RND
+    self.feature_size = 32
+    self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.update_metric = True
     # ---------------------------------------------------------

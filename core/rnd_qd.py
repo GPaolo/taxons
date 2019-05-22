@@ -12,6 +12,7 @@ import gc
 
 class RndQD(object):
 
+  # ---------------------------------------------------
   def __init__(self, env, parameters):
     """
     :param env: Environment in which we act
@@ -55,56 +56,15 @@ class RndQD(object):
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
     self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate)
-    self.cumulated_state = []
 
     self.END = False
     self.elapsed_gen = 0
 
-    # self.thread = threading.Thread(target=self._control_interface)
-    # self.thread.daemon = True
-    # self.thread.start()
+    self.running_avg = 0
+    self.n = 0
+  # ---------------------------------------------------
 
-  # Need these two functions to remove pool from the dict
-  # def __getstate__(self):
-  #   self_dict = self.__dict__.copy()
-  #   del self_dict['pool']
-  #   del self_dict['thread']
-  #   return self_dict
-  #
-  # def __setstate__(self, state):
-  #   self.__dict__.update(state)
-  #
-  # def _control_interface(self):
-  #   print('If you want to show the progress, press s.')
-  #   print('If you want to stop training, press q.')
-  #   matplotlib.use('agg')
-  #   while True:
-  #     try:
-  #       action = input(' ')
-  #       if action == 's':
-  #         try:
-  #           if self.archive is not None:
-  #             bs_points = np.concatenate(self.archive['bs'].values)
-  #           else:
-  #             bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-  #           utils.show(bs_points, filepath=self.save_path)
-  #         except BaseException as e:
-  #           ex_type, ex_value, ex_traceback = sys.exc_info()
-  #           trace_back = traceback.extract_tb(ex_traceback)
-  #           stack_trace = list()
-  #           for trace in trace_back:
-  #             stack_trace.append(
-  #               "File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
-  #           print('Cannot show progress due to {}: {}'.format(ex_type.__name__, ex_value))
-  #           print(stack_trace[0])
-  #       elif action == 'q':
-  #         print('Quitting training...')
-  #         self.END = True
-  #         break
-  #     except KeyboardInterrupt:
-  #       print('BYE')
-  #       break
-
+  # ---------------------------------------------------
   def evaluate_agent(self, agent):
     """
     This function evaluates the agent in the environment. This function should be run in parallel
@@ -124,17 +84,20 @@ class RndQD(object):
       t += 1
       cumulated_reward += reward
     state = self.env.render(mode='rgb_array')/255.
+
+    self.running_avg = self.n/(self.n+1) * self.running_avg + state/(self.n+1) # This one is for normalizing the input
+    self.n = self.n + 1
+
     if 'Ant' in self.params.env_tag:
       agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
     return state
+  # ---------------------------------------------------
 
+  # ---------------------------------------------------
   def update_agents(self, states):
-    states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
-    if self.params.update_metric:
-      self.cumulated_state = states
     surprise, features, _ = self.metric(states.to(self.device))
     surprise = surprise.cpu().data.numpy() # Has dimension [pop_size]
     features = features.cpu().data.numpy()
@@ -143,7 +106,9 @@ class RndQD(object):
       agent['features'] = [feat, state.cpu().data.numpy()]
       agent['surprise'] = surpr
     return surprise
+  # ---------------------------------------------------
 
+  # ---------------------------------------------------
   def update_archive_feat(self):
     """
     This function is used to update the position of the archive elements in the feature space (given that is changing
@@ -157,24 +122,24 @@ class RndQD(object):
 
       for agent, feat in zip(self.archive, feature):
         agent['features'][0] = feat.flatten().cpu().data.numpy()
+  # ---------------------------------------------------
 
-  def update_metric(self):
+  # ---------------------------------------------------
+  def update_metric(self, states):
     """
     This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
     """
-    # if not len(self.archive) == 0:
-    #   feats = self.archive['features'].values
-    #   archive_state = torch.Tensor([f[1] for f in feats])
-    #   self.cumulated_state = torch.cat([self.cumulated_state, archive_state])
-
     # Split the batch in 3 minibatches to have better learning
-    mini_batches = utils.split_array(self.cumulated_state.to(self.device), wanted_parts=3)
+    mini_batches = utils.split_array(states.to(self.device), wanted_parts=3)
     for data in mini_batches:
-      _, f, _ = self.metric.training_step(data)
+      loss, f, _ = self.metric.training_step(data)
       self.metric_update_steps += 1
+    print("Loss at {}: {}".format(self.metric_update_steps, loss))
     return f
+  # ---------------------------------------------------
 
+  # ---------------------------------------------------
   def train(self, steps=10000):
     """
     This function trains the agents and the RND
@@ -185,7 +150,9 @@ class RndQD(object):
       states = []
       for agent in self.population:
         states.append(self.evaluate_agent(agent))
-      states = np.stack(states)
+      states = np.stack(states) - self.running_avg # Center data for training
+      states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
+
       avg_gen_surprise = np.mean(self.update_agents(states))
       max_rew = np.max(self.population['reward'].values)
 
@@ -194,8 +161,8 @@ class RndQD(object):
       self.opt.step()
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
-      if self.params.update_metric and not self.metric_update_single_agent:
-        f = self.update_metric()
+      if self.params.update_metric:
+        f = self.update_metric(states)
 
       print(f[2])
       if self.elapsed_gen % 10 == 0:
@@ -229,7 +196,9 @@ class RndQD(object):
         print('Seed {} - Quitting.'.format(self.params.seed))
         break
     gc.collect()
+  # ---------------------------------------------------
 
+  # ---------------------------------------------------
   def save(self, ckpt=False):
     if ckpt:
       folder = 'models/ckpt'
@@ -249,3 +218,4 @@ class RndQD(object):
     with open(os.path.join(self.save_path, 'logs.json'), 'w') as f:
       json.dump(self.logs, f, indent=4)
     print('Seed {} - Done'.format(self.params.seed))
+  # ---------------------------------------------------
