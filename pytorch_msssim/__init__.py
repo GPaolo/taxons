@@ -113,7 +113,7 @@ class SSIM(torch.nn.Module):
         (_, channel, _, _) = img1.size()
 
         if channel == self.channel and self.window.dtype == img1.dtype:
-            window = self.window
+            window = self.window.to(img1.device).type(img1.dtype)
         else:
             window = create_window(self.window_size, channel).to(img1.device).type(img1.dtype)
             self.window = window

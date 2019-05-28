@@ -84,6 +84,8 @@ class RndQD(object):
       t += 1
       cumulated_reward += reward
     state = self.env.render(mode='rgb_array')/255.
+    self.env.step(action)
+    old_state = self.env.render(mode='rgb_array') / 255.
 
     self.running_avg = self.n/(self.n+1) * self.running_avg + state/(self.n+1) # This one is for normalizing the input
     self.n = self.n + 1
@@ -93,7 +95,7 @@ class RndQD(object):
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
-    return state
+    return state, old_state
   # ---------------------------------------------------
 
   # ---------------------------------------------------
@@ -125,15 +127,23 @@ class RndQD(object):
   # ---------------------------------------------------
 
   # ---------------------------------------------------
-  def update_metric(self, states):
+  def update_metric(self, states, old_states):
     """
     This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
     """
+    # Take archive data
+    if not len(self.archive) == 0 and self.params.train_on_archive:
+      feats = self.archive['features'].values
+      archi_state = torch.Tensor([f[1] for f in feats]).to(self.device)
+      total_state = torch.cat((states.to(self.device), archi_state), 0)
+    else:
+      total_state = states.to(self.device)
     # Split the batch in 3 minibatches to have better learning
-    mini_batches = utils.split_array(states.to(self.device), wanted_parts=3)
-    for data in mini_batches:
-      loss, f, _ = self.metric.training_step(data)
+    mini_batches = utils.split_array(total_state, batch_size=32)
+    old_mini_batches = utils.split_array(old_states, batch_size=32)
+    for data, old_data in zip(mini_batches, old_mini_batches):
+      loss, f, _ = self.metric.training_step(data, old_data)
       self.metric_update_steps += 1
     print("Loss at {}: {}".format(self.metric_update_steps, loss))
     return f
@@ -148,10 +158,16 @@ class RndQD(object):
     """
     for self.elapsed_gen in range(steps):
       states = []
+      old_states = []
       for agent in self.population:
-        states.append(self.evaluate_agent(agent))
-      states = np.stack(states) - self.running_avg # Center data for training
+        state, old_state = self.evaluate_agent(agent)
+        states.append(state)
+        old_states.append(old_state)
+      states = np.stack(states)# - self.running_avg # Center data for training
       states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
+
+      old_states = np.stack(old_states)  # - self.running_avg # Center data for training
+      old_states = self.metric.subsample(torch.Tensor(old_states).permute(0, 3, 1, 2))
 
       avg_gen_surprise = np.mean(self.update_agents(states))
       max_rew = np.max(self.population['reward'].values)
@@ -162,7 +178,7 @@ class RndQD(object):
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
       if self.params.update_metric:
-        f = self.update_metric(states)
+        f = self.update_metric(states, old_states)
 
       print(f[2])
       if self.elapsed_gen % 10 == 0:

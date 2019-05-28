@@ -205,11 +205,12 @@ def get_projectpath():
   return cwd
 
 
-def split_array(a, wanted_parts=1):
+def split_array(a, batch_size=32):
   length = len(a)
-  return [a[i * length // wanted_parts : (i+1) * length // wanted_parts] for i in range(wanted_parts)]
-
+  parts = int(np.ceil(length/batch_size))
+  np.random.shuffle(a)
+  return [a[k*batch_size:min(length, (k+1)*batch_size)] for k in range(parts)]
 
 def rgb2gray(img):
-  gray = 0.2989 * img[:,:,0] + 0.5870 * img[:,:,1] + 0.1140 * img[:,:,2]
+  gray = 0.2989 * img[:,:,:,0] + 0.5870 * img[:,:,:,1] + 0.1140 * img[:,:,:,2]
   return np.expand_dims(gray, -1)

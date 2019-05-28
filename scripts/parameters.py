@@ -9,7 +9,7 @@ class Params(object):
   def __init__(self):
     self.info = 'Train AE with input data centered'
 
-    self.exp_name = 'TEST_AE_norm'
+    self.exp_name = 'AA'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -38,10 +38,11 @@ class Params(object):
     # ---------------------------------------------------------
     self.gpu = True
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 32
+    self.feature_size = 10
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.update_metric = True
+    self.train_on_archive = False
     # ---------------------------------------------------------
 
     # Optimizer
