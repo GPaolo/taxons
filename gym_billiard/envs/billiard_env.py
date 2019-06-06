@@ -55,7 +55,7 @@ class BilliardEnv(gym.Env):
   def reset(self):
     if self.params.RANDOM_BALL_INIT_POSE:
       init_ball_pose = np.array([self.np_random.uniform(low=-1.3, high=1.3), # x
-                                 self.np_random.uniform(low=-1.3, high=0)])  # y
+                                 self.np_random.uniform(low=-1.3, high=1.3)])  # y
     else:
       init_ball_pose = np.array([-0.5, 0.2])
 
@@ -154,8 +154,6 @@ class BilliardEnv(gym.Env):
         color = [0, 0, 255]
       elif obj_name in ['link0', 'link1']:
         color = [100, 100, 100]
-        if mode=='rgb_array':
-          color = [0, 0, 0]
       elif 'wall' in obj_name:
         color = [150, 150, 150]
 
@@ -163,7 +161,9 @@ class BilliardEnv(gym.Env):
         if mode=='human':
           fixture.shape.draw(body, self.screen, self.params, color)
         elif mode=='rgb_array':
-          fixture.shape.draw(body, capture, self.params, color)
+          obj_name = body.userData['name']
+          if not obj_name in ['link0', 'link1']:
+            fixture.shape.draw(body, capture, self.params, color)
 
     if mode=='human':
       pygame.display.flip()

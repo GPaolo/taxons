@@ -28,42 +28,42 @@ if __name__ == "__main__":
   # Load metric
   # -----------------------------------------------
   print('Loading metric...')
-  device = torch.device('cuda')
-  selector = ae.ConvAutoEncoder(device=device, encoding_shape=params.feature_size, learning_rate=0.0001)
+  device = torch.device('cpu')
+  selector = ae.AutoEncoder(device=device, encoding_shape=params.feature_size, learning_rate=0.0001, beta=1)
   # -----------------------------------------------
 
   # Possible targets
   # -----------------------------------------------
   with open('/home/giuseppe/src/rnd_qd/train_img.npy', 'rb') as f:
     x = np.load(f)
-
-  images = torch.Tensor(x).permute(0, 3, 1, 2).to(device)/255.
   # -----------------------------------------------
 
   # Train/Load trained
   # -----------------------------------------------
   if not TEST_TRAINED:
-    total_epochs = 500
-    batches = utils.split_array(images, batch_size=64)
+    total_epochs = 3
+    batches = utils.split_array(x, batch_size=100)
     loss = 0
     for k in range(total_epochs):
       for data in batches:
-        loss, f, y = selector.training_step(data)
+        images = torch.Tensor(data).permute(0, 3, 1, 2).to(device)/np.max(data)
+        loss, f, y = selector.training_step(images)
       print('Epoch {} - Loss {}'.format(k, loss))
       # if loss.cpu().data < 0.001:
       #   break
     selector.save(load_path)
   # -----------------------------------------------
   else:
-    selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
+    selector.load(os.path.join(load_path, 'models/ckpt/ckpt_ae.pth'))
+  selector.training = False
   # -----------------------------------------------
 
 
   # Load test samples
   # -----------------------------------------------
-  with open('/home/giuseppe/src/rnd_qd/input_img.npy', 'rb') as f:
+  with open('/home/giuseppe/src/rnd_qd/test_img.npy', 'rb') as f:
     x_test = np.load(f)
-  images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)
+  images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)/np.max(x_test)
   # -----------------------------------------------
 
   # Test

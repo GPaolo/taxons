@@ -38,11 +38,11 @@ class Params(object):
     # ---------------------------------------------------------
     self.gpu = True
     self.metric = 'AE'  # 'RND'
-    self.feature_size = 10
+    self.feature_size = 32
     self.learning_rate = 0.0001 # 0.0001 for RND
     self.per_agent_update = False
     self.update_metric = True
-    self.train_on_archive = False
+    self.train_on_archive = True
     # ---------------------------------------------------------
 
     # Optimizer
