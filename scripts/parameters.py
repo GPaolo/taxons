@@ -37,7 +37,7 @@ class Params(object):
     # Metric
     # ---------------------------------------------------------
     self.gpu = True
-    self.metric = 'AE'  # 'RND', 'BVAE'
+    self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
     self.feature_size = 10
     self.learning_rate = 0.001 # 0.0001 for RND
     self.lr_scale_fact = 0.1

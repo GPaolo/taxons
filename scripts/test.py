@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/TEST_AE_16/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ball.3/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -26,8 +26,12 @@ if __name__ == "__main__":
 
   # Possible targets
   # -----------------------------------------------
-  with open('/home/giuseppe/src/rnd_qd/input_img.npy', 'rb') as f:
-    x = np.load(f)
+  x = []
+  env.env.params.RANDOM_BALL_INIT_POSE = True
+  for k in range(21):
+    env.reset()
+    x.append(env.render(mode='rgb_array'))
+  x = np.stack(x)
 
   fig, ax = plt.subplots(7, 3)
   k = 0
@@ -38,6 +42,7 @@ if __name__ == "__main__":
       ax[i, j].set_title(k)
       k += 1
   plt.show()
+  env.env.params.RANDOM_BALL_INIT_POSE = False
   # -----------------------------------------------
 
   # Load metric
@@ -49,7 +54,7 @@ if __name__ == "__main__":
     device = torch.device('cpu')
 
   if params.metric == 'AE':
-    selector = ae.ConvAutoEncoder(device=device, encoding_shape=params.feature_size)
+    selector = ae.AutoEncoder(device=device, encoding_shape=params.feature_size)
     selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
   elif params.metric == 'RND':
     selector = rnd.RND(params.feature_size)
@@ -88,7 +93,8 @@ if __name__ == "__main__":
       obs = utils.obs_formatting(params.env_tag, obs)
       t += 1
 
-    state = env.render(mode='rgb_array')/255.
+    state = env.render(mode='rgb_array')
+    state = state/np.max(state)
     state = selector.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0).to(device))
     surprise, bs_point, y = selector(state)
     bs_point = bs_point.flatten().cpu().data.numpy()
@@ -111,7 +117,7 @@ if __name__ == "__main__":
   for target in x_image:
     # Get new target BS point
     goal = torch.Tensor(x[target]).permute(2, 0, 1).unsqueeze(0).to(device)
-    surprise, bs_point, _ = selector(goal/255.)
+    surprise, bs_point, _ = selector(goal/torch.max(goal))
     bs_point = bs_point.flatten().cpu().data.numpy()
     print('Target point surprise {}'.format(surprise))
 
@@ -151,7 +157,8 @@ if __name__ == "__main__":
       obs = utils.obs_formatting(params.env_tag, obs)
       ts += 1
 
-    state = env.render(mode='rgb_array')/255.
+    state = env.render(mode='rgb_array')
+    state = state/np.max(state)
     fig, ax = plt.subplots(2)
     ax[0].imshow(state)
     ax[1].imshow(x[target])

@@ -15,7 +15,7 @@ class Params(object):
     self.LINK_FRICTION = .9
     self.LINK_THICKNESS = 0.05
 
-    self.BALL_RADIUS = .1
+    self.BALL_RADIUS = .2
     self.BALL_ELASTICITY = .7
     self.BALL_FRICTION = .9
 

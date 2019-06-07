@@ -181,6 +181,69 @@ class AutoEncoder(BaseAE):
   # ----------------------------------------------------------------
 
 
+class FFAE(BaseAE):
+  """
+  This class implements a FF autoencoder
+  """
+  # ----------------------------------------------------------------
+  def _define_encoder(self):
+    self.encoder = nn.Sequential(nn.Conv2d(3, 3, 3, bias=False), nn.SELU(),
+                                 nn.BatchNorm2d(3),
+                                 View((-1, 62 * 62 * 3)),
+                                 nn.Linear(62 * 62 * 3, 5120, bias=False), nn.SELU(),
+                                 nn.Linear(5120, 2560, bias=False), nn.SELU(),
+                                 nn.Linear(2560, 512, bias=False), nn.SELU(),
+                                 nn.Linear(512, 128, bias=False), nn.SELU(),
+                                 nn.Linear(128, self.encoding_shape, bias=False), nn.SELU(),
+                                 )
+  # ----------------------------------------------------------------
+
+  # ----------------------------------------------------------------
+  def _define_decoder(self):
+    self.decoder = nn.Sequential(nn.Linear(self.encoding_shape, 512, bias=False), nn.SELU(),
+                                 nn.Linear(512, 2560, bias=False), nn.SELU(),
+                                 nn.Linear(2560, 5120, bias=False), nn.SELU(),
+                                 nn.Linear(5120, 62*62*3, bias=False), nn.SELU(),
+                                 View((-1, 3, 62, 62)),
+                                 nn.BatchNorm2d(3),
+                                 nn.ConvTranspose2d(3, 3, 3), nn.ReLU()
+                                 )
+  # ----------------------------------------------------------------
+
+  # ----------------------------------------------------------------
+  def forward(self, x):
+    if x.shape[-1] > self.first_subs/4:  # Only subsample if not done yet.
+      x = self.subsample(x)
+
+    feat = self.encoder(x)
+    y = self.decoder(feat)
+
+    rec_error = self.rec_loss(x, y)
+    # Make mean along all the dimensions except the batch one
+    dims = list(range(1, len(rec_error.shape)))
+    rec_error = torch.mean(rec_error, dim=dims)  # Reconstruction error for each sample
+
+    return rec_error, torch.squeeze(feat), y
+  # ----------------------------------------------------------------
+
+  # ----------------------------------------------------------------
+  def training_step(self, x, old_x=None):
+    self.train()
+    rec_error, feat, y = self.forward(x)
+    # Reconstruction Loss
+    rec_loss = torch.mean(rec_error)
+    loss = rec_loss
+
+    self.zero_grad()
+    loss.backward()
+    self.optimizer.step()
+    self.eval()
+    print('Rec Loss: {}'.format(rec_loss.cpu().data))
+    print()
+    return loss, feat, y
+  # ----------------------------------------------------------------
+
+
 class BVAE(BaseAE):
   # ----------------------------------------------------------------
   def __init__(self, device=None, learning_rate=0.001, lr_scale=None, **kwargs):

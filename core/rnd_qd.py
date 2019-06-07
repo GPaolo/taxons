@@ -55,6 +55,11 @@ class RndQD(object):
                                    learning_rate=self.params.learning_rate,
                                    lr_scale=self.params.lr_scale_fact,
                                    encoding_shape=self.params.feature_size)
+    elif self.params.metric == 'FFAE':
+      self.metric = ae.FFAE(device=self.device,
+                            learning_rate=self.params.learning_rate,
+                            lr_scale=self.params.lr_scale_fact,
+                            encoding_shape=self.params.feature_size)
     elif self.params.metric == 'BVAE':
       self.metric = ae.BVAE(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:

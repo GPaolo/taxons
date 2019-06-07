@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/SmallerBall1/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ball.2/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))

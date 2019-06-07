@@ -136,10 +136,12 @@ class LRScheduler(_LRScheduler):
     self.optimizer = optimizer
     self.last_epoch = last_epoch
     self.scale = scale
+    self.init_call = True
     super(LRScheduler, self).__init__(self.optimizer)
 
   def get_lr(self):
-    if self.last_epoch == 0:
+    if self.init_call:
+      self.init_call = False
       return [group['lr'] for group in self.optimizer.param_groups]
 
     lr = [group['lr'] * self.scale for group in self.optimizer.param_groups]
