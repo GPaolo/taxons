@@ -67,7 +67,6 @@ if __name__ == "__main__":
   # images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)/np.max(x_test)
   x_test = []
   env = gym.make("Billiard-v0")
-  env.env.params.BALL_RADIUS = .7
   env.env.params.RANDOM_BALL_INIT_POSE = True
   for k in range(50):
     env.reset()

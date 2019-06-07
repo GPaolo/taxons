@@ -20,6 +20,47 @@ class View(nn.Module):
 
 class BaseAE(nn.Module):
   # ----------------------------------------------------------------
+  def __init__(self, device=None, learning_rate=0.001, lr_scale=None, **kwargs):
+    super(BaseAE, self).__init__()
+
+    if device is not None:
+      self.device = device
+    else:
+      self.device = torch.device("cpu")
+
+    self.encoding_shape = kwargs['encoding_shape']
+    # Model definition is done in these functions that are to be overridden
+    self._define_subsampler()
+    self._define_encoder()
+    self._define_decoder()
+
+    self.rec_loss = nn.MSELoss(reduction='none')
+    self.learning_rate = learning_rate
+    self.zero_grad()
+
+    self.optimizer = optim.Adam(self.parameters(), self.learning_rate)
+    self.lr_scale = lr_scale
+    if self.lr_scale is not None:
+      self.lr_scheduler = utils.LRScheduler(self.optimizer, self.lr_scale)
+    self.to(self.device)
+    self.eval()
+  # ----------------------------------------------------------------
+
+  # ----------------------------------------------------------------
+  def _define_encoder(self):
+    raise NotImplementedError
+
+  def _define_decoder(self):
+    raise NotImplementedError
+
+  def _define_subsampler(self):
+    self.first_subs = 256
+    self.subsample = nn.Sequential(nn.AdaptiveAvgPool2d(self.first_subs),
+                                   nn.AvgPool2d(2),
+                                   nn.AvgPool2d(2))  # 256->64
+  # ----------------------------------------------------------------
+
+  # ----------------------------------------------------------------
   def save(self, filepath):
     save_ckpt = {
       'ae': self.state_dict(),
@@ -64,64 +105,46 @@ class BaseAE(nn.Module):
 
 
 class AutoEncoder(BaseAE):
+  """
+  This class implements the Convolutional Autoencoder
+  """
   # ----------------------------------------------------------------
-  def __init__(self, device=None, learning_rate=0.001, lr_scale=None, **kwargs):
-    super(AutoEncoder, self).__init__()
-
-    if device is not None:
-      self.device = device
-    else:
-      self.device = torch.device("cpu")
-
-    self.encoding_shape = kwargs['encoding_shape']
-    self.first_subs = 256
-    self.subsample = nn.Sequential(nn.AdaptiveAvgPool2d(self.first_subs),
-                                   nn.AvgPool2d(2),
-                                   nn.AvgPool2d(2)) # 256->64
-
-    # Encoder
-    # ------------------------------------
-    self.encoder = nn.Sequential(nn.Conv2d(3, 32, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(), #64->32
+  def _define_encoder(self):
+    self.encoder = nn.Sequential(nn.Conv2d(3, 32, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),  # 64->32
                                  nn.BatchNorm2d(32),
-                                 nn.Conv2d(32, 128, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(), #32->16
+                                 nn.Conv2d(32, 128, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),
+                                 # 32->16
                                  nn.BatchNorm2d(128),
-                                 nn.Conv2d(128, 128, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(), #16->8
+                                 nn.Conv2d(128, 128, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),
+                                 # 16->8
                                  nn.BatchNorm2d(128),
-                                 nn.Conv2d(128, 64, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(), #8->4
+                                 nn.Conv2d(128, 64, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),  # 8->4
                                  nn.BatchNorm2d(64),
                                  View((-1, 64 * 4 * 4)),
                                  nn.Linear(64 * 4 * 4, 1024, bias=False), nn.SELU(),
                                  nn.Linear(1024, 256, bias=False), nn.SELU(),
                                  nn.Linear(256, self.encoding_shape, bias=False), nn.SELU(),
                                  )
-    # ------------------------------------
+  # ----------------------------------------------------------------
 
-    # Decoder
-    # ------------------------------------
+  # ----------------------------------------------------------------
+  def _define_decoder(self):
     self.decoder = nn.Sequential(nn.Linear(self.encoding_shape, 256, bias=False), nn.SELU(),
                                  nn.Linear(256, 32 * 4 * 4, bias=False), nn.SELU(),
                                  View((-1, 32, 4, 4)),
                                  nn.BatchNorm2d(32),
-                                 nn.ConvTranspose2d(32, 64, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(), # 4 -> 8
+                                 nn.ConvTranspose2d(32, 64, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),
+                                 # 4 -> 8
                                  nn.BatchNorm2d(64),
-                                 nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(), # 8 -> 16
+                                 nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),
+                                 # 8 -> 16
                                  nn.BatchNorm2d(32),
-                                 nn.ConvTranspose2d(32, 32, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(), # 16 -> 32
+                                 nn.ConvTranspose2d(32, 32, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),
+                                 # 16 -> 32
                                  nn.BatchNorm2d(32),
-                                 nn.ConvTranspose2d(32, 3, kernel_size=4, stride=2, padding=1, bias=False), nn.ReLU(), # 32 -> 64
+                                 nn.ConvTranspose2d(32, 3, kernel_size=4, stride=2, padding=1, bias=False), nn.ReLU(),
+                                 # 32 -> 64
                                  )
-    # ------------------------------------
-
-    self.rec_loss = nn.MSELoss(reduction='none')
-    self.learning_rate = learning_rate
-    self.zero_grad()
-
-    self.optimizer = optim.Adam(self.parameters(), self.learning_rate)
-    self.lr_scale = lr_scale
-    if self.lr_scale is not None:
-      self.lr_scheduler = utils.LRScheduler(self.optimizer, self.lr_scale)
-    self.to(self.device)
-    self.eval()
   # ----------------------------------------------------------------
 
   # ----------------------------------------------------------------
@@ -167,20 +190,13 @@ class BVAE(BaseAE):
     :param learning_rate:
     :param kwargs:
     """
-    super(BVAE, self).__init__()
+    super(BVAE, self).__init__(device, learning_rate, lr_scale, **kwargs)
 
-    if device is not None:
-      self.device = device
-    else:
-      self.device = torch.device("cpu")
+    self.beta = kwargs['beta']
+  # ----------------------------------------------------------------
 
-    self.encoding_shape = kwargs['encoding_shape']
-    self.first_subs = 256
-    self.subsample = nn.Sequential(nn.AdaptiveAvgPool2d(self.first_subs),
-                                   nn.AvgPool2d(2),
-                                   nn.AvgPool2d(2))  # 256->64
-    # Encoder
-    # ------------------------------------
+  # ----------------------------------------------------------------
+  def _define_encoder(self):
     self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=32, kernel_size=4, stride=2, padding=1),  # B,  32, 32, 32
                                  nn.SELU(),
                                  nn.Conv2d(32, 32, 4, 2, 1),  # B,  32, 16, 16
@@ -194,10 +210,10 @@ class BVAE(BaseAE):
                                  View((-1, 256 * 1 * 1)),  # B, 256
                                  nn.Linear(256, self.encoding_shape * 2),  # B, z_dim*2
                                  )
-    # ------------------------------------
+  # ----------------------------------------------------------------
 
-    # Decoder
-    # ------------------------------------
+  # ----------------------------------------------------------------
+  def _define_decoder(self):
     self.decoder = nn.Sequential(nn.Linear(self.encoding_shape, 256),  # B, 256
                                  View((-1, 256, 1, 1)),  # B, 256,  1,  1
                                  nn.SELU(),
@@ -212,19 +228,6 @@ class BVAE(BaseAE):
                                  nn.ConvTranspose2d(32, 3, 4, 2, 1),  # B, nc, 64, 64
                                  nn.ReLU()
                                  )
-    # ------------------------------------
-
-    self.rec_loss = nn.MSELoss(reduction='none')
-    self.learning_rate = learning_rate
-    self.beta = kwargs['beta']
-    self.zero_grad()
-
-    self.optimizer = optim.Adam(self.parameters(), self.learning_rate)
-    self.lr_scale = lr_scale
-    if self.lr_scale is not None:
-      self.lr_scheduler = utils.LRScheduler(self.optimizer, self.lr_scale)
-    self.to(self.device)
-    self.eval()
   # ----------------------------------------------------------------
 
   # ----------------------------------------------------------------
