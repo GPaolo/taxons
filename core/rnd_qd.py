@@ -51,7 +51,12 @@ class RndQD(object):
     print("Seed {} - Using device: {}".format(self.params.seed, self.device))
 
     if self.params.metric == 'AE':
-      self.metric = ae.AutoEncoder(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
+      self.metric = ae.AutoEncoder(device=self.device,
+                                   learning_rate=self.params.learning_rate,
+                                   lr_scale=self.params.lr_scale_fact,
+                                   encoding_shape=self.params.feature_size)
+    elif self.params.metric == 'BVAE':
+      self.metric = ae.BVAE(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
@@ -84,8 +89,8 @@ class RndQD(object):
       t += 1
       cumulated_reward += reward
     state = self.env.render(mode='rgb_array')/255.
-    self.env.step(action)
-    old_state = self.env.render(mode='rgb_array') / 255.
+    # self.env.step(action)
+    # old_state = self.env.render(mode='rgb_array') / 255.
 
     self.running_avg = self.n/(self.n+1) * self.running_avg + state/(self.n+1) # This one is for normalizing the input
     self.n = self.n + 1
@@ -95,7 +100,7 @@ class RndQD(object):
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
-    return state, old_state, cumulated_reward
+    return state, None, cumulated_reward
   # ---------------------------------------------------
 
   # ---------------------------------------------------
@@ -127,7 +132,7 @@ class RndQD(object):
   # ---------------------------------------------------
 
   # ---------------------------------------------------
-  def update_metric(self, states, old_states):
+  def update_metric(self, states, old_states=None):
     """
     This function uses the cumulated state to update the metrics parameters and then empties the cumulated_state
     :return:
@@ -139,12 +144,13 @@ class RndQD(object):
       total_state = torch.cat((states.to(self.device), archi_state), 0)
     else:
       total_state = states.to(self.device)
-    old_states = old_states.to(self.device)
+    # old_states = old_states.to(self.device)
     # Split the batch in 3 minibatches to have better learning
-    mini_batches = utils.split_array(total_state, batch_size=64)
-    old_mini_batches = utils.split_array(old_states, batch_size=64)
-    for data, old_data in zip(mini_batches, old_mini_batches):
-      loss, f, _ = self.metric.training_step(data, old_data)
+    mini_batches = utils.split_array(total_state, batch_size=128)
+    # old_mini_batches = utils.split_array(old_states, batch_size=64)
+    # for data, old_data in zip(mini_batches, old_mini_batches):
+    for data in mini_batches:
+      loss, f, _ = self.metric.training_step(data)
       self.metric_update_steps += 1
     # print("Loss at {}: {}".format(self.metric_update_steps, loss))
     return f
@@ -157,18 +163,23 @@ class RndQD(object):
     :param steps: number of update steps (or generations)
     :return:
     """
+    inputs = None
     for self.elapsed_gen in range(steps):
       states = []
       old_states = []
       for agent in self.population:
-        state, old_state, _ = self.evaluate_agent(agent)
+        state, _, _ = self.evaluate_agent(agent)
         states.append(state)
-        old_states.append(old_state)
+        # old_states.append(old_state)
       states = np.stack(states)# - self.running_avg # Center data for training
       states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
+      if inputs is None:
+        inputs = states.clone()
+      else:
+        inputs = torch.cat((inputs, states), 0)
 
-      old_states = np.stack(old_states)  # - self.running_avg # Center data for training
-      old_states = self.metric.subsample(torch.Tensor(old_states).permute(0, 3, 1, 2))
+      # old_states = np.stack(old_states)  # - self.running_avg # Center data for training
+      # old_states = self.metric.subsample(torch.Tensor(old_states).permute(0, 3, 1, 2))
 
       avg_gen_surprise = np.mean(self.update_agents(states))
       max_rew = np.max(self.population['reward'].values)
@@ -179,9 +190,12 @@ class RndQD(object):
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
       if self.params.update_metric and self.elapsed_gen % 50 == 0 and self.elapsed_gen > 0:
-        for epoch in range(10):
-          f = self.update_metric(states, old_states)
+        for epoch in range(5):
+          f = self.update_metric(inputs)
           print(f[2].cpu().data)
+        if hasattr(self.metric, 'lr_scheduler'):
+          self.metric.lr_scheduler.step()
+        inputs = None
 
       if self.elapsed_gen % 10 == 0:
         gc.collect()

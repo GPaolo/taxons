@@ -8,15 +8,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from core.metrics import ae, rnd
 from core.utils import utils
+import gym, gym_billiard
 
 import os
 if __name__ == "__main__":
 
-  TEST_TRAINED = False
+  TEST_TRAINED = True
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/AA/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/SmallerBall1/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -61,9 +62,18 @@ if __name__ == "__main__":
 
   # Load test samples
   # -----------------------------------------------
-  with open('/home/giuseppe/src/rnd_qd/test_img.npy', 'rb') as f:
-    x_test = np.load(f)
-  images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)/np.max(x_test)
+  # with open('/home/giuseppe/src/rnd_qd/test_img.npy', 'rb') as f:
+  #   x_test = np.load(f)
+  # images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)/np.max(x_test)
+  x_test = []
+  env = gym.make("Billiard-v0")
+  env.env.params.BALL_RADIUS = .7
+  env.env.params.RANDOM_BALL_INIT_POSE = True
+  for k in range(50):
+    env.reset()
+    x_test.append(env.render(mode='rgb_array'))
+  x_test = np.stack(x_test)
+  images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device) / np.max(x_test)
   # -----------------------------------------------
 
   # Test
@@ -96,7 +106,7 @@ if __name__ == "__main__":
 
   plt.show()
 
-  uu = 2
+  uu = 1
   _, a, y = selector(images_test[uu:uu + 1])
   y = y.permute(0, 2, 3, 1)[0]
   fig, ax = plt.subplots(1, 2)

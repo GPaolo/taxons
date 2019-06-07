@@ -4,14 +4,9 @@
 import torch, torchvision
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 import os
 import sys
-import operator
-import functools
-import pytorch_msssim
-from pytorch_msssim import msssim, ssim
-
+from core.utils import utils
 
 # ----------------------------------------------------------------
 class View(nn.Module):
@@ -70,7 +65,7 @@ class BaseAE(nn.Module):
 
 class AutoEncoder(BaseAE):
   # ----------------------------------------------------------------
-  def __init__(self, device=None, learning_rate=0.001, **kwargs):
+  def __init__(self, device=None, learning_rate=0.001, lr_scale=None, **kwargs):
     super(AutoEncoder, self).__init__()
 
     if device is not None:
@@ -122,6 +117,9 @@ class AutoEncoder(BaseAE):
     self.zero_grad()
 
     self.optimizer = optim.Adam(self.parameters(), self.learning_rate)
+    self.lr_scale = lr_scale
+    if self.lr_scale is not None:
+      self.lr_scheduler = utils.LRScheduler(self.optimizer, self.lr_scale)
     self.to(self.device)
     self.eval()
   # ----------------------------------------------------------------
@@ -162,7 +160,7 @@ class AutoEncoder(BaseAE):
 
 class BVAE(BaseAE):
   # ----------------------------------------------------------------
-  def __init__(self, device=None, learning_rate=0.001, **kwargs):
+  def __init__(self, device=None, learning_rate=0.001, lr_scale=None, **kwargs):
     """
     Beta-VAE implementation taken from https://github.com/1Konny/Beta-VAE/blob/master/model.py
     :param device:
@@ -222,6 +220,9 @@ class BVAE(BaseAE):
     self.zero_grad()
 
     self.optimizer = optim.Adam(self.parameters(), self.learning_rate)
+    self.lr_scale = lr_scale
+    if self.lr_scale is not None:
+      self.lr_scheduler = utils.LRScheduler(self.optimizer, self.lr_scale)
     self.to(self.device)
     self.eval()
   # ----------------------------------------------------------------

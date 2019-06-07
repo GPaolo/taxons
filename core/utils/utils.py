@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import json
 import traceback
+from torch.optim.lr_scheduler import _LRScheduler
 
 class FCLayer(object):
 
@@ -127,6 +128,25 @@ class DMPSin(object):
       self.__amplitude = x
 
 
+class LRScheduler(_LRScheduler):
+  """
+  Scales the LR of a given factor every new metric update cycle
+  """
+  def __init__(self, optimizer, scale, last_epoch=0):
+    self.optimizer = optimizer
+    self.last_epoch = last_epoch
+    self.scale = scale
+    super(LRScheduler, self).__init__(self.optimizer)
+
+  def get_lr(self):
+    if self.last_epoch == 0:
+      return [group['lr'] for group in self.optimizer.param_groups]
+
+    lr = [group['lr'] * self.scale for group in self.optimizer.param_groups]
+    print("New lr: {}".format(lr))
+    return lr
+
+
 def action_formatting(env_tag, action):
   """
   This function helps reformat the actions according to the environment
@@ -210,6 +230,7 @@ def split_array(a, batch_size=32):
   parts = int(np.ceil(length/batch_size))
   np.random.shuffle(a)
   return [a[k*batch_size:min(length, (k+1)*batch_size)] for k in range(parts)]
+
 
 def rgb2gray(img):
   gray = 0.2989 * img[:,:,:,0] + 0.5870 * img[:,:,:,1] + 0.1140 * img[:,:,:,2]
