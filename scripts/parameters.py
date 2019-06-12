@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Train AE with differente data training strategy and ball radius of .1'
+    self.info = 'Train with ball of .2 and Surprise metric'
 
-    self.exp_name = 'SmallerBall1'
+    self.exp_name = 'Ball.2.Surprise'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -27,7 +27,7 @@ class Params(object):
     self.use_archive = True
     self.mutation_rate = 0.5
 
-    self.qd_agent = 'DMP'  # 'DMP
+    self.qd_agent = 'Neural'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
@@ -44,11 +44,12 @@ class Params(object):
     self.per_agent_update = False
     self.update_metric = True
     self.train_on_archive = True
+    self.update_interval = 10
     # ---------------------------------------------------------
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto'
+    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto', 'Novelty'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------

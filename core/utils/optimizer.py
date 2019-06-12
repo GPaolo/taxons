@@ -92,7 +92,6 @@ class ParetoOptimizer(BaseOptimizer):
       mean_k_dist = np.mean(dists[idx[:k]])
       self.pop[agent_idx]['novelty'] = mean_k_dist
 
-
   def step(self, **kwargs):
     """
     Once the agents have been evaluated, it calculates the pareto front of the agents and decides who and how is
@@ -113,28 +112,28 @@ class ParetoOptimizer(BaseOptimizer):
       else: # add only the non dominated
         arch_costs = np.array([np.stack(self.archive['surprise'].values), np.stack(self.archive['novelty'].values)]).transpose()
         for idx in is_pareto:
+          self.pop[idx]['best'] = True
           if self.pop[idx]['name'] not in self.archive['name'].values: # Add an element in the archive only if not present already
             costs = np.array([self.pop[idx]['surprise'], self.pop[idx]['novelty']])
             if np.any(np.any(costs > arch_costs, axis=1)): # TODO Invece di fare cosi potrei ricalcolare il pareto front dell'archivio+quello da aggiungere e vedere se ci sta. Se ci sta lo aggiungo
               self.archive.add(self.pop.copy(idx, with_data=True))
-              self.pop[idx]['best'] = True
-
 
     # Create new gen by substituting random agents with copies of the best ones.
     # (Also the best ones can be subst, effectively reducing the amount of dead agents)
     new_gen = []
     for i in is_pareto:
       if self.pop[i]['best']:
-        new_gen.append(self.pop.copy(i)) # Reproduce only if has been added to the archive. This way we push exploration
+        new_gen.append(self.pop.copy(i)) # Reproduce only if is on the Pareto Front
 
 
     dead = random.sample(range(self.pop.size), len(new_gen))
     for i, new_agent in zip(dead, new_gen):
       self.pop[i] = new_agent
+      self.pop[i]['best'] = False # The new generation is not considered as being on the pareto front, so it can be mutated. While the ones on the front are not
 
-    # Mutate pop that are not pareto optima
+    # Mutate pop
     for a in self.pop:
-      if np.random.random() <= self.mutation_rate:
+      if np.random.random() <= self.mutation_rate and not a['best']:
         a['agent'].mutate()
         a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
         self.pop.agent_name += 1

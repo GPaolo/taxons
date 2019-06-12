@@ -14,6 +14,7 @@ import pathos
 from pathos.pools import ProcessPool
 import traceback
 import gc
+torch.backends.cudnn.enabled = False # There is a issue with CUDNN and Pytorch https://bit.ly/2ReLSDq
 
 
 def main(seed, params):

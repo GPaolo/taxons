@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ball.2/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ball.2.Surprise/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -68,6 +68,7 @@ if __name__ == "__main__":
   x_test = []
   env = gym.make("Billiard-v0")
   env.env.params.RANDOM_BALL_INIT_POSE = True
+  env.env.params.RANDOM_ARM_INIT_POSE = True
   for k in range(50):
     env.reset()
     x_test.append(env.render(mode='rgb_array'))
@@ -105,16 +106,17 @@ if __name__ == "__main__":
 
   plt.show()
 
-  uu = 1
-  _, a, y = selector(images_test[uu:uu + 1])
-  y = y.permute(0, 2, 3, 1)[0]
-  fig, ax = plt.subplots(1, 2)
-  ax[0].imshow(images_test.permute(0,2,3,1).cpu().data[uu])
+  for uu in range(min(20, len(images_test))):
+    error, a, y = selector(images_test[uu:uu + 1])
+    y = y.permute(0, 2, 3, 1)[0]
+    fig, ax = plt.subplots(1, 2)
+    ax[0].imshow(images_test.permute(0,2,3,1).cpu().data[uu])
 
-  img = np.array(y.cpu().data*255)
-  img = img.astype('int32')
-  ax[1].imshow(img)
-  plt.show()
+    img = np.array(y.cpu().data*255)
+    img = img.astype('int32')
+    ax[1].imshow(img)
+    print("Rec Error: {}".format(error.cpu().data))
+    plt.show()
   # -----------------------------------------------
 
 

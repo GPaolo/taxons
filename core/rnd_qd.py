@@ -93,7 +93,8 @@ class RndQD(object):
       obs = utils.obs_formatting(self.params.env_tag, obs)
       t += 1
       cumulated_reward += reward
-    state = self.env.render(mode='rgb_array')/255.
+    state = self.env.render(mode='rgb_array')
+    state = state/np.max(state)
     # self.env.step(action)
     # old_state = self.env.render(mode='rgb_array') / 255.
 
@@ -194,12 +195,12 @@ class RndQD(object):
       self.opt.step()
 
       # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
-      if self.params.update_metric and self.elapsed_gen % 50 == 0 and self.elapsed_gen > 0:
+      if self.params.update_metric and self.elapsed_gen % self.params.update_interval == 0 and self.elapsed_gen > 0:
         for epoch in range(5):
           f = self.update_metric(inputs)
-          print(f[2].cpu().data)
-        if hasattr(self.metric, 'lr_scheduler'):
-          self.metric.lr_scheduler.step()
+          print(f[0].cpu().data)
+        # if hasattr(self.metric, 'lr_scheduler'):
+        #   self.metric.lr_scheduler.step()
         inputs = None
 
       if self.elapsed_gen % 10 == 0:
