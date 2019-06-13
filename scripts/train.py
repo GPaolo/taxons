@@ -58,7 +58,7 @@ def main(seed, params):
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
   if 'Ant' in params.env_tag:
-    limit = 10
+    limit = 5
   else:
     limit = 1.35
   utils.show(bs_points, filepath=params.save_path,

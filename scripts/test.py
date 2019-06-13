@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ball.3/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ant.Novelty/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -27,10 +27,18 @@ if __name__ == "__main__":
   # Possible targets
   # -----------------------------------------------
   x = []
-  env.env.params.RANDOM_BALL_INIT_POSE = True
+  if "Billiard" in params.env_tag:
+    env.env.params.RANDOM_BALL_INIT_POSE = True
+  elif "Ant" in params.env_tag:
+    env.render()
+
   for k in range(21):
     env.reset()
-    x.append(env.render(mode='rgb_array'))
+    if "Ant" in params.env_tag:
+      for step in range(300):
+        env.step(env.action_space.sample())
+    tmp = env.render(mode='rgb_array')
+    x.append(tmp)
   x = np.stack(x)
 
   fig, ax = plt.subplots(7, 3)
@@ -42,7 +50,8 @@ if __name__ == "__main__":
       ax[i, j].set_title(k)
       k += 1
   plt.show()
-  env.env.params.RANDOM_BALL_INIT_POSE = False
+  if "Billiard" in params.env_tag:
+    env.env.params.RANDOM_BALL_INIT_POSE = False
   # -----------------------------------------------
 
   # Load metric
@@ -117,9 +126,9 @@ if __name__ == "__main__":
   for target in x_image:
     # Get new target BS point
     goal = torch.Tensor(x[target]).permute(2, 0, 1).unsqueeze(0).to(device)
-    surprise, bs_point, _ = selector(goal/torch.max(goal))
+    surprise, bs_point, reconstr = selector(goal/torch.max(goal))
     bs_point = bs_point.flatten().cpu().data.numpy()
-    print('Target point surprise {}'.format(surprise))
+    print('Target point surprise {}'.format(surprise.cpu().data))
 
     # Get K closest agents
     # -----------------------------------------------
@@ -159,9 +168,10 @@ if __name__ == "__main__":
 
     state = env.render(mode='rgb_array')
     state = state/np.max(state)
-    fig, ax = plt.subplots(2)
+    fig, ax = plt.subplots(3)
     ax[0].imshow(state)
     ax[1].imshow(x[target])
+    ax[2].imshow(reconstr.permute(0,2,3,1)[0].cpu().data)
     plt.show()
     # -----------------------------------------------
   # -----------------------------------------------

@@ -67,6 +67,14 @@ class DMPExp(object):
     """
     return np.exp(np.sin((x - mu)/sigma)/2)
 
+  def load(self, params):
+    self.mu = params['mu']
+    self.sigma = params['sigma']
+    self.w = params['w']
+    self.a_x = params['a_x']
+    self.tau = params['tau']
+    self.name = params['name']
+
 
 class DMPPoly(object):
   def __init__(self, name='dmp', **kwargs):
@@ -85,6 +93,11 @@ class DMPPoly(object):
   @property
   def params(self):
     return {'w': self.w, 'scale':self.scale, 'name':self.name}
+
+  def load(self, params):
+    self.scale = params['scale']
+    self.w = params['w']
+    self.name = params['name']
 
 
 class DMPSin(object):
@@ -126,6 +139,11 @@ class DMPSin(object):
       self.__amplitude = -5
     else:
       self.__amplitude = x
+
+  def load(self, params):
+    self.period = params['period']
+    self.amplitude = params['amplitude']
+    self.name = params['name']
 
 
 class LRScheduler(_LRScheduler):

@@ -168,9 +168,7 @@ class DMPAgent(BaseAgent):
     self.action_len = params[-1]  # the last is the action lenght
 
     for p, g in zip(params[:-1], self._genome):
-      assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for dmp {} of agent {}'.format(self.name, agent)
-      g.w = deepcopy(p['w'])
-      g.scale = deepcopy(p['scale'])
+      g.load(deepcopy(p))
 
 
 

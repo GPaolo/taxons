@@ -2,10 +2,8 @@ import numpy as np
 from core.metrics import rnd, ae
 from core.qd import population, agents
 from core.utils import utils
-import gym, torch
-import gym_billiard
-import os, threading, sys, traceback
-import matplotlib
+import torch
+import os
 import json
 import gc
 
@@ -93,6 +91,13 @@ class RndQD(object):
       obs = utils.obs_formatting(self.params.env_tag, obs)
       t += 1
       cumulated_reward += reward
+
+      np.array([self.env.env.data.qpos[:2]])
+
+      if 'Ant' in self.params.env_tag:
+        CoM = np.array([self.env.env.data.qpos[:2]])
+        if t >= self.params.max_episode_len or np.any(np.abs(CoM) >= np.array([4, 4])):
+          done = True
     state = self.env.render(mode='rgb_array')
     state = state/np.max(state)
     # self.env.step(action)
@@ -170,6 +175,8 @@ class RndQD(object):
     :return:
     """
     inputs = None
+    if 'Ant' in self.params.env_tag: # Need it otherwise cannot init OpenGL
+      self.env.render()
     for self.elapsed_gen in range(steps):
       states = []
       old_states = []
@@ -220,7 +227,7 @@ class RndQD(object):
       else:
         bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
       if 'Ant' in self.params.env_tag:
-        limit = 10
+        limit = 5
       else:
         limit = 1.35
       coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen, 'seed':self.params.seed}, limit=limit)

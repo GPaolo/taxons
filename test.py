@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ball.2.Surprise/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ant.Novelty/7'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -66,12 +66,21 @@ if __name__ == "__main__":
   #   x_test = np.load(f)
   # images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)/np.max(x_test)
   x_test = []
-  env = gym.make("Billiard-v0")
-  env.env.params.RANDOM_BALL_INIT_POSE = True
-  env.env.params.RANDOM_ARM_INIT_POSE = True
+  env_tag = "Ant-v2"
+  env = gym.make(env_tag)
+  if "Billiard" in env_tag:
+    env.env.params.RANDOM_BALL_INIT_POSE = True
+    env.env.params.RANDOM_ARM_INIT_POSE = True
+  elif "Ant" in env_tag:
+    env.render()
+
   for k in range(50):
     env.reset()
-    x_test.append(env.render(mode='rgb_array'))
+    if "Ant" in env_tag:
+      for step in range(300):
+        env.step(env.action_space.sample())
+    tmp = env.render(mode='rgb_array')
+    x_test.append(tmp)
   x_test = np.stack(x_test)
   images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device) / np.max(x_test)
   # -----------------------------------------------
@@ -109,12 +118,16 @@ if __name__ == "__main__":
   for uu in range(min(20, len(images_test))):
     error, a, y = selector(images_test[uu:uu + 1])
     y = y.permute(0, 2, 3, 1)[0]
-    fig, ax = plt.subplots(1, 2)
+    fig, ax = plt.subplots(1, 3)
     ax[0].imshow(images_test.permute(0,2,3,1).cpu().data[uu])
+
+    subs = selector.subsample(images_test[uu:uu+1])
+    subs = subs.permute(0, 2, 3, 1)[0]
+    ax[1].imshow(np.array(subs.cpu().data))
 
     img = np.array(y.cpu().data*255)
     img = img.astype('int32')
-    ax[1].imshow(img)
+    ax[2].imshow(img)
     print("Rec Error: {}".format(error.cpu().data))
     plt.show()
   # -----------------------------------------------
