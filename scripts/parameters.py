@@ -7,13 +7,14 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Train with Ant and novelty'
+    self.info = 'Baseline with novelty search and billiard'
 
-    self.exp_name = 'Collectdata_Billiard_AE_NoTrain'
+    self.exp_name = 'Collectdata_Billiard_NS'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
+    self.baseline = False
 
     # Environment
     # ---------------------------------------------------------
@@ -37,7 +38,7 @@ class Params(object):
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = True
+    self.gpu = False
     self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
     self.feature_size = 10
     self.learning_rate = 0.001 # 0.0001 for RND

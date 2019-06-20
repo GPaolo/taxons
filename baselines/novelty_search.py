@@ -1,144 +1,43 @@
 import numpy as np
 from core.qd import population, agents
 from core.utils import utils
-import gym
-import random
-import threading
-import gym_billiard
-import matplotlib
-import matplotlib.pyplot as plt
-import os
-# env_tag = 'MountainCarContinuous-v0'
-env_tag = 'Ant-v2'
-
+import os, gc, json
 
 class NoveltySearch(object):
-  def __init__(self, env, filepath, obs_shape=6, action_shape=8, pop_size=50):
-    self.obs_space = obs_shape
-    self.max_arch_len = 100000
-    self.action_space = action_shape
-    self.agent_type = 'DMP'
 
-    if self.agent_type == 'DMP':
-      agent = agents.DMPAgent
-      shapes = {'dof':self.action_space, 'degree':5}
-    elif self.agent_type == 'Neural':
-      agent = agents.FFNeuralAgent
-      shapes = {'input_shape': 6, 'output_shape': self.action_space}
-
-    self.pop = population.Population(agent=agent,
-                                     shapes=shapes,
-                                     pop_size=pop_size)
-    self.archive = population.Population(agent=agent,
-                                         shapes=shapes,
-                                         pop_size=0)
+  # ---------------------------------------------------
+  def __init__(self, env, parameters):
+    self.params = parameters
+    self.pop_size = self.params.pop_size
     self.env = env
-    self.min_dist = 0.5
-    self.novel_in_gen = 0
-    self.not_added = 0
-    self.mutation_rate = 0.5
-    self.thread = threading.Thread(target=self._show_progress)
-    self.thread.start()
-    self.adaptive_distance = False
-    self.filepath = filepath
-    if not os.path.exists(self.filepath):
-      os.mkdir(self.filepath)
+    self.save_path = self.params.save_path
+    self.agents_shapes = self.params.agent_shapes
+    self.agent_name = self.params.qd_agent
 
-  def _show_progress(self):
-    matplotlib.use('agg')
-    print('If you want to show the progress, press s.')
-    while True:
-      action = input(' ')
-      if action == 's':
-        try:
-          if 'Ant' in env_tag:
-            limit = 10
-          else:
-            limit = 1.35
-          bs_points = np.concatenate(self.archive['bs'].values)
-          utils.show(bs_points, self.filepath, limit=limit)
-        except:
-          print('Cannot show progress now.')
+    self.logs = {'Generation':[], 'Avg gen surprise':[], 'Max reward':[], 'Archive size':[], 'Coverage':[]}
 
-  def measure_novelty(self):
-    # MEASURE AGENT NOVELTY
-    for agent_idx in range(self.pop.size):
-      bs_point = self.pop[agent_idx]['bs']
 
-      bs_space = np.concatenate(self.pop['bs'].values)
-      bs_space = np.delete(bs_space, agent_idx, axis=0)
-      if self.archive.size > 0:
-        archive_bs_space = np.concatenate(self.archive['bs'].values)
-        bs_space = np.concatenate([bs_space, archive_bs_space])
-      # Get distances
-      diff = np.atleast_2d(bs_space - bs_point)
-      dists = np.sqrt(np.sum(diff * diff, axis=1))
-      k = 15
-      if len(dists) <= k: # Should never happen
-        idx = list(range(len(dists)))
-        k = len(idx)
-      else:
-        idx = np.argpartition(dists, k)  # Get 15 nearest neighs
-      novel = True
+    if self.agent_name == 'Neural':
+      agent_type = agents.FFNeuralAgent
+    elif self.agent_name == 'DMP':
+      agent_type = agents.DMPAgent
 
-      mean_k_dist = np.mean(dists[idx[:k]])
-      if not self.adaptive_distance:
-        self.pop[agent_idx]['surprise'] = mean_k_dist
-      else:
-        if mean_k_dist <= self.min_dist:
-          novel = False
-        self.pop[agent_idx]['best'] = novel
+    self.population = population.Population(agent=agent_type,
+                                            shapes=self.agents_shapes,
+                                            pop_size=self.pop_size)
+    self.archive = None
+    if self.params.use_archive:
+      self.archive = population.Population(agent=agent_type,
+                                           shapes=self.agents_shapes,
+                                           pop_size=0)
 
-  def update_archive(self):
-    new_gen = []  # Reproduce only the novel ones
+    self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate, metric_update_interval=self.params.update_interval)
 
-    # ADD AGENT TO ARCHIVE
-    if not self.adaptive_distance:
-      novel = self.pop['surprise'].sort_values(ascending=False)
-      best = novel.iloc[:5].index.values  # Get 5 best
-      dead = novel.iloc[-5:].index.values  # Get 5 worst
-      if self.archive is not None:
-        for idx in best:
-          if self.pop[idx]['name'] not in self.archive['name'].values:
-            self.archive.add(self.pop.copy(idx, with_data=True))  # Only add the most novel ones
-      for i in best:
-        new_gen.append(self.pop.copy(i))
-        self.pop[i]['best'] = True
+    self.END = False
+    self.elapsed_gen = 0
+  # ---------------------------------------------------
 
-    else: # Adaptive distance
-      for agent_idx in range(self.pop.size):
-        if self.pop[agent_idx]['best'] and self.pop[agent_idx]['name'] not in self.archive['name'].values:
-          if len(self.archive) >= self.max_arch_len: # If archive is full, replace a random element
-            replaced = random.randint(0, len(self.archive)-1)
-            self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
-          else:
-            self.archive.add(self.pop.copy(agent_idx, with_data=True))
-          self.novel_in_gen += 1
-        # Randomly choose an agent to add to the archive
-        elif np.random.uniform() <= 0.005 and self.pop[agent_idx]['name'] not in self.archive['name'].values:
-          if len(self.archive) >= self.max_arch_len:
-            replaced = random.randint(0, len(self.archive)-1)
-            self.archive[replaced] = self.pop.copy(agent_idx, with_data=True)
-          else:
-            self.archive.add(self.pop.copy(agent_idx, with_data=True))
-          # self.novel_in_gen += 1
-      for i, a in enumerate(self.pop):
-        if a['best']:
-          new_gen.append(self.pop.copy(i))
-      dead = random.sample(range(self.pop.size), len(new_gen))
-
-    # This one is common in both adaptive and non adaptive distance
-    for i, new_agent in zip(dead, new_gen):
-      self.pop[i] = new_agent
-
-    # Mutate pop
-    for a in self.pop:
-      if np.random.random() <= self.mutation_rate:
-        a['agent'].mutate()
-        a['name'] = self.pop.agent_name  # When an agent is mutated it also changes name, otherwise it will never be added to the archive
-        self.pop.agent_name += 1
-      a['best'] = False
-
+  # ---------------------------------------------------
   def evaluate_agent(self, agent):
     """
     This function evaluates the agent in the environment. This function should be run in parallel
@@ -147,83 +46,102 @@ class NoveltySearch(object):
     """
     done = False
     cumulated_reward = 0
-    obs = utils.obs_formatting(env_tag, self.env.reset())
+
+    obs = utils.obs_formatting(self.params.env_tag, self.env.reset())
     t = 0
     while not done:
-      action = utils.action_formatting(env_tag, agent['agent'](t))
+      agent_input = t
+      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
       obs, reward, done, info = self.env.step(action)
-      obs = utils.obs_formatting(env_tag, obs)
-      cumulated_reward += reward
+      obs = utils.obs_formatting(self.params.env_tag, obs)
       t += 1
-    if 'Ant' in env_tag:
-      agent['bs'] = np.array([env.env.data.qpos[:2]]) # xy position of CoM of the robot
+      cumulated_reward += reward
+
+      if 'Ant' in self.params.env_tag:
+        CoM = np.array([self.env.env.data.qpos[:2]])
+        if t >= self.params.max_episode_len or np.any(np.abs(CoM) >= np.array([4, 4])):
+          done = True
+
+    if 'Ant' in self.params.env_tag:
+      agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
+    agent['features'] = [agent['bs'][0], None]
+    return cumulated_reward
+  # ---------------------------------------------------
 
-  def evolve(self, gen=1000):
-    self.elapsed_gen = 0
-    for self.elapsed_gen in range(gen):
-      for a in self.pop:
-        self.evaluate_agent(a)
+  # ---------------------------------------------------
+  def train(self, steps=10000):
+    for self.elapsed_gen in range(steps):
+      for agent in self.population:
+        self.evaluate_agent(agent)
 
-      self.measure_novelty()
-      self.update_archive()
-
-      if self.novel_in_gen > 2:
-        self.min_dist += self.min_dist*0.1
-        self.not_added = 0
-      elif self.novel_in_gen == 0:
-        self.not_added += 1
-      else:
-        self.not_added = 0
-      self.novel_in_gen = 0
-      if self.not_added > 4 and self.min_dist > 0.3:
-        self.min_dist -= self.min_dist * 0.1
+      max_rew = np.max(self.population['reward'].values)
+      self.opt.step()
 
       if self.elapsed_gen % 10 == 0:
-        print('Gen {}'.format(self.elapsed_gen))
-        print('Archive size {}'.format(self.archive.size))
-        print('Min distance {}'.format(self.min_dist))
+        gc.collect()
+        print('Seed {} - Generation {}'.format(self.params.seed, self.elapsed_gen))
+        if self.archive is not None:
+          print('Seed {} - Archive size {}'.format(self.params.seed, self.archive.size))
+        print('Seed {} - Max reward {}'.format(self.params.seed, max_rew))
+        print('Saving checkpoint...')
+        self.save(ckpt=True)
+        print("Done")
         print()
 
+      if self.archive is not None:
+        bs_points = np.concatenate(self.archive['bs'].values)
+      else:
+        bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
+      if 'Ant' in self.params.env_tag:
+        limit = 5
+      else:
+        limit = 1.35
+      coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen, 'seed':self.params.seed}, limit=limit)
+
+      self.logs['Generation'].append(str(self.elapsed_gen))
+      self.logs['Avg gen surprise'].append('0')
+      self.logs['Max reward'].append(str(max_rew))
+      self.logs['Archive size'].append(str(self.archive.size))
+      self.logs['Coverage'].append(str(coverage))
+      if self.END:
+        print('Seed {} - Quitting.'.format(self.params.seed))
+        break
+    gc.collect()
+  # ---------------------------------------------------
+
+  # ---------------------------------------------------
+  def save(self, ckpt=False):
+    if ckpt:
+      folder = 'models/ckpt'
+    else:
+      folder = 'models'
+    save_subf = os.path.join(self.save_path, folder)
+    print('Seed {} - Saving...'.format(self.params.seed))
+    if not os.path.exists(save_subf):
+      try:
+        os.makedirs(os.path.abspath(save_subf))
+      except:
+        print('Seed {} - Cannot create save folder.'.format(self.params.seeds))
+    self.population.save_pop(save_subf, 'pop')
+    self.archive.save_pop(save_subf, 'archive')
+
+    with open(os.path.join(self.save_path, 'logs.json'), 'w') as f:
+      json.dump(self.logs, f, indent=4)
+    print('Seed {} - Done'.format(self.params.seed))
+  # ---------------------------------------------------
 
 
-if __name__ == '__main__':
-  env = gym.make(env_tag)
 
-  seeds = [10, 7, 9, 42, 2]
 
-  for iteration, seed in enumerate(seeds):
-    print('Running with seed: {}'.format(seed))
-    random.seed(seed)
-    env.seed(seed)
-    np.random.seed(seed)
 
-    filepath = os.path.join(utils.get_projectpath(), 'baselines', 'ns_{}'.format(iteration))
 
-    ns = NoveltySearch(env, filepath, pop_size=100, obs_shape=6, action_shape=8)
-    try:
-      ns.evolve(500)
-    except KeyboardInterrupt:
-      print('User Interruption')
 
-    bs_points = np.concatenate(ns.archive['bs'].values)
-    utils.show(bs_points, ns.filepath, 'NS_{}_{}'.format(ns.elapsed_gen, env_tag), info={'Generation':500, 'Seed':seed})
-    #print(ns.archive['name'].values)
 
-    # print('Testing result according to best reward.')
-    # rewards = ns.archive['reward'].sort_values(ascending=False)
-    # for idx in range(ns.archive.size):
-    #   tested = ns.archive[rewards.iloc[idx:idx + 1].index.values[0]]
-    #   print()
-    #   print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
-    #   done = False
-    #   ts = 0
-    #   obs = utils.obs_formatting(env_tag, ns.env.reset())
-    #   while not done and ts < 1000:
-    #     ns.env.render()
-    #     action = utils.action_formatting(env_tag, tested['agent'](ts))
-    #     obs, reward, done, info = ns.env.step(action)
-    #     obs = utils.obs_formatting(env_tag, obs)
-    #     ts += 1
+
+
+
+
+

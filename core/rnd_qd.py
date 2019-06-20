@@ -67,9 +67,6 @@ class RndQD(object):
 
     self.END = False
     self.elapsed_gen = 0
-
-    self.running_avg = 0
-    self.n = 0
   # ---------------------------------------------------
 
   # ---------------------------------------------------
@@ -106,7 +103,7 @@ class RndQD(object):
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
-    return state, None, cumulated_reward
+    return state, None, cumulated_reward # TODO check why there is a None here
   # ---------------------------------------------------
 
   # ---------------------------------------------------
