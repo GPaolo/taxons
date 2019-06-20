@@ -63,7 +63,7 @@ class RndQD(object):
     else:
       self.metric = rnd.RND(device=self.device, learning_rate=self.params.learning_rate, encoding_shape=self.params.feature_size)
 
-    self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate)
+    self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate, metric_update_interval=self.params.update_interval)
 
     self.END = False
     self.elapsed_gen = 0
@@ -92,8 +92,6 @@ class RndQD(object):
       t += 1
       cumulated_reward += reward
 
-      np.array([self.env.env.data.qpos[:2]])
-
       if 'Ant' in self.params.env_tag:
         CoM = np.array([self.env.env.data.qpos[:2]])
         if t >= self.params.max_episode_len or np.any(np.abs(CoM) >= np.array([4, 4])):
@@ -102,9 +100,6 @@ class RndQD(object):
     state = state/np.max(state)
     # self.env.step(action)
     # old_state = self.env.render(mode='rgb_array') / 255.
-
-    self.running_avg = self.n/(self.n+1) * self.running_avg + state/(self.n+1) # This one is for normalizing the input
-    self.n = self.n + 1
 
     if 'Ant' in self.params.env_tag:
       agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
@@ -186,10 +181,11 @@ class RndQD(object):
         # old_states.append(old_state)
       states = np.stack(states)# - self.running_avg # Center data for training
       states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
-      if inputs is None:
-        inputs = states.clone()
-      else:
-        inputs = torch.cat((inputs, states), 0)
+      if self.params.update_metric:
+        if inputs is None:
+          inputs = states.clone()
+        else:
+          inputs = torch.cat((inputs, states), 0)
 
       # old_states = np.stack(old_states)  # - self.running_avg # Center data for training
       # old_states = self.metric.subsample(torch.Tensor(old_states).permute(0, 3, 1, 2))
@@ -208,8 +204,10 @@ class RndQD(object):
           print(f[0].cpu().data)
         # if hasattr(self.metric, 'lr_scheduler'):
         #   self.metric.lr_scheduler.step()
+        del inputs
         inputs = None
 
+      torch.cuda.empty_cache()
       if self.elapsed_gen % 10 == 0:
         gc.collect()
         print('Seed {} - Generation {}'.format(self.params.seed, self.elapsed_gen))

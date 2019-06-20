@@ -17,7 +17,8 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ant.Novelty/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Collectdata_Billiard_AE_Novelty/11'
+  env_tag = "Billiard-v0"
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     selector.save(load_path)
   # -----------------------------------------------
   else:
-    selector.load(os.path.join(load_path, 'models/ckpt/ckpt_ae.pth'))
+    selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
   selector.training = False
   # -----------------------------------------------
 
@@ -66,7 +67,6 @@ if __name__ == "__main__":
   #   x_test = np.load(f)
   # images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)/np.max(x_test)
   x_test = []
-  env_tag = "Ant-v2"
   env = gym.make(env_tag)
   if "Billiard" in env_tag:
     env.env.params.RANDOM_BALL_INIT_POSE = True

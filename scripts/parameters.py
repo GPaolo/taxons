@@ -9,11 +9,11 @@ class Params(object):
   def __init__(self):
     self.info = 'Train with Ant and novelty'
 
-    self.exp_name = 'Test'
+    self.exp_name = 'Collectdata_Billiard_AE_NoTrain'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = False
+    self.parallel = True
 
     # Environment
     # ---------------------------------------------------------
@@ -26,9 +26,9 @@ class Params(object):
     self.generations = 500
     self.pop_size = 100
     self.use_archive = True
-    self.mutation_rate = 0.5
+    self.mutation_rate = 0.9
 
-    self.qd_agent = 'Neural'  # 'DMP
+    self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
@@ -43,7 +43,7 @@ class Params(object):
     self.learning_rate = 0.001 # 0.0001 for RND
     self.lr_scale_fact = 0.1
     self.per_agent_update = False
-    self.update_metric = True
+    self.update_metric = False
     self.train_on_archive = True
     self.update_interval = 30
     # ---------------------------------------------------------
