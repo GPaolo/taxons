@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Test_2_bs/7'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ant_High_Features/11'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -37,6 +37,9 @@ if __name__ == "__main__":
     if "Ant" in params.env_tag:
       for step in range(300):
         env.step(env.action_space.sample())
+        CoM = np.array([env.env.data.qpos[:2]])
+        if np.any(np.abs(CoM) >= np.array([3, 3])):
+          break
     tmp = env.render(mode='rgb_array')
     x.append(tmp)
   x = np.stack(x)
@@ -88,26 +91,31 @@ if __name__ == "__main__":
 
   # Evaluate archive agents BS points
   # -----------------------------------------------
-  for i, agent in enumerate(pop):
-    if i % 50 == 0:
-      print('Evaluating agent {}'.format(i))
-    done = False
-    obs = utils.obs_formatting(params.env_tag, env.reset())
-    t = 0
-    while not done:
-      agent_input = t
-      action = utils.action_formatting(params.env_tag, agent['agent'](agent_input))
+  if pop[0]['features'] is None:
+    for i, agent in enumerate(pop):
+      if i % 50 == 0:
+        print('Evaluating agent {}'.format(i))
+      done = False
+      obs = utils.obs_formatting(params.env_tag, env.reset())
+      t = 0
+      while not done:
+        agent_input = t
+        action = utils.action_formatting(params.env_tag, agent['agent'](agent_input))
 
-      obs, reward, done, info = env.step(action)
-      obs = utils.obs_formatting(params.env_tag, obs)
-      t += 1
+        obs, reward, done, info = env.step(action)
+        obs = utils.obs_formatting(params.env_tag, obs)
+        t += 1
+        if "Ant" in params.env_tag:
+          CoM = np.array([env.env.data.qpos[:2]])
+          if np.any(np.abs(CoM) >= np.array([3, 3])):
+            done = True
 
-    state = env.render(mode='rgb_array')
-    state = state/np.max(state)
-    state = selector.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0).to(device))
-    surprise, bs_point, y = selector(state)
-    bs_point = bs_point.flatten().cpu().data.numpy()
-    agent['features'] = [bs_point]
+      state = env.render(mode='rgb_array')
+      state = state/np.max((np.max(state), 1))
+      state = selector.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0).to(device))
+      surprise, bs_point, y = selector(state)
+      bs_point = bs_point.flatten().cpu().data.numpy()
+      agent['features'] = [bs_point]
   # -----------------------------------------------
 
   # Testing
@@ -126,9 +134,10 @@ if __name__ == "__main__":
   for target in x_image:
     # Get new target BS point
     goal = torch.Tensor(x[target]).permute(2, 0, 1).unsqueeze(0).to(device)
-    surprise, bs_point, reconstr = selector(goal/torch.max(goal))
+    surprise, bs_point, reconstr = selector(goal/torch.max(torch.Tensor(np.array([torch.max(goal), 1]))))
     bs_point = bs_point.flatten().cpu().data.numpy()
     print('Target point surprise {}'.format(surprise.cpu().data))
+    print('Target bs point {}'.format(bs_point))
 
     # Get K closest agents
     # -----------------------------------------------
@@ -165,9 +174,12 @@ if __name__ == "__main__":
       obs, reward, done, info = env.step(action)
       obs = utils.obs_formatting(params.env_tag, obs)
       ts += 1
+      CoM = np.array([env.env.data.qpos[:2]])
+      if np.any(np.abs(CoM) >= np.array([3, 3])):
+        done =True
 
     state = env.render(mode='rgb_array')
-    state = state/np.max(state)
+    state = state/np.max((np.max(state), 1))
     fig, ax = plt.subplots(3)
     ax[0].imshow(state)
     ax[1].imshow(x[target])

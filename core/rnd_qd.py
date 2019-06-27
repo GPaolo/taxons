@@ -91,12 +91,10 @@ class RndQD(object):
 
       if 'Ant' in self.params.env_tag:
         CoM = np.array([self.env.env.data.qpos[:2]])
-        if t >= self.params.max_episode_len or np.any(np.abs(CoM) >= np.array([4, 4])):
+        if t >= self.params.max_episode_len or np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
     state = self.env.render(mode='rgb_array')
-    state = state/np.max(state)
-    # self.env.step(action)
-    # old_state = self.env.render(mode='rgb_array') / 255.
+    state = state/np.max((np.max(state), 1))
 
     if 'Ant' in self.params.env_tag:
       agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
@@ -128,10 +126,12 @@ class RndQD(object):
     if not len(self.archive) == 0:
       feats = self.archive['features'].values
       state = torch.Tensor([f[1] for f in feats]).to(self.device)
-      _, feature, _ = self.metric(state)
+      surprise, feature, _ = self.metric(state)
+      surprise = surprise.cpu().data.numpy()  # Has dimension [pop_size]
 
       for agent, feat in zip(self.archive, feature):
         agent['features'][0] = feat.flatten().cpu().data.numpy()
+      self.archive.pop['surprise'] = surprise
   # ---------------------------------------------------
 
   # ---------------------------------------------------
@@ -171,11 +171,9 @@ class RndQD(object):
       self.env.render()
     for self.elapsed_gen in range(steps):
       states = []
-      old_states = []
       for agent in self.population:
         state, _, _ = self.evaluate_agent(agent)
         states.append(state)
-        # old_states.append(old_state)
       states = np.stack(states)# - self.running_avg # Center data for training
       states = self.metric.subsample(torch.Tensor(states).permute(0, 3, 1, 2))
       if self.params.update_metric:
@@ -183,9 +181,6 @@ class RndQD(object):
           inputs = states.clone()
         else:
           inputs = torch.cat((inputs, states), 0)
-
-      # old_states = np.stack(old_states)  # - self.running_avg # Center data for training
-      # old_states = self.metric.subsample(torch.Tensor(old_states).permute(0, 3, 1, 2))
 
       avg_gen_surprise = np.mean(self.update_agents(states))
       max_rew = np.max(self.population['reward'].values)
@@ -199,10 +194,11 @@ class RndQD(object):
         for epoch in range(5):
           f = self.update_metric(inputs)
           print(f[0].cpu().data)
-        # if hasattr(self.metric, 'lr_scheduler'):
-        #   self.metric.lr_scheduler.step()
         del inputs
         inputs = None
+
+      # if hasattr(self.metric, 'lr_scheduler') and self.elapsed_gen % 100 == 0 and self.elapsed_gen > 0:
+      #   self.metric.lr_scheduler.step()
 
       torch.cuda.empty_cache()
       if self.elapsed_gen % 10 == 0:
@@ -222,7 +218,7 @@ class RndQD(object):
       else:
         bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
       if 'Ant' in self.params.env_tag:
-        limit = 5
+        limit = 3.5
       else:
         limit = 1.35
       coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen, 'seed':self.params.seed}, limit=limit)

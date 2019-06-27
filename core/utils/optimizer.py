@@ -134,9 +134,6 @@ class ParetoOptimizer(BaseOptimizer):
         if self.pop[idx]['name'] not in self.archive['name'].values:
           self.archive.add(self.pop.copy(idx, with_data=True))  # Only add the most novel ones
 
-    # Maybe I should add to new gen only the ones that are added to the archive? In order not to have repetitions?
-    # No, it does not makes sense, like this is better, so if one is still novel after the first time it can still
-    # create ''novel'' kids.
     new_gen = []
     for i in best:
       new_gen.append(self.pop.copy(i))
@@ -184,9 +181,10 @@ class ParetoOptimizer(BaseOptimizer):
         print('Using Novelty update')
         self.update_archive_novelty()
       else:
-        print('Using Surprise update') # TODO dai un'occhiata alla distr della surprise
+        print('Using Surprise update')
+        self.min_surprise = np.max(self.archive['surprise'])
         self.update_archive_surprise()
-    self.min_surprise = np.max(self.pop['surprise'])# + 2*np.std(self.pop['surprise'])
+    print("Min surprise {}".format(self.min_surprise))
     print("Max surprise {}".format(np.max(self.pop['surprise'])))
     print('Added to archive: {}'.format(len(self.archive)-archive_len))
 

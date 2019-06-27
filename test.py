@@ -17,8 +17,8 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Collectdata_Billiard_AE_Novelty/11'
-  env_tag = "Billiard-v0"
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ant_High_Features/3'
+  env_tag = "Ant-v2"
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     selector.save(load_path)
   # -----------------------------------------------
   else:
-    selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
+    selector.load(os.path.join(load_path, 'models/ckpt/ckpt_ae.pth'))
   selector.training = False
   # -----------------------------------------------
 
@@ -79,10 +79,14 @@ if __name__ == "__main__":
     if "Ant" in env_tag:
       for step in range(300):
         env.step(env.action_space.sample())
+        CoM = np.array([env.env.data.qpos[:2]])
+        if np.any(np.abs(CoM) >= np.array([3, 3])):
+          break
     tmp = env.render(mode='rgb_array')
     x_test.append(tmp)
-  x_test = np.stack(x_test)
-  images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device) / np.max(x_test)
+  x_test = np.stack(x_test) / np.max((np.max(x_test), 1))
+  # x_test = np.abs(x_test - np.array([init_state]))
+  images_test = torch.Tensor(x_test).permute(0, 3, 1, 2).to(device)
   # -----------------------------------------------
 
   # Test

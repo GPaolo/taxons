@@ -54,6 +54,21 @@ class BaseAE(nn.Module):
     raise NotImplementedError
 
   def _define_subsampler(self):
+    def resize_image(input_tensors):
+      final_output = None
+      #batch_size, channel, height, width = input_tensors.shape
+      for img in input_tensors:
+        img_PIL = torchvision.transforms.ToPILImage()(img)
+        img_PIL = torchvision.transforms.Resize([64, 64])(img_PIL)
+        img_PIL = torchvision.transforms.ToTensor()(img_PIL)
+        if final_output is None:
+          final_output = img_PIL
+        else:
+          final_output = torch.cat((final_output, img_PIL), 0)
+      return final_output
+
+
+
     self.first_subs = 256
     self.subsample = nn.Sequential(nn.AdaptiveAvgPool2d(self.first_subs),
                                    nn.AvgPool2d(2),

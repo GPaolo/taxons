@@ -9,16 +9,16 @@ class Params(object):
   def __init__(self):
     self.info = 'Baseline with novelty search and billiard'
 
-    self.exp_name = 'Collectdata_Billiard_NS'
+    self.exp_name = 'Ant_High_Features'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = True
+    self.parallel = False
     self.baseline = False
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'Billiard-v0' # Billiard-v0 Ant-v2 MountainCarContinuous-v0
+    self.env_tag = 'Ant-v2' # Billiard-v0 Ant-v2 MountainCarContinuous-v0
     self.max_episode_len = 300
     # ---------------------------------------------------------
 
@@ -33,20 +33,20 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'} # poly, exp, sin
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'sin'} # poly, exp, sin
     # ---------------------------------------------------------
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = False
+    self.gpu = True
     self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
-    self.feature_size = 10
+    self.feature_size = 20
     self.learning_rate = 0.001 # 0.0001 for RND
-    self.lr_scale_fact = 0.1
+    self.lr_scale_fact = 0.5
     self.per_agent_update = False
-    self.update_metric = False
+    self.update_metric = True
     self.train_on_archive = True
-    self.update_interval = 30
+    self.update_interval = 50
     # ---------------------------------------------------------
 
     # Optimizer

@@ -93,7 +93,7 @@ class Population(object):
     save_ckpt['Genome'] = {}
 
     for a in self:
-      save_ckpt['Genome'][a['name']] = a['agent'].genome
+      save_ckpt['Genome'][a['name']] = {'gen': a['agent'].genome, 'feat': a['features']}
     try:
       with open(os.path.join(filepath, 'qd_{}.pkl'.format(name)), 'wb') as file:
         pkl.dump(save_ckpt, file)
@@ -118,7 +118,13 @@ class Population(object):
     for agent_name in ckpt['Genome']:
       agent = {'agent': self.agent_class(self.shapes), 'reward': None, 'surprise': None, 'novelty': None,
                'best': False, 'bs': None, 'name': agent_name, 'features': None}
-      agent_genome = ckpt['Genome'][agent_name]
+      try:
+        agent_genome = ckpt['Genome'][agent_name]['gen']
+        agent['features'] = ckpt['Genome'][agent_name]['feat']
+      except:
+        print('Agents without features!')
+        agent_genome = ckpt['Genome'][agent_name]
+
       assert len(agent_genome) == len(agent['agent'].genome), 'Wrong genome length. Saved {}, current {}'.format(agent_genome, self[-1]['agent'].genome)
       agent['agent'].load_genome(agent_genome, agent_name)
       for k in range(len(agent_genome)):

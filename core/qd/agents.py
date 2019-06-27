@@ -145,7 +145,7 @@ class DMPAgent(BaseAgent):
     for i, dmp in enumerate(self._genome):
       output[i] = dmp(x)
 
-    if x/500. > self.action_len:
+    if x/300. > self.action_len:
       output = np.zeros(self.dof)
     return [output]
 

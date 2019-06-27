@@ -104,7 +104,7 @@ class DMPSin(object):
   def __init__(self, name='dmp', **kwargs):
     self.name = name
     self.amplitude = np.random.randn()
-    self.period = np.random.uniform(0, 5)
+    self.period = np.random.uniform(10, 50)
 
   def __call__(self, t):
     x = self.amplitude * np.sin(2*np.pi*t/self.period)
@@ -120,12 +120,7 @@ class DMPSin(object):
 
   @period.setter
   def period(self, x):
-    if x > 5:
-      self.__period = 5
-    elif x < .5:
-      self.__period = .5
-    else:
-      self.__period = x
+    self.__period = x
 
   @property
   def amplitude(self):
