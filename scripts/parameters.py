@@ -9,11 +9,11 @@ class Params(object):
   def __init__(self):
     self.info = 'Baseline with novelty search and billiard'
 
-    self.exp_name = 'Ant_High_Features'
+    self.exp_name = 'Collectdata_Ant_AE_Novelty'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = False
+    self.parallel = True
     self.baseline = False
 
     # Environment
@@ -24,7 +24,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 500
+    self.generations = 301
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9
@@ -40,13 +40,13 @@ class Params(object):
     # ---------------------------------------------------------
     self.gpu = True
     self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
-    self.feature_size = 20
+    self.feature_size = 10
     self.learning_rate = 0.001 # 0.0001 for RND
     self.lr_scale_fact = 0.5
     self.per_agent_update = False
     self.update_metric = True
     self.train_on_archive = True
-    self.update_interval = 50
+    self.update_interval = 30
     # ---------------------------------------------------------
 
     # Optimizer

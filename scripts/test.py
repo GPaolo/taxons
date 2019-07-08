@@ -134,7 +134,7 @@ if __name__ == "__main__":
   for target in x_image:
     # Get new target BS point
     goal = torch.Tensor(x[target]).permute(2, 0, 1).unsqueeze(0).to(device)
-    surprise, bs_point, reconstr = selector(goal/torch.max(torch.Tensor(np.array([torch.max(goal), 1]))))
+    surprise, bs_point, reconstr = selector(goal/torch.max(torch.Tensor(np.array([torch.max(goal).cpu().data, 1]))))
     bs_point = bs_point.flatten().cpu().data.numpy()
     print('Target point surprise {}'.format(surprise.cpu().data))
     print('Target bs point {}'.format(bs_point))
