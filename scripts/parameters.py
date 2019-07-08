@@ -7,18 +7,19 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Baseline with novelty search and billiard'
+    self.info = 'Baseline with search in policy space'
 
-    self.exp_name = 'Ant_High_Features'
+    self.exp_name = 'Baseline_Policy_Space'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = False
-    self.baseline = False
+    self.parallel = True
+    self.baseline_ns = False
+    self.baseline_ps = True
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'Ant-v2' # Billiard-v0 Ant-v2 MountainCarContinuous-v0
+    self.env_tag = 'Billiard-v0' # Billiard-v0 Ant-v2 MountainCarContinuous-v0
     self.max_episode_len = 300
     # ---------------------------------------------------------
 
@@ -38,7 +39,7 @@ class Params(object):
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = True
+    self.gpu = False
     self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
     self.feature_size = 20
     self.learning_rate = 0.001 # 0.0001 for RND
