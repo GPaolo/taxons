@@ -2,7 +2,7 @@
 # Date: 15/02/19
 
 from core import rnd_qd
-from baselines import novelty_search
+from baselines import novelty_search, policy_space
 import gym, torch
 import gym_billiard
 import numpy as np
@@ -31,8 +31,10 @@ def main(seed, params):
   if not os.path.exists(params.save_path):
     os.mkdir(params.save_path)
 
-  if params.baseline:
+  if params.baseline_ns:
     evolver = novelty_search.NoveltySearch(env=env, parameters=params)
+  elif params.baseline_ps:
+    evolver = policy_space.PolicySpace(env=env, parameters=params)
   else:
     evolver = rnd_qd.RndQD(env=env, parameters=params)
 
@@ -72,7 +74,7 @@ def main(seed, params):
              limit=limit)
 
 if __name__ == "__main__":
-  parallel_threads = 4
+  parallel_threads = 6
   seeds = [11, 59, 3, 6, 4, 18, 13, 1, 22, 34, 99, 43, 100, 15, 66, 10, 7, 9, 42, 2]
   # seeds = [2]
 

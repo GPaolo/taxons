@@ -163,8 +163,11 @@ class BilliardEnv(gym.Env):
           fixture.shape.draw(body, self.screen, self.params, color)
         elif mode=='rgb_array':
           obj_name = body.userData['name']
-          if not obj_name in ['link0', 'link1']:
+          if self.params.SHOW_ARM_IN_ARRAY:
             fixture.shape.draw(body, capture, self.params, color)
+          else:
+            if not obj_name in ['link0', 'link1']:
+              fixture.shape.draw(body, capture, self.params, color)
 
     if mode=='human':
       pygame.display.flip()
