@@ -2,39 +2,26 @@
 # Date: 08/07/2019
 
 import numpy as np
-from core.qd import population, agents
+from core.qd import population
 from core.utils import utils
-import os, gc, json
+from baselines.baseline import BaseBaseline
+import gc
 
 
-class RandomSearch(object):
-
+class RandomSearch(BaseBaseline):
+  """Generates a lot of random agents and tests them"""
   # ---------------------------------------------------
   def __init__(self, env, parameters):
-    self.params = parameters
+    super(BaseBaseline, self).__init__(env, parameters)
+
     self.pop_size = self.params.generations*5
     self.params.pop_size = self.pop_size
-    self.env = env
-    self.save_path = self.params.save_path
-    self.agents_shapes = self.params.agent_shapes
-    self.agent_name = self.params.qd_agent
-
-    self.logs = {'Generation': [], 'Avg gen surprise': [], 'Max reward': [], 'Archive size': [], 'Coverage': []}
-
-    if self.agent_name == 'Neural':
-      agent_type = agents.FFNeuralAgent
-    elif self.agent_name == 'DMP':
-      agent_type = agents.DMPAgent
-
-    self.population = population.Population(agent=agent_type,
+    self.population = population.Population(agent=self.agent_type,
                                             shapes=self.agents_shapes,
                                             pop_size=self.pop_size)
     self.archive = None
     self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate,
                                      metric_update_interval=self.params.update_interval)
-
-    self.END = False
-    self.elapsed_gen = 0
   # ---------------------------------------------------
 
   # ---------------------------------------------------
@@ -96,24 +83,4 @@ class RandomSearch(object):
     self.logs['Archive size'] = [str(self.population.size)] * self.params.generations
     self.logs['Coverage'] = [str(coverage)] * self.params.generations
     gc.collect()
-  # ---------------------------------------------------
-
-  # ---------------------------------------------------
-  def save(self, ckpt=False):
-    if ckpt:
-      folder = 'models/ckpt'
-    else:
-      folder = 'models'
-    save_subf = os.path.join(self.save_path, folder)
-    print('Seed {} - Saving...'.format(self.params.seed))
-    if not os.path.exists(save_subf):
-      try:
-        os.makedirs(os.path.abspath(save_subf))
-      except:
-        print('Seed {} - Cannot create save folder.'.format(self.params.seeds))
-    self.population.save_pop(save_subf, 'pop')
-
-    with open(os.path.join(self.save_path, 'logs.json'), 'w') as f:
-      json.dump(self.logs, f, indent=4)
-    print('Seed {} - Done'.format(self.params.seed))
   # ---------------------------------------------------
