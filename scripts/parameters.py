@@ -9,23 +9,23 @@ class Params(object):
   def __init__(self):
     self.info = 'Baseline with search in policy space'
 
-    self.exp_name = 'Baseline_Policy_Space'
+    self.exp_name = 'Collectdata_Ant_AE_Surprise'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
     self.baseline_ns = False
-    self.baseline_ps = True
+    self.baseline_ps = False
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'Billiard-v0' # Billiard-v0 Ant-v2 MountainCarContinuous-v0
+    self.env_tag = 'Ant-v2' # Billiard-v0 Ant-v2 MountainCarContinuous-v0
     self.max_episode_len = 300
     # ---------------------------------------------------------
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 301
+    self.generations = 500
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9
@@ -39,7 +39,7 @@ class Params(object):
 
     # Metric
     # ---------------------------------------------------------
-    self.gpu = False
+    self.gpu = True
     self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
     self.feature_size = 10
     self.learning_rate = 0.001 # 0.0001 for RND
@@ -52,7 +52,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto', 'Novelty'
+    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto', 'Novelty'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------
