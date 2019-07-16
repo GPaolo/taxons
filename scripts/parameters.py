@@ -9,13 +9,14 @@ class Params(object):
   def __init__(self):
     self.info = 'Baseline with search in policy space'
 
-    self.exp_name = 'Baseline_Policy_Space'
+    self.exp_name = 'Baseline_Random_Space'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
     self.baseline_ns = False
-    self.baseline_ps = True
+    self.baseline_ps = False
+    self.baseline_rs = True
 
     # Environment
     # ---------------------------------------------------------
@@ -34,14 +35,14 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'sin'} # poly, exp, sin
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'} # poly, exp, sin
     # ---------------------------------------------------------
 
     # Metric
     # ---------------------------------------------------------
     self.gpu = False
     self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
-    self.feature_size = 20
+    self.feature_size = 10
     self.learning_rate = 0.001 # 0.0001 for RND
     self.lr_scale_fact = 0.5
     self.per_agent_update = False

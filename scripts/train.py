@@ -2,7 +2,7 @@
 # Date: 15/02/19
 
 from core import rnd_qd
-from baselines import novelty_search, policy_space
+from baselines import novelty_search, policy_space, random_search
 import gym, torch
 import gym_billiard
 import numpy as np
@@ -35,6 +35,8 @@ def main(seed, params):
     evolver = novelty_search.NoveltySearch(env=env, parameters=params)
   elif params.baseline_ps:
     evolver = policy_space.PolicySpace(env=env, parameters=params)
+  elif params.baseline_rs:
+    evolver = random_search.RandomSearch(env=env, parameters=params)
   else:
     evolver = rnd_qd.RndQD(env=env, parameters=params)
 
