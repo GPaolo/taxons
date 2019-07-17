@@ -12,7 +12,7 @@ class RandomSearch(BaseBaseline):
   """Generates a lot of random agents and tests them"""
   # ---------------------------------------------------
   def __init__(self, env, parameters):
-    super(BaseBaseline, self).__init__(env, parameters)
+    super().__init__(env, parameters)
 
     self.pop_size = self.params.generations*5
     self.params.pop_size = self.pop_size

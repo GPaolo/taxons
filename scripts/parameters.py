@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Baseline with search in policy space'
+    self.info = 'Billiard environmentwith with 2500 random agent and one single generation'
 
-    self.exp_name = 'Baseline_Random_Space'
+    self.exp_name = 'Billiard_RS'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -48,7 +48,7 @@ class Params(object):
     self.per_agent_update = False
     self.update_metric = True
     self.train_on_archive = True
-    self.update_interval = 50
+    self.update_interval = 30
     # ---------------------------------------------------------
 
     # Optimizer

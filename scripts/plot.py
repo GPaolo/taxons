@@ -76,9 +76,10 @@ if __name__ == '__main__':
   plotter = GenPlot()
 
   c_nt, s_nt, a_nt, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_NoTrain')
-  c_ps, s_ps, a_ps, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Baseline_Policy_Space')
   c_aen, s_aen, a_aen, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Novelty')
   c_aes, s_aes, a_aes, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Surprise')
+  c_ps, s_ps, a_ps, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_PS')
+  c_rs, s_rs, a_rs, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_RS')
   c_ns, s_ns, a_ns, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_NS')
   # plotter.plot_data(g, [c_nt, c_ps, c_aen, c_aes, c_ns],
   #                   labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
@@ -94,17 +95,17 @@ if __name__ == '__main__':
   #                   title='Archive Size', y_axis='Number of agents')
 
   fig, axes = plt.subplots(nrows=1, ncols=3)
-  plotter.plot_data_single_fig(g, [c_nt, c_ps, c_aen, c_aes, c_ns],
-                    labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
-                    colors=['red', 'blue', 'yellow', 'green', 'violet'],
+  plotter.plot_data_single_fig(g, [c_nt, c_ps, c_aen, c_aes, c_ns, c_rs],
+                    labels=['NT', 'PS', 'AEN', 'AES', 'NS', 'RS'],
+                    colors=['red', 'blue', 'yellow', 'green', 'violet', 'grey'],
                     title='Coverage', y_axis='Coverage %', axes=axes[0])
-  plotter.plot_data_single_fig(g, [s_nt, s_ps, s_aen, s_aes, s_ns],
-                    labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
-                    colors=['red', 'blue', 'yellow', 'green', 'violet'],
+  plotter.plot_data_single_fig(g, [s_nt, s_ps, s_aen, s_aes, s_ns, s_rs],
+                    labels=['NT', 'PS', 'AEN', 'AES', 'NS', 'RS'],
+                    colors=['red', 'blue', 'yellow', 'green', 'violet', 'gray'],
                     title='Surprise', y_axis='Reconstruction error', axes=axes[1])
-  plotter.plot_data_single_fig(g, [a_nt, a_ps, a_aen, a_aes, a_ns],
-                    labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
-                    colors=['red', 'blue', 'yellow', 'green', 'violet'],
+  plotter.plot_data_single_fig(g, [a_nt, a_ps, a_aen, a_aes, a_ns, a_rs],
+                    labels=['NT', 'PS', 'AEN', 'AES', 'NS', 'RS'],
+                    colors=['red', 'blue', 'yellow', 'green', 'violet', 'gray'],
                     title='Archive Size', y_axis='Number of agents', axes=axes[2])
   handles, labels = axes[0].get_legend_handles_labels()
   fig.legend(handles, labels, loc='upper left')

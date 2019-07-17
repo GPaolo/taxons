@@ -127,7 +127,7 @@ class ParetoOptimizer(BaseOptimizer):
 
   def update_archive_surprise(self):
     novel = self.pop['surprise'].sort_values(ascending=False)
-    best = novel[novel >= self.min_surprise].index.values # Get the ones with high enough surprise
+    best = novel.iloc[:5].index.values # Get the ones with high enough surprise
     worst = novel.iloc[-len(best):].index.values  # Get worst ones
     if self.archive is not None:
       for idx in best:
