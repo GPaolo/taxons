@@ -182,9 +182,7 @@ class ParetoOptimizer(BaseOptimizer):
         self.update_archive_novelty()
       else:
         print('Using Surprise update')
-        self.min_surprise = np.max(self.archive['surprise'])
         self.update_archive_surprise()
-    print("Min surprise {}".format(self.min_surprise))
     print("Max surprise {}".format(np.max(self.pop['surprise'])))
     print('Added to archive: {}'.format(len(self.archive)-archive_len))
 
