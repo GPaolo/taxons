@@ -14,8 +14,7 @@ class Params(object):
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
-    self.baseline_ns = False
-    self.baseline_ps = False
+    self.baseline = 'RBD' # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------

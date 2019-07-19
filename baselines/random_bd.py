@@ -1,15 +1,21 @@
 # Created by Giuseppe Paolo 
-# Date: 30/06/2019
+# Date: 17/07/2019
 
 import numpy as np
 from core.utils import utils
 from baselines.baseline import BaseBaseline
 import gc
 
-class PolicySpace(BaseBaseline):
+class RandomBD(BaseBaseline):
   """
-  Performs NS in the policy parameters space
+  Performs standard NS with handcrafted fetures
   """
+  # ---------------------------------------------------
+  def __init__(self, env, parameters):
+    super().__init__(env, parameters)
+    np.random.seed(self.params.seed)
+
+  # ---------------------------------------------------
   # ---------------------------------------------------
   def evaluate_agent(self, agent):
     """
@@ -36,22 +42,11 @@ class PolicySpace(BaseBaseline):
           done = True
 
     if 'Ant' in self.params.env_tag:
-      agent['bs'] = np.array([self.env.env.data.qpos[:2]])  # xy position of CoM of the robot
+      agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
-
-    # Extract genome as a feature
-    feat = []
-    for k in agent['agent'].genome:
-      if isinstance(k, dict):
-        for i in k:
-          if i is not 'name':
-            feat.append(k[i])
-      else:
-        feat.append(k)
-
-    agent['features'] = [np.array(feat), None] #TODO check this!!!
+    agent['features'] = [np.random.random(self.params.feature_size), None]
     return cumulated_reward
   # ---------------------------------------------------
 
@@ -95,3 +90,17 @@ class PolicySpace(BaseBaseline):
         break
     gc.collect()
   # ---------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

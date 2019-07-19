@@ -2,7 +2,7 @@
 # Date: 15/02/19
 
 from core import rnd_qd
-from baselines import novelty_search, policy_space
+from baselines import novelty_search, policy_space, random_search, random_bd
 import gym, torch
 import gym_billiard
 import numpy as np
@@ -31,10 +31,14 @@ def main(seed, params):
   if not os.path.exists(params.save_path):
     os.mkdir(params.save_path)
 
-  if params.baseline_ns:
+  if params.baseline == 'NS':
     evolver = novelty_search.NoveltySearch(env=env, parameters=params)
-  elif params.baseline_ps:
+  elif params.baseline == 'PS':
     evolver = policy_space.PolicySpace(env=env, parameters=params)
+  elif params.baseline == 'RS':
+    evolver = random_search.RandomSearch(env=env, parameters=params)
+  elif params.baseline == 'RBD':
+    evolver = random_bd.RandomBD(env=env, parameters=params)
   else:
     evolver = rnd_qd.RndQD(env=env, parameters=params)
 
