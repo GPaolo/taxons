@@ -1,13 +1,21 @@
+# Created by Giuseppe Paolo 
+# Date: 17/07/2019
+
 import numpy as np
 from core.utils import utils
 from baselines.baseline import BaseBaseline
 import gc
 
-class NoveltySearch(BaseBaseline):
+class RandomBD(BaseBaseline):
   """
   Performs standard NS with handcrafted fetures
   """
+  # ---------------------------------------------------
+  def __init__(self, env, parameters):
+    super().__init__(env, parameters)
+    np.random.seed(self.params.seed)
 
+  # ---------------------------------------------------
   # ---------------------------------------------------
   def evaluate_agent(self, agent):
     """
@@ -38,7 +46,7 @@ class NoveltySearch(BaseBaseline):
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
-    agent['features'] = [agent['bs'][0], None]
+    agent['features'] = [np.random.random(self.params.feature_size), None]
     return cumulated_reward
   # ---------------------------------------------------
 

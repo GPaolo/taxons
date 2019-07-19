@@ -7,16 +7,14 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Billiard environmentwith with 2500 random agent and one single generation'
+    self.info = 'Billiard environmentwith with random baheaviour descriptor and NS'
 
-    self.exp_name = 'Billiard_RS'
+    self.exp_name = 'Billiard_RBD'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
-    self.baseline_ns = False
-    self.baseline_ps = False
-    self.baseline_rs = True
+    self.baseline = 'RBD' # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------
