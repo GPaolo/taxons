@@ -42,9 +42,10 @@ class GenPlot(object):
     gens = np.array(gens)
     return coverage, gen_surprise, archive_size, gens
 
-  def plot_data(self, gens, data, title, labels, colors, y_axis):
+  def plot_data(self, gens, data, title, labels, cmap, y_axis):
     # Create plots
     fig, axes = plt.subplots(nrows=1, ncols=1)
+    colors = [cmap(k) for k in range(len(data))]
 
     for exp, c, l in zip(data, colors, labels):
       std = np.std(exp, 0)
@@ -52,6 +53,7 @@ class GenPlot(object):
       max = np.max(exp, 0)
       min = np.min(exp, 0)
 
+      axes.grid(True)
       axes.plot(gens, mean, color=c, label=l)
       axes.fill_between(gens, max, min, facecolor=c, alpha=0.3)
 
@@ -60,8 +62,10 @@ class GenPlot(object):
     axes.set_xlabel('Generations')
     axes.set_ylabel(y_axis)
     plt.show()
+    return fig
 
-  def plot_data_single_fig(self, gens, data, title, labels, colors, y_axis, axes, use_std=False):
+  def plot_data_single_fig(self, gens, data, title, labels, cmap, y_axis, axes, use_std=False):
+    colors = [cmap(k) for k in range(len(data))]
     for exp, c, l in zip(data, colors, labels):
       std = np.std(exp, 0)
       mean = np.mean(exp, 0)
@@ -72,6 +76,7 @@ class GenPlot(object):
         max = mean + std
         min = mean - std
 
+      axes.grid(True)
       axes.plot(gens, mean, color=c, label=l)
       axes.fill_between(gens, max, min, facecolor=c, alpha=0.3)
 
@@ -83,12 +88,15 @@ class GenPlot(object):
 if __name__ == '__main__':
   plotter = GenPlot()
 
+  c_mix, s_mix, a_mix, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_Mixed')
   c_nt, s_nt, a_nt, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_NoTrain')
-  #c_ps, s_ps, a_ps, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Baseline_Policy_Space')
   c_aen, s_aen, a_aen, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_Novelty')
   c_aes, s_aes, a_aes, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_Surprise')
   c_ns, s_ns, a_ns, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_NS')
-  #c_mix, s_mix, a_mix, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_Mixed')
+  c_ps, s_ps, a_ps, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_PS')
+  c_rbd, s_rbd, a_rbd, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_RBD')
+  c_rs, s_rs, a_rs, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_RS')
+
   # plotter.plot_data(g, [c_nt, c_ps, c_aen, c_aes, c_ns],
   #                   labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
   #                   colors=['red', 'blue', 'yellow', 'green', 'violet'],
@@ -103,25 +111,28 @@ if __name__ == '__main__':
   #                   title='Archive Size', y_axis='Number of agents')
 
   use_std = True
-  colors = ['red', 'blue', 'yellow', 'green', 'violet']
 
-  fig, axes = plt.subplots(nrows=1, ncols=3)
+  colors = plt.get_cmap('Set1')
+  plt.rc('grid', linestyle="dotted", color='gray')
+  labels = ['MIX', 'NT', 'AEN', 'AES', 'NS', 'PS', 'RBD', 'RS']
 
-  plotter.plot_data_single_fig(g, [c_nt, c_aen, c_ns, c_aes],
-                    labels=['NT', 'AEN', 'NS', 'AES'],
-                    colors=colors[:4],
+  fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(60, 10))
+
+  plotter.plot_data_single_fig(g, [c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs],
+                    labels=labels,
+                    cmap=colors,
                     title='Coverage', y_axis='Coverage %', axes=axes[0],
                     use_std=use_std)
 
-  plotter.plot_data_single_fig(g, [s_nt, s_aen, s_ns, s_aes],
-                   labels=['NT', 'AEN', 'NS', 'AES'],
-                   colors=colors[:4],
-                   title='Surprise', y_axis='Reconstruction error', axes=axes[1],
+  plotter.plot_data_single_fig(g, [s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs],
+                   labels=labels,
+                   cmap=colors,
+                   title='Rec. Error', y_axis='Reconstruction error', axes=axes[1],
                    use_std = use_std)
 
-  plotter.plot_data_single_fig(g, [a_nt, a_aen, a_ns, a_aes],
-                    labels=['NT', 'AEN', 'NS', 'AES'],
-                    colors=colors[:4],
+  plotter.plot_data_single_fig(g, [a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs],
+                    labels=labels,
+                    cmap=colors,
                     title='Archive Size', y_axis='Number of agents', axes=axes[2],
                     use_std=use_std)
 
@@ -129,3 +140,7 @@ if __name__ == '__main__':
   fig.legend(handles, labels, loc='upper left')
   plt.subplots_adjust(left=0.1, right=.99, top=0.9, bottom=0.1, wspace=0.4)
   plt.show()
+
+  fig.savefig('/home/giuseppe/src/rnd_qd/experiments/ant_plots.pdf')
+
+  # plt.figure(figsize=(5, 10))

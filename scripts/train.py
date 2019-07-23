@@ -78,7 +78,7 @@ def main(seed, params):
              limit=limit)
 
 if __name__ == "__main__":
-  parallel_threads = 2
+  parallel_threads = 4
   seeds = [11, 59, 3, 6, 4, 18, 13, 1,
            22, 34, 99, 43, 100, 15, 66, 10,
           7, 9, 42, 2]

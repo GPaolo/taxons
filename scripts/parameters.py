@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Ant with AE mixed. Both novelty and Surprise are used chosen randomly. surprise takes the 5 best'
+    self.info = 'Ant with randomly assigned array as behaviour descriptor'
 
-    self.exp_name = 'Collectdata_Ant_AE_Mixed'
+    self.exp_name = 'Collectdata_Ant_RBD'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -51,7 +51,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto', 'Novelty'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto', 'Novelty'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------
