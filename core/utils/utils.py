@@ -176,7 +176,7 @@ def action_formatting(env_tag, action):
     return action[0]
 
 
-def obs_formatting(env_tag, obs):
+def obs_formatting(env_tag, obs, reward=None, done=None, info=None):
   """
     This function helps reformat the observations according to the environment
     :param env_tag: Environment name
@@ -191,6 +191,8 @@ def obs_formatting(env_tag, obs):
     return np.array([np.concatenate(obs)])
   elif env_tag == 'Ant-v2':
     return np.array([obs[13:27]])
+  elif env_tag == 'FastsimSimpleNavigation-v0':
+    return np.array([info['robot_pos'][:2]])
   else:
     return obs
 

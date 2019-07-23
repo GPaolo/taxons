@@ -32,7 +32,7 @@ class RandomBD(BaseBaseline):
       agent_input = t
       action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
       obs, reward, done, info = self.env.step(action)
-      obs = utils.obs_formatting(self.params.env_tag, obs)
+      obs = utils.obs_formatting(self.params.env_tag, obs, reward, done, info)
       t += 1
       cumulated_reward += reward
 

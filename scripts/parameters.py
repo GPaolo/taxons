@@ -13,12 +13,12 @@ class Params(object):
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = True
+    self.parallel = False
     self.baseline = 'RBD' # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'Ant-v2' # Billiard-v0 Ant-v2 MountainCarContinuous-v0
+    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 Ant-v2 FastsimSimpleNavigation-v0
     self.max_episode_len = 300
     # ---------------------------------------------------------
 

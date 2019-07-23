@@ -103,7 +103,7 @@ if __name__ == "__main__":
         action = utils.action_formatting(params.env_tag, agent['agent'](agent_input))
 
         obs, reward, done, info = env.step(action)
-        obs = utils.obs_formatting(params.env_tag, obs)
+        obs = utils.obs_formatting(params.env_tag, obs, reward, done, info)
         t += 1
         if "Ant" in params.env_tag:
           CoM = np.array([env.env.data.qpos[:2]])
@@ -172,7 +172,7 @@ if __name__ == "__main__":
       agent_input = ts
       action = utils.action_formatting(params.env_tag, selected.iloc[0]['agent'](agent_input))
       obs, reward, done, info = env.step(action)
-      obs = utils.obs_formatting(params.env_tag, obs)
+      obs = utils.obs_formatting(params.env_tag, obs, reward, done, info)
       ts += 1
       CoM = np.array([env.env.data.qpos[:2]])
       if np.any(np.abs(CoM) >= np.array([3, 3])):
