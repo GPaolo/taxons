@@ -4,7 +4,7 @@
 from core import rnd_qd
 from baselines import novelty_search, policy_space, random_search, random_bd
 import gym, torch
-import gym_billiard
+import gym_billiard, gym_fastsim
 import numpy as np
 from core.utils import utils
 import os
@@ -69,16 +69,23 @@ def main(seed, params):
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
   if 'Ant' in params.env_tag:
-    limit = 5
+    u_limit = 3.5
+    l_limit = -u_limit
+  elif 'FastsimSimpleNavigation' in params.env_tag:
+    u_limit = 600
+    l_limit = 0
   else:
-    limit = 1.35
+    u_limit = 1.35
+    l_limit = -u_limit
+
   utils.show(bs_points, filepath=params.save_path,
              name='final_{}_{}'.format(evolver.elapsed_gen, params.env_tag),
              info={'seed':seed},
-             limit=limit)
+             upper_limit=u_limit, lower_limit=l_limit)
+
 
 if __name__ == "__main__":
-  parallel_threads = 4
+  parallel_threads = 2
   seeds = [11, 59, 3, 6, 4, 18, 13, 1,
            22, 34, 99, 43, 100, 15, 66, 10,
           7, 9, 42, 2]
@@ -96,7 +103,6 @@ if __name__ == "__main__":
     if params[0].parallel:
       nodes = min(len(seeds), pathos.threading.cpu_count()-1)
       print('Creating {} threads...'.format(nodes))
-      # pool = ProcessPool(nodes=nodes)
       with ProcessPool(nodes=nodes) as pool:
         start_time = time.monotonic()
         try:
@@ -105,8 +111,6 @@ if __name__ == "__main__":
           break
         end_time = time.monotonic()
       total_train_time += (end_time - start_time)
-      # pool.terminate()
-      # pool.join()
     else:
       end = False
       for seed, par in zip(seeds, params):
@@ -119,30 +123,5 @@ if __name__ == "__main__":
         total_train_time += (end_time - start_time)
         if end: break
     gc.collect()
-  # for res in results:
-  #   utils.show(res[0], res[1], res[2])
 
   print('\nTotal training time: \n{}\n'.format(timedelta(seconds=total_train_time)))
-
-  # print('Testing result according to best reward.')
-  # rewards = pop['reward'].sort_values(ascending=False)
-  # for idx in range(pop.size):
-  #   tested = pop[rewards.iloc[idx:idx + 1].index.values[0]]
-  #   print()
-  #   print('Testing agent {} with reward {}'.format(tested['name'], tested['reward']))
-  #   done = False
-  #   ts = 0
-  #   obs = utils.obs_formatting(params.env_tag, evolver.env.reset())
-  #   while not done:
-  #     evolver.env.render()
-  #
-  #     if params.qd_agent == 'Neural':
-  #       agent_input = obs
-  #     elif params.qd_agent == 'DMP':
-  #       agent_input = ts
-  #
-  #     action = utils.action_formatting(params.env_tag, tested['agent'](agent_input))
-  #     obs, reward, done, info = evolver.env.step(action)
-  #     obs = utils.obs_formatting(params.env_tag, obs)
-  #     ts += 1
-

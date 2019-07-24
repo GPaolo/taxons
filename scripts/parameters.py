@@ -9,17 +9,17 @@ class Params(object):
   def __init__(self):
     self.info = 'Ant with randomly assigned array as behaviour descriptor'
 
-    self.exp_name = 'Collectdata_Ant_RBD'
+    self.exp_name = 'Test_maze_NS'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = False
-    self.baseline = 'RBD' # None, 'NS', 'PS', 'RS', 'RBD'
+    self.parallel = True
+    self.baseline = 'NS' # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------
     self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 Ant-v2 FastsimSimpleNavigation-v0
-    self.max_episode_len = 300
+    self.max_episode_len = 1000
     # ---------------------------------------------------------
 
     # QD
@@ -33,7 +33,7 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'sin'} # poly, exp, sin
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 6, 'type': 'poly'} # poly, exp, sin
     # ---------------------------------------------------------
 
     # Metric
@@ -111,6 +111,8 @@ class Params(object):
     elif 'Billiard' in self.env_tag:
       return 2
     elif 'MountainCar' in self.env_tag:
+      return 2
+    elif 'FastsimSimpleNavigation' in self.env_tag:
       return 2
   # ---------------------------------------------------------
 # ---------------------------------------------------------

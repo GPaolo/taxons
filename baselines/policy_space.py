@@ -30,9 +30,12 @@ class PolicySpace(BaseBaseline):
       t += 1
       cumulated_reward += reward
 
+      if  t >= self.params.max_episode_len:
+        done = True
+
       if 'Ant' in self.params.env_tag:
         CoM = np.array([self.env.env.data.qpos[:2]])
-        if t >= self.params.max_episode_len or np.any(np.abs(CoM) >= np.array([4, 4])):
+        if np.any(np.abs(CoM) >= np.array([4, 4])):
           done = True
 
     if 'Ant' in self.params.env_tag:
@@ -80,10 +83,18 @@ class PolicySpace(BaseBaseline):
       else:
         bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
       if 'Ant' in self.params.env_tag:
-        limit = 5
+        u_limit = 3.5
+        l_limit = -u_limit
+      elif 'FastsimSimpleNavigation' in self.params.env_tag:
+        u_limit = 600
+        l_limit = 0
       else:
-        limit = 1.35
-      coverage = utils.show(bs_points, filepath=self.save_path, info={'gen':self.elapsed_gen, 'seed':self.params.seed}, limit=limit)
+        u_limit = 1.35
+        l_limit = -u_limit
+
+      coverage = utils.show(bs_points, filepath=self.save_path,
+                            info={'gen':self.elapsed_gen, 'seed':self.params.seed},
+                            upper_limit=u_limit, lower_limit=l_limit)
 
       self.logs['Generation'].append(str(self.elapsed_gen))
       self.logs['Avg gen surprise'].append('0')

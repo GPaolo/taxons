@@ -192,27 +192,29 @@ def obs_formatting(env_tag, obs, reward=None, done=None, info=None):
   elif env_tag == 'Ant-v2':
     return np.array([obs[13:27]])
   elif env_tag == 'FastsimSimpleNavigation-v0':
+    if info is None:
+      return None
     return np.array([info['robot_pos'][:2]])
   else:
     return obs
 
 
-def show(bs_points, filepath, name=None, info=None, limit=1.35):
+def show(bs_points, filepath, name=None, info=None, upper_limit=1.35, lower_limit=-1.35):
   print('Seed {} - Behaviour space coverage representation.'.format(info['seed']))
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.rcParams["patch.force_edgecolor"] = True
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
   axes[0].set_title('Final position')
   axes[0].scatter(pts[0], pts[1])
-  axes[0].set_xlim(-limit, limit)
-  axes[0].set_ylim(-limit, limit)
+  axes[0].set_xlim(lower_limit, upper_limit)
+  axes[0].set_ylim(lower_limit, upper_limit)
 
   axes[1].set_title('Histogram')
-  H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50), range=np.array([[-limit, limit], [-limit, limit]]))
+  H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50), range=np.array([[lower_limit, upper_limit], [lower_limit, upper_limit]]))
   extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
   cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
-  axes[1].set_xlim(-limit, limit)
-  axes[1].set_ylim(-limit, limit)
+  axes[1].set_xlim(lower_limit, upper_limit)
+  axes[1].set_ylim(lower_limit, upper_limit)
   plt.colorbar(cax, ax=axes[1])
 
   coverage = np.count_nonzero(H)/(50*50)*100
