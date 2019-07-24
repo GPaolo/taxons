@@ -28,7 +28,7 @@ class NoveltySearch(BaseBaseline):
       t += 1
       cumulated_reward += reward
 
-      if  t >= self.params.max_episode_len:
+      if t >= self.params.max_episode_len:
         done = True
 
       if 'Ant' in self.params.env_tag:

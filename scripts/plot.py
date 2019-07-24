@@ -88,14 +88,14 @@ class GenPlot(object):
 if __name__ == '__main__':
   plotter = GenPlot()
 
-  c_mix, s_mix, a_mix, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_Mixed')
-  c_nt, s_nt, a_nt, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_NoTrain')
-  c_aen, s_aen, a_aen, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_Novelty')
-  c_aes, s_aes, a_aes, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_AE_Surprise')
-  c_ns, s_ns, a_ns, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_NS')
-  c_ps, s_ps, a_ps, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_PS')
-  c_rbd, s_rbd, a_rbd, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_RBD')
-  c_rs, s_rs, a_rs, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Collectdata_Ant_RS')
+  c_mix, s_mix, a_mix, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed')
+  c_nt, s_nt, a_nt, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_NoTrain')
+  c_aen, s_aen, a_aen, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Novelty')
+  c_aes, s_aes, a_aes, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Surprise')
+  c_ns, s_ns, a_ns, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_NS')
+  c_ps, s_ps, a_ps, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_PS')
+  c_rbd, s_rbd, a_rbd, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD')
+  c_rs, s_rs, a_rs, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_RS')
 
   # plotter.plot_data(g, [c_nt, c_ps, c_aen, c_aes, c_ns],
   #                   labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
@@ -141,6 +141,6 @@ if __name__ == '__main__':
   plt.subplots_adjust(left=0.1, right=.99, top=0.9, bottom=0.1, wspace=0.4)
   plt.show()
 
-  fig.savefig('/home/giuseppe/src/rnd_qd/experiments/ant_plots.pdf')
+  fig.savefig('/home/giuseppe/src/rnd_qd/experiments/billiard_plots.pdf')
 
   # plt.figure(figsize=(5, 10))
