@@ -159,8 +159,8 @@ class Eval(object):
     for target_idx in range(len(self.target_images)):
       print('Testing target {}'.format(target_idx))
 
-      # Get BS point # TODO this one changes according to the metric (AE or NS) implement the others too
-      bs_point = self._get_bs_from_image(self.target_images[target_idx])
+      # Get BS point # TODO this one changes according to the metric (AE or NS or RBD, the others do not make sense to try) implement the others too
+      bs_point = self._get_target_bs_point(self.target_images[target_idx], self.target_poses[target_idx])
 
       selected = self._get_closest_agent(bs_point)
       state, f_pose = self._test_agent(selected)
@@ -179,14 +179,17 @@ class Eval(object):
   # -----------------------------------------------
 
   # -----------------------------------------------
-  def _get_bs_from_image(self, image):
-    goal = torch.Tensor(image).permute(2, 0, 1).unsqueeze(0).to(self.device)
-    goal = goal / torch.max(torch.Tensor(np.array([torch.max(goal).cpu().data, 1])))  # Normalize in [0,1]
-    surprise, bs_point, reconstr = self.selector(goal)
-    bs_point = bs_point.flatten().cpu().data.numpy()
-    # print('Target {} surprise {}'.format(target_idx, surprise.cpu().data))
-    # print('Target bs point {}'.format(bs_point))
-    # print('')
+  def _get_target_bs_point(self, image=None, pose=None):
+    if 'AE' in self.folder:
+      goal = torch.Tensor(image).permute(2, 0, 1).unsqueeze(0).to(self.device)
+      goal = goal / torch.max(torch.Tensor(np.array([torch.max(goal).cpu().data, 1])))  # Normalize in [0,1]
+      surprise, bs_point, reconstr = self.selector(goal)
+      bs_point = bs_point.flatten().cpu().data.numpy()
+    elif 'NS' in self.folder:
+      bs_point = pose
+    elif 'RBD' in self.folder:
+      bs_point = np.random.random(self.params.feature_size)
+
     return bs_point
   # -----------------------------------------------
 
@@ -251,7 +254,8 @@ class Eval(object):
       load_path = os.path.join(self.folder, seed)
 
       self.load_params(load_path)
-      self.load_metric(load_path)
+      if 'AE' in self.folder:
+        self.load_metric(load_path)
       self.load_archive(load_path)
 
       if self.pop[0]['features'] is None or self.reeval_bs:
@@ -269,7 +273,7 @@ class Eval(object):
 
 
 if __name__ == "__main__":
-  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed')
+  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD')
 
   errors = evaluator.run_test()
 
