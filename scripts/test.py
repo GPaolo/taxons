@@ -10,6 +10,11 @@ from core.metrics import ae, rnd
 from core.qd import population, agents
 from core.utils import utils
 import os
+import matplotlib.pyplot as plt
+from matplotlib import cm
+import pickle as pkl
+
+
 
 class Eval(object):
 
@@ -157,9 +162,9 @@ class Eval(object):
     final_state = []
 
     for target_idx in range(len(self.target_images)):
-      print('Testing target {}'.format(target_idx))
+      # print('Testing target {}'.format(target_idx))
 
-      # Get BS point # TODO this one changes according to the metric (AE or NS or RBD, the others do not make sense to try) implement the others too
+      # Get BS point
       bs_point = self._get_target_bs_point(self.target_images[target_idx], self.target_poses[target_idx])
 
       selected = self._get_closest_agent(bs_point)
@@ -169,12 +174,12 @@ class Eval(object):
       final_state.append(state)
 
       final_distance = np.sqrt(np.sum((self.target_poses[target_idx] - f_pose) ** 2))
-      print('Positional error: {}'.format(final_distance))
+      # print('Positional error: {}'.format(final_distance))
 
     final_state = np.stack(final_state)
     final_pose = np.stack(final_pose)
     final_pose_error = np.sqrt(np.sum((self.target_poses - final_pose) ** 2, axis=1))
-
+    print('Done')
     return final_state, final_pose_error
   # -----------------------------------------------
 
@@ -189,6 +194,8 @@ class Eval(object):
       bs_point = pose
     elif 'RBD' in self.folder:
       bs_point = np.random.random(self.params.feature_size)
+    else:
+      raise ValueError('This experiment cannot be tested. Only ones are AE, NS or RBD')
 
     return bs_point
   # -----------------------------------------------
@@ -202,7 +209,7 @@ class Eval(object):
     # Get agent with smallest distance in BS space
     closest_agent = np.argmin(dists)
     selected = self.pop[closest_agent]
-    print("Selected agent {}".format(closest_agent))
+    # print("Selected agent {}".format(closest_agent))
     return selected
   # -----------------------------------------------
 
@@ -219,7 +226,7 @@ class Eval(object):
     while not done:
       # env.render()
       agent_input = ts
-      action = utils.action_formatting(self.env_tag, agent['agent'](agent_input))
+      action = utils.action_formatting(self.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
 
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(self.env_tag, obs, reward, done, info)
@@ -264,8 +271,36 @@ class Eval(object):
       final_state, final_pose_error = self.test_pop()
       errors[seed] = np.copy(final_pose_error)
 
+      to_save = errors.copy()
+      to_save['targets'] = self.target_poses
+      with open(os.path.join(self.folder, 'errors.pkl'), 'wb') as f:
+        pkl.dump(to_save, f)
+
     return errors
   # -----------------------------------------------
+
+  # -----------------------------------------------
+  def plot_errors(self, errors):
+    # fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(60, 10))
+    size = (50, 50)
+    heatmap = np.zeros(size)
+    points = (self.target_poses+1.3)*size/3
+    points = points.astype(int)
+
+    for seed in errors:
+      for point, error in zip(points, errors[seed]):
+        heatmap[point[0], point[1]] += error
+
+    heatmap = heatmap/len(errors.keys())
+
+    plt.figure()
+    plt.imshow(heatmap, cmap=cm.jet, interpolation='gaussian')
+    cb = plt.colorbar()
+    cb.set_label('mean value')
+    plt.show()
+  # -----------------------------------------------
+
+
 
 # -----------------------------------------------
 
@@ -273,15 +308,21 @@ class Eval(object):
 
 
 if __name__ == "__main__":
-  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD')
+  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD', targets=10)
+
 
   errors = evaluator.run_test()
+  evaluator.plot_errors(errors)
 
-  print("")
-  for key in errors:
-    avg = np.mean(errors[key])
-    std = np.std(errors[key])
-    print("Seed {}: Mean {} - Std {}.".format(key, avg, std))
+  # print("")
+  # for key in errors:
+  #   avg = np.mean(errors[key])
+  #   std = np.std(errors[key])
+  #   print("Seed {}: Mean {} - Std {}.".format(key, avg, std))
+
+
+
+
   # # Parameters
   # # -----------------------------------------------
   # load_path = '/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/11'

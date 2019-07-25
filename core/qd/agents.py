@@ -2,6 +2,7 @@ import numpy as np
 from core.utils import utils
 from abc import ABCMeta, abstractmethod # This is to force implementation of child class methods
 from copy import deepcopy
+import math
 
 class BaseAgent(metaclass=ABCMeta):
 
@@ -74,22 +75,22 @@ class FFNeuralAgent(BaseAgent):
     self.output_shape = shapes['output_shape']
 
     self.action_len = np.random.uniform()
-    self._genome = [utils.FCLayer(self.input_shape, 16, 'fc1'),
-                    utils.FCLayer(16, 32, 'fc2'),
-                    utils.FCLayer(32, 16, 'fc3'),
-                    utils.FCLayer(16, self.output_shape, 'fc4')]
+    self._genome = [utils.FCLayer(self.input_shape, 5, 'fc1'),
+                    utils.FCLayer(5, self.output_shape, 'fc2')]
 
   def evaluate(self, x):
     if not len(np.shape(x)) > 1:
       output = np.array([x])
-    output = output/500.
     for l in self._genome[:-1]:
-      output = np.cos(l(output))
+      output = self.sigmoid(l(output))
     output = np.tanh(self._genome[-1](output))
 
-    if x/500. > self.action_len:
+    if x > self.action_len:
       output = np.zeros_like(output)
     return output
+
+  def sigmoid(x):
+    return math.exp(-np.logaddexp(0, -x))
 
   def __call__(self, x):
     return self.evaluate(x)
@@ -145,7 +146,7 @@ class DMPAgent(BaseAgent):
     for i, dmp in enumerate(self._genome):
       output[i] = dmp(x)
 
-    if x/300. > self.action_len:
+    if x > self.action_len:
       output = np.zeros(self.dof)
     return [output]
 

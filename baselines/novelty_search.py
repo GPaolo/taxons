@@ -22,7 +22,7 @@ class NoveltySearch(BaseBaseline):
     t = 0
     while not done:
       agent_input = t
-      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
+      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(self.params.env_tag, obs, reward, done, info)
       t += 1
