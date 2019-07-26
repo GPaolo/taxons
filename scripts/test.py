@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import pickle as pkl
 import progressbar
+import gc
 
 
 
@@ -61,22 +62,25 @@ class Eval(object):
     elif "Ant" in self.env_tag:
       self.env.render()
 
-    for k in range(targets):  # Generate target datapoints
-      obs = self.env.reset()
+    with progressbar.ProgressBar(max_value=targets) as bar:
+      for k in range(targets):  # Generate target datapoints
+        obs = self.env.reset()
 
-      if "Ant" in self.env_tag:
-        for step in range(300):
-          self.env.step(self.env.action_space.sample())
-          CoM = np.array([self.env.env.data.qpos[:2]])
-          t_pose = CoM
-          if np.any(np.abs(CoM) >= np.array([3, 3])):
-            break
-      elif 'Billiard' in self.env_tag:
-        t_pose = obs[0]
+        if "Ant" in self.env_tag:
+          for step in range(300):
+            self.env.step(self.env.action_space.sample())
+            CoM = np.array([self.env.env.data.qpos[:2]])
+            t_pose = CoM
+            if np.any(np.abs(CoM) >= np.array([3, 3])):
+              break
+        elif 'Billiard' in self.env_tag:
+          t_pose = obs[0]
 
-      tmp = self.env.render(mode='rgb_array')
-      target_images.append(tmp)
-      target_poses.append(t_pose)
+        tmp = self.env.render(mode='rgb_array')
+        target_images.append(tmp)
+        target_poses.append(t_pose)
+
+        bar.update(k)
 
     target_images = np.stack(target_images)
     target_poses = np.stack(target_poses)
@@ -99,7 +103,7 @@ class Eval(object):
       self.env.env.params.RANDOM_BALL_INIT_POSE = False
     print('Done.')
 
-    return target_images, target_poses
+    return target_images, np.squeeze(target_poses)
   # -----------------------------------------------
 
   # -----------------------------------------------
@@ -171,14 +175,15 @@ class Eval(object):
         state, f_pose = self._test_agent(selected)
 
         final_pose.append(f_pose)
-        final_state.append(state)
+        # final_state.append(state)
 
         final_distance = np.sqrt(np.sum((self.target_poses[target_idx] - f_pose) ** 2))
         bar.update(target_idx)
         # print('Positional error: {}'.format(final_distance))
 
-    final_state = np.stack(final_state)
-    final_pose = np.stack(final_pose)
+    gc.collect()
+    # final_state = np.stack(final_state)
+    final_pose = np.squeeze(np.stack(final_pose))
     final_pose_error = np.sqrt(np.sum((self.target_poses - final_pose) ** 2, axis=1))
     print('Done')
     return final_state, final_pose_error
@@ -237,7 +242,7 @@ class Eval(object):
         done = True
 
       if 'Ant' in self.env_tag:
-        CoM = np.array([self.env.env.data.qpos[:2]])
+        CoM = np.array(self.env.env.data.qpos[:2])
         f_pose = CoM
         if np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
@@ -246,6 +251,7 @@ class Eval(object):
 
     state = self.env.render(mode='rgb_array')
     state = state / np.max((np.max(state), 1))
+    gc.collect()
     return state, f_pose
   # -----------------------------------------------
 
@@ -285,30 +291,38 @@ class Eval(object):
     # fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(60, 10))
     size = (50, 50)
     heatmap = np.zeros(size)
-    points = (self.target_poses+1.3)*size/2.6
+    counts = np.ones_like(heatmap) # This one is used to do the avg for each position
+
+    if 'Ant' in self.folder:
+      data_range = [-3.5, 3.5]
+    elif 'Billiard' in self.folder:
+      data_range = [-1.3, 1.3]
+
+    points = (self.target_poses-data_range[0])*size/(2*data_range[1])
     points = points.astype(int)
 
     for seed in errors:
       for point, error in zip(points, errors[seed]):
-        heatmap[point[0], point[1]] += error
+        heatmap[point[0], point[1]] += error #TODO Might have to come up with a beter way to deal with errors in the same positions
+        counts[point[0], point[1]] += 1
 
-    heatmap = heatmap/len(errors.keys())
+    heatmap = heatmap/counts
 
-    fig, axes = plt.subplots(nrows=1, ncols=2)
+    fig, axes = plt.subplots(nrows=1, ncols=1)
 
-    im = axes[0].imshow(heatmap, cmap=cm.jet, interpolation='bessel')
-    cb = fig.colorbar(im, ax=axes[0])
+    im = axes.imshow(heatmap, cmap=cm.jet, interpolation='bessel')
+    cb = fig.colorbar(im, ax=axes)
     cb.set_label('mean value')
 
-    bs_points = self.pop['bs']
-    pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-    H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50),
-                                       range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
-    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-    cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
-    axes[1].set_xlim(-1.5, 1.5)
-    axes[1].set_ylim(-1.5, 1.5)
-    plt.colorbar(cax, ax=axes[1])
+    # bs_points = self.pop['bs']
+    # pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
+    # H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50),
+    #                                    range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
+    # extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+    # cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
+    # axes[1].set_xlim(-1.5, 1.5)
+    # axes[1].set_ylim(-1.5, 1.5)
+    # plt.colorbar(cax, ax=axes[1])
 
 
     plt.show()
@@ -322,7 +336,7 @@ class Eval(object):
 
 
 if __name__ == "__main__":
-  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD', targets=50)
+  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Ant_AE_Mixed', targets=1000)
 
 
   errors = evaluator.run_test()
