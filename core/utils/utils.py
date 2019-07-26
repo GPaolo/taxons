@@ -43,7 +43,7 @@ class DMPExp(object):
     self.sigma = np.random.uniform(size=self.num_basis_func)
     self.w = np.random.randn(self.num_basis_func)
     self.a_x  = np.random.uniform()
-    self.tau = 500
+    self.tau = 2
     self.name = name
 
   def __call__(self, t):
@@ -83,7 +83,7 @@ class DMPPoly(object):
   def __init__(self, name='dmp', **kwargs):
     self.degree = kwargs['degree']
     self.w = np.random.randn(self.degree+1)
-    self.scale = 100
+    self.scale = 1
     self.name = name
 
   def __call__(self, t):
@@ -107,7 +107,7 @@ class DMPSin(object):
   def __init__(self, name='dmp', **kwargs):
     self.name = name
     self.amplitude = np.random.randn()
-    self.period = np.random.uniform(10, 50)
+    self.period = np.random.uniform()
 
   def __call__(self, t):
     x = self.amplitude * np.sin(2*np.pi*t/self.period)
