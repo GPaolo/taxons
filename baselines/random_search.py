@@ -48,12 +48,12 @@ class RandomSearch(BaseBaseline):
         done = True
 
       if 'Ant' in self.params.env_tag:
-        CoM = np.array([self.env.env.data.qpos[:2]])
-        if np.any(np.abs(CoM) >= np.array([4, 4])):
+        CoM = np.array([self.env.robot.body_xyz[:2]])
+        if np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
 
     if 'Ant' in self.params.env_tag:
-      agent['bs'] = np.array([self.env.env.data.qpos[:2]])  # xy position of CoM of the robot
+      agent['bs'] = np.array([self.env.robot.body_xyz[:2]])  # xy position of CoM of the robot
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
