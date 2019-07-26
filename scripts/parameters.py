@@ -9,7 +9,7 @@ class Params(object):
   def __init__(self):
     self.info = 'Ant with randomly assigned array as behaviour descriptor'
 
-    self.exp_name = 'Test_maze_NS'
+    self.exp_name = 'Test_Maze_NS'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7

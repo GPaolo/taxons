@@ -8,11 +8,14 @@ from torch.optim.lr_scheduler import _LRScheduler
 
 class FCLayer(object):
 
-  def __init__(self, input, output, name='fc'):
+  def __init__(self, input, output, name='fc', bias=True):
     super().__init__()
     std = np.random.uniform()
     self.w = np.random.randn(input, output) * std
-    self.bias = np.random.randn(1, output)
+    if bias:
+      self.bias = np.random.randn(1, output)
+    else:
+      self.bias = np.zeros((1, output))
     self.name = name
 
   def __call__(self, x):
@@ -172,6 +175,8 @@ def action_formatting(env_tag, action):
   if env_tag == 'MountainCarContinuous-v0':
     assert action.shape == (1,1), 'Shape is not of dimension {}. Has dimension {}'.format([1,1], action)
     return action[0]
+  elif 'Fastsim' in env_tag:
+    return action[0]*5
   else:
     return action[0]
 

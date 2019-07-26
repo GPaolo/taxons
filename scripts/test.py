@@ -20,11 +20,12 @@ import gc
 class Eval(object):
 
   # -----------------------------------------------
-  def __init__(self, exp_folder=None, reeval_bs=False, targets=100):
+  def __init__(self, exp_folder=None, reeval_bs=False, targets=100, render_test=False):
     assert os.path.exists(exp_folder), 'Experiment folder {} does not exist'.format(exp_folder)
     self.folder = exp_folder
     self.params = None
     self.reeval_bs = reeval_bs
+    self.render_test = render_test
 
     # Get all the seeds
     self.seeds = list(os.walk(self.folder))[0][1][:1]
@@ -33,6 +34,8 @@ class Eval(object):
       self.env_tag = 'Billiard-v0'
     elif 'Ant' in self.folder:
       self.env_tag = 'Ant-v2'
+    elif 'Maze' in self.folder:
+      self.env_tag = 'FastsimSimpleNavigation-v0'
 
     self.env = gym.make(self.env_tag)
     self.env.reset()
@@ -107,6 +110,23 @@ class Eval(object):
   # -----------------------------------------------
 
   # -----------------------------------------------
+  def _get_target_bs_point(self, image=None, pose=None):
+    if 'AE' in self.folder:
+      goal = torch.Tensor(image).permute(2, 0, 1).unsqueeze(0).to(self.device)
+      goal = goal / torch.max(torch.Tensor(np.array([torch.max(goal).cpu().data, 1])))  # Normalize in [0,1]
+      surprise, bs_point, reconstr = self.selector(goal)
+      bs_point = bs_point.flatten().cpu().data.numpy()
+    elif 'NS' in self.folder:
+      bs_point = pose
+    elif 'RBD' in self.folder:
+      bs_point = np.random.random(self.params.feature_size)
+    else:
+      raise ValueError('This experiment cannot be tested. Only ones are AE, NS or RBD')
+
+    return bs_point
+  # -----------------------------------------------
+
+  # -----------------------------------------------
   def load_metric(self, load_path):
     print('Loading metric...')
     if self.params.gpu:
@@ -156,57 +176,6 @@ class Eval(object):
   # -----------------------------------------------
 
   # -----------------------------------------------
-  def test_pop(self):
-    """
-    This one tests the pop related to the seed
-    :return: array of final image states and array of final positional errors
-    """
-    print('Starting pop testing...')
-    final_pose = []
-    final_state = []
-
-    with progressbar.ProgressBar(max_value=len(self.target_poses)) as bar:
-
-      for target_idx in range(len(self.target_images)):
-        # Get BS point
-        bs_point = self._get_target_bs_point(self.target_images[target_idx], self.target_poses[target_idx])
-
-        selected = self._get_closest_agent(bs_point)
-        state, f_pose = self._test_agent(selected)
-
-        final_pose.append(f_pose)
-        # final_state.append(state)
-
-        final_distance = np.sqrt(np.sum((self.target_poses[target_idx] - f_pose) ** 2))
-        bar.update(target_idx)
-        # print('Positional error: {}'.format(final_distance))
-
-    gc.collect()
-    # final_state = np.stack(final_state)
-    final_pose = np.squeeze(np.stack(final_pose))
-    final_pose_error = np.sqrt(np.sum((self.target_poses - final_pose) ** 2, axis=1))
-    print('Done')
-    return final_state, final_pose_error
-  # -----------------------------------------------
-
-  # -----------------------------------------------
-  def _get_target_bs_point(self, image=None, pose=None):
-    if 'AE' in self.folder:
-      goal = torch.Tensor(image).permute(2, 0, 1).unsqueeze(0).to(self.device)
-      goal = goal / torch.max(torch.Tensor(np.array([torch.max(goal).cpu().data, 1])))  # Normalize in [0,1]
-      surprise, bs_point, reconstr = self.selector(goal)
-      bs_point = bs_point.flatten().cpu().data.numpy()
-    elif 'NS' in self.folder:
-      bs_point = pose
-    elif 'RBD' in self.folder:
-      bs_point = np.random.random(self.params.feature_size)
-    else:
-      raise ValueError('This experiment cannot be tested. Only ones are AE, NS or RBD')
-
-    return bs_point
-  # -----------------------------------------------
-
-  # -----------------------------------------------
   def _get_closest_agent(self, bs_point):
     bs_space = np.stack([a[0] for a in self.pop['features'].values])
     # Get distances
@@ -229,10 +198,12 @@ class Eval(object):
     done = False
     ts = 0
     obs = utils.obs_formatting(self.env_tag, self.env.reset())
+
     while not done:
-      # env.render()
+      if self.render_test:
+        self.env.render()
       agent_input = ts
-      action = utils.action_formatting(self.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
+      action = utils.action_formatting(self.env_tag, agent['agent'](agent_input))# TODO /self.params.max_episode_len))
 
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(self.env_tag, obs, reward, done, info)
@@ -272,6 +243,7 @@ class Eval(object):
         self.load_metric(load_path)
       self.load_archive(load_path)
 
+      self.env.seed(int(seed))
       if self.pop[0]['features'] is None or self.reeval_bs:
         self.evaluate_archive_bs()
 
@@ -284,6 +256,49 @@ class Eval(object):
         pkl.dump(to_save, f)
 
     return errors
+  # -----------------------------------------------
+
+  # -----------------------------------------------
+  def test_pop(self):
+    """
+    This one tests the pop related to the seed
+    :return: array of final image states and array of final positional errors
+    """
+    print('Starting pop testing...')
+    final_pose = []
+    final_state = []
+
+    with progressbar.ProgressBar(max_value=len(self.target_poses)) as bar:
+      for target_idx in range(len(self.target_images)):
+        # Get BS point
+        bs_point = self._get_target_bs_point(self.target_images[target_idx], self.target_poses[target_idx])
+
+        selected = self._get_closest_agent(bs_point)
+        state, f_pose = self._test_agent(selected)
+
+        if self.render_test:
+          fig, ax = plt.subplots(2)
+          ax[0].imshow(state)
+          ax[0].set_title('Final State')
+          ax[1].imshow(self.target_images[target_idx])
+          ax[1].set_title('Target state')
+          # ax[2].imshow(reconstr.permute(0,2,3,1)[0].cpu().data)
+          # ax[2].set_title('Reconstructed')
+          plt.show()
+
+        final_pose.append(f_pose)
+        # final_state.append(state)
+
+        final_distance = np.sqrt(np.sum((self.target_poses[target_idx] - f_pose) ** 2))
+        bar.update(target_idx)
+        # print('Positional error: {}'.format(final_distance))
+
+    gc.collect()
+    # final_state = np.stack(final_state)
+    final_pose = np.squeeze(np.stack(final_pose))
+    final_pose_error = np.sqrt(np.sum((self.target_poses - final_pose) ** 2, axis=1))
+    print('Done')
+    return final_state, final_pose_error
   # -----------------------------------------------
 
   # -----------------------------------------------
@@ -310,25 +325,11 @@ class Eval(object):
 
     fig, axes = plt.subplots(nrows=1, ncols=1)
 
-    im = axes.imshow(heatmap, cmap=cm.jet, interpolation='bessel')
+    im = axes.imshow(heatmap, cmap=cm.jet)#, interpolation='bessel')
     cb = fig.colorbar(im, ax=axes)
     cb.set_label('mean value')
-
-    # bs_points = self.pop['bs']
-    # pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
-    # H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50),
-    #                                    range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
-    # extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-    # cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
-    # axes[1].set_xlim(-1.5, 1.5)
-    # axes[1].set_ylim(-1.5, 1.5)
-    # plt.colorbar(cax, ax=axes[1])
-
-
     plt.show()
   # -----------------------------------------------
-
-
 
 # -----------------------------------------------
 
@@ -336,7 +337,7 @@ class Eval(object):
 
 
 if __name__ == "__main__":
-  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Ant_AE_Mixed', targets=1000)
+  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Test_maze_NS', targets=10, render_test=True)
 
 
   errors = evaluator.run_test()

@@ -73,9 +73,9 @@ class FFNeuralAgent(BaseAgent):
     self.input_shape = shapes['input_shape']
     self.output_shape = shapes['output_shape']
 
-    self.action_len = np.random.uniform()
-    self._genome = [utils.FCLayer(self.input_shape, 5, 'fc1'),
-                    utils.FCLayer(5, self.output_shape, 'fc2')]
+    self.action_len = np.random.uniform(0.5, 1)
+    self._genome = [utils.FCLayer(self.input_shape, 5, 'fc1', bias=False),
+                    utils.FCLayer(5, self.output_shape, 'fc2', bias=False)]
 
   def evaluate(self, x):
     if not len(np.shape(x)) > 1:
@@ -104,8 +104,13 @@ class FFNeuralAgent(BaseAgent):
     self.action_len = self.action_len + self.mutation_operator()
 
   def _mutate_layer(self, layer):
-    layer.w = layer.w + self.mutation_operator(layer.w.shape[0], layer.w.shape[1])
-    layer.bias = layer.bias + self.mutation_operator(layer.bias.shape[0], layer.bias.shape[1])
+    mutation_selection = np.array(np.random.uniform(size=(layer.w.shape[0], layer.w.shape[1]))<= 0.15).astype(int)
+    layer.w += self.mutation_operator(layer.w.shape[0], layer.w.shape[1]) * mutation_selection
+    layer.w = np.clip(layer.w, a_min=-5, a_max=5)
+
+    mutation_selection = np.array(np.random.uniform(size=(layer.bias.shape[0], layer.bias.shape[1]))<= 0.15).astype(int)
+    # layer.bias += self.mutation_operator(layer.bias.shape[0], layer.bias.shape[1]) * mutation_selection
+
 
   def load_genome(self, params, agent_name):
     self.action_len = params[-1] # the last is the action lenght
@@ -124,7 +129,7 @@ class DMPAgent(BaseAgent):
 
     self.dof = shapes['dof']
     self.shapes = shapes
-    self.action_len = np.random.uniform()
+    self.action_len = np.random.uniform(0.5, 1)
 
     self._genome = []
     if shapes['type'] == 'poly':
@@ -145,7 +150,7 @@ class DMPAgent(BaseAgent):
     for i, dmp in enumerate(self._genome):
       output[i] = dmp(x)
 
-    if x > self.action_len:
+    if x/300. > self.action_len: #TODO if x > self.action_len:
       output = np.zeros(self.dof)
     return [output]
 
