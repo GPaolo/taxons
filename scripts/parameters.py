@@ -18,8 +18,8 @@ class Params(object):
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'Billiard-v0' # Billiard-v0 Ant-v2 FastsimSimpleNavigation-v0
-    self.max_episode_len = 300
+    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 Ant-v2 FastsimSimpleNavigation-v0
+    self.max_episode_len = 2000
     # ---------------------------------------------------------
 
     # QD
@@ -29,7 +29,7 @@ class Params(object):
     self.use_archive = True
     self.mutation_rate = 0.9
 
-    self.qd_agent = 'DMP'  # 'DMP
+    self.qd_agent = 'Neural'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':

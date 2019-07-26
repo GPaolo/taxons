@@ -2,7 +2,6 @@ import numpy as np
 from core.utils import utils
 from abc import ABCMeta, abstractmethod # This is to force implementation of child class methods
 from copy import deepcopy
-import math
 
 class BaseAgent(metaclass=ABCMeta):
 
@@ -85,12 +84,12 @@ class FFNeuralAgent(BaseAgent):
       output = self.sigmoid(l(output))
     output = np.tanh(self._genome[-1](output))
 
-    if x > self.action_len:
-      output = np.zeros_like(output)
+    #if x > self.action_len:
+     # output = np.zeros_like(output)
     return output
 
-  def sigmoid(x):
-    return math.exp(-np.logaddexp(0, -x))
+  def sigmoid(self, x):
+    return np.exp(-np.logaddexp(0, -x))
 
   def __call__(self, x):
     return self.evaluate(x)
