@@ -84,8 +84,8 @@ class FFNeuralAgent(BaseAgent):
       output = self.sigmoid(l(output))
     output = np.tanh(self._genome[-1](output))
 
-    #if x > self.action_len:
-     # output = np.zeros_like(output)
+    if x > self.action_len:
+     output = np.zeros_like(output)
     return output
 
   def sigmoid(self, x):
