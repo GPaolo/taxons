@@ -4,7 +4,6 @@
 from scripts import parameters
 import gym, torch
 import gym_billiard
-import matplotlib.pyplot as plt
 import numpy as np
 from core.metrics import ae, rnd
 from core.qd import population, agents
@@ -13,6 +12,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import pickle as pkl
+import progressbar
 
 
 
@@ -26,7 +26,7 @@ class Eval(object):
     self.reeval_bs = reeval_bs
 
     # Get all the seeds
-    self.seeds = list(os.walk(self.folder))[0][1]
+    self.seeds = list(os.walk(self.folder))[0][1][:1]
 
     if 'Billiard' in self.folder:
       self.env_tag = 'Billiard-v0'
@@ -161,20 +161,21 @@ class Eval(object):
     final_pose = []
     final_state = []
 
-    for target_idx in range(len(self.target_images)):
-      # print('Testing target {}'.format(target_idx))
+    with progressbar.ProgressBar(max_value=len(self.target_poses)) as bar:
 
-      # Get BS point
-      bs_point = self._get_target_bs_point(self.target_images[target_idx], self.target_poses[target_idx])
+      for target_idx in range(len(self.target_images)):
+        # Get BS point
+        bs_point = self._get_target_bs_point(self.target_images[target_idx], self.target_poses[target_idx])
 
-      selected = self._get_closest_agent(bs_point)
-      state, f_pose = self._test_agent(selected)
+        selected = self._get_closest_agent(bs_point)
+        state, f_pose = self._test_agent(selected)
 
-      final_pose.append(f_pose)
-      final_state.append(state)
+        final_pose.append(f_pose)
+        final_state.append(state)
 
-      final_distance = np.sqrt(np.sum((self.target_poses[target_idx] - f_pose) ** 2))
-      # print('Positional error: {}'.format(final_distance))
+        final_distance = np.sqrt(np.sum((self.target_poses[target_idx] - f_pose) ** 2))
+        bar.update(target_idx)
+        # print('Positional error: {}'.format(final_distance))
 
     final_state = np.stack(final_state)
     final_pose = np.stack(final_pose)
@@ -284,7 +285,7 @@ class Eval(object):
     # fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(60, 10))
     size = (50, 50)
     heatmap = np.zeros(size)
-    points = (self.target_poses+1.3)*size/3
+    points = (self.target_poses+1.3)*size/2.6
     points = points.astype(int)
 
     for seed in errors:
@@ -293,10 +294,23 @@ class Eval(object):
 
     heatmap = heatmap/len(errors.keys())
 
-    plt.figure()
-    plt.imshow(heatmap, cmap=cm.jet, interpolation='gaussian')
-    cb = plt.colorbar()
+    fig, axes = plt.subplots(nrows=1, ncols=2)
+
+    im = axes[0].imshow(heatmap, cmap=cm.jet, interpolation='bessel')
+    cb = fig.colorbar(im, ax=axes[0])
     cb.set_label('mean value')
+
+    bs_points = self.pop['bs']
+    pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
+    H, xedges, yedges = np.histogram2d(pts[0], pts[1], bins=(50, 50),
+                                       range=np.array([[-1.5, 1.5], [-1.5, 1.5]]))
+    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+    cax = axes[1].matshow(np.rot90(H, k=1), extent=extent)
+    axes[1].set_xlim(-1.5, 1.5)
+    axes[1].set_ylim(-1.5, 1.5)
+    plt.colorbar(cax, ax=axes[1])
+
+
     plt.show()
   # -----------------------------------------------
 
@@ -308,7 +322,7 @@ class Eval(object):
 
 
 if __name__ == "__main__":
-  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD', targets=10)
+  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD', targets=50)
 
 
   errors = evaluator.run_test()
