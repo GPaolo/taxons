@@ -83,7 +83,7 @@ class RndQD(object):
     t = 0
     while not done:
       agent_input = t
-      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
+      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))#/self.params.max_episode_len))
       obs, reward, done, info = self.env.step(action)
       obs = utils.obs_formatting(self.params.env_tag, obs, reward, done, info)
       t += 1
@@ -93,14 +93,14 @@ class RndQD(object):
         done = True
 
       if 'Ant' in self.params.env_tag:
-        CoM = np.array([self.env.env.data.qpos[:2]])
+        CoM = np.array([self.env.robot.body_xyz[:2]])
         if np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
     state = self.env.render(mode='rgb_array')
     state = state/np.max((np.max(state), 1))
 
     if 'Ant' in self.params.env_tag:
-      agent['bs'] =  np.array([self.env.env.data.qpos[:2]]) # xy position of CoM of the robot
+      agent['bs'] =  np.array([self.env.robot.body_xyz[:2]]) # xy position of CoM of the robot
     else:
       agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
@@ -170,8 +170,8 @@ class RndQD(object):
     :return:
     """
     inputs = None
-    if 'Ant' in self.params.env_tag: # Need it otherwise cannot init OpenGL
-      self.env.render()
+    # if 'Ant' in self.params.env_tag: # Need it otherwise cannot init OpenGL
+    #   self.env.render()
     for self.elapsed_gen in range(steps):
       states = []
       for agent in self.population:

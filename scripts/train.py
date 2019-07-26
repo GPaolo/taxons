@@ -4,7 +4,7 @@
 from core import rnd_qd
 from baselines import novelty_search, policy_space, random_search, random_bd
 import gym, torch
-import gym_billiard, gym_fastsim
+import gym_billiard, gym_fastsim, pybulletgym
 import numpy as np
 from core.utils import utils
 import os
