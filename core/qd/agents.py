@@ -72,20 +72,25 @@ class FFNeuralAgent(BaseAgent):
 
     self.input_shape = shapes['input_shape']
     self.output_shape = shapes['output_shape']
+    self.use_bias = True
 
     self.action_len = np.random.uniform(0.5, 1)
-    self._genome = [utils.FCLayer(self.input_shape, 5, 'fc1', bias=False),
-                    utils.FCLayer(5, self.output_shape, 'fc2', bias=False)]
+    self._genome = [utils.FCLayer(self.input_shape, 5, 'fc1', bias=self.use_bias),
+                    utils.FCLayer(5, self.output_shape, 'fc2', bias=self.use_bias)]
 
   def evaluate(self, x):
-    if not len(np.shape(x)) > 1:
-      output = np.array([x])
-    for l in self._genome[:-1]:
-      output = self.sigmoid(l(output))
-    output = np.tanh(self._genome[-1](output))
+    # TODO REMOVE THIS OBSCENITY.
+    output = x[0]
+    t = x[1]
+    if not len(np.shape(output)) > 1:
+      output = np.array([output])
 
-    if x > self.action_len:
-     output = np.zeros_like(output)
+    if t > self.action_len:
+     output = [np.zeros(self.output_shape)]
+    else:
+      for l in self._genome[:-1]:
+        output = self.sigmoid(l(output))
+      output = np.tanh(self._genome[-1](output))
     return output
 
   def sigmoid(self, x):
@@ -101,15 +106,16 @@ class FFNeuralAgent(BaseAgent):
     '''
     for l in self._genome:
       self._mutate_layer(l)
-    self.action_len = self.action_len + self.mutation_operator()
+    self.action_len = np.clip(self.action_len + self.mutation_operator(), a_min=0.5, a_max=1)
 
   def _mutate_layer(self, layer):
-    mutation_selection = np.array(np.random.uniform(size=(layer.w.shape[0], layer.w.shape[1]))<= 0.15).astype(int)
+    mutation_selection = np.array(np.random.uniform(size=(layer.w.shape[0], layer.w.shape[1]))<= 0.2).astype(int)
     layer.w += self.mutation_operator(layer.w.shape[0], layer.w.shape[1]) * mutation_selection
     layer.w = np.clip(layer.w, a_min=-5, a_max=5)
 
-    mutation_selection = np.array(np.random.uniform(size=(layer.bias.shape[0], layer.bias.shape[1]))<= 0.15).astype(int)
-    # layer.bias += self.mutation_operator(layer.bias.shape[0], layer.bias.shape[1]) * mutation_selection
+    if self.use_bias:
+      mutation_selection = np.array(np.random.uniform(size=(layer.bias.shape[0], layer.bias.shape[1]))<= 0.2).astype(int)
+      layer.bias += self.mutation_operator(layer.bias.shape[0], layer.bias.shape[1]) * mutation_selection
 
 
   def load_genome(self, params, agent_name):
@@ -147,11 +153,11 @@ class DMPAgent(BaseAgent):
 
   def evaluate(self, x):
     output = np.zeros(self.dof)
-    for i, dmp in enumerate(self._genome):
-      output[i] = dmp(x)
 
-    if x > self.action_len: #TODO if x > self.action_len:
-      output = np.zeros(self.dof)
+    if x <= self.action_len:
+      for i, dmp in enumerate(self._genome):
+        output[i] = dmp(x)
+
     return [output]
 
   def __call__(self, x):

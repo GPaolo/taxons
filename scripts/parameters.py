@@ -7,19 +7,19 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Ant with randomly assigned array as behaviour descriptor'
+    self.info = 'Maxe with pure NS based on robot position in the maze. Neural agents.'
 
-    self.exp_name = 'Test_Maze_NS'
+    self.exp_name = 'Maze_NS'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
-    self.parallel = False
-    self.baseline = None # None, 'NS', 'PS', 'RS', 'RBD'
+    self.parallel = True
+    self.baseline = 'NS' # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'AntMuJoCoEnv-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.max_episode_len = 300
+    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
+    self.max_episode_len = 2000
     # ---------------------------------------------------------
 
     # QD
@@ -29,11 +29,11 @@ class Params(object):
     self.use_archive = True
     self.mutation_rate = 0.9
 
-    self.qd_agent = 'DMP'  # 'DMP
+    self.qd_agent = 'Neural'  # 'DMP
     if self.qd_agent == 'Neural':
-      self.agent_shapes = {'input_shape': 1, 'output_shape': self.action_shape}
+      self.agent_shapes = {'input_shape': 5, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'sin'} # poly, exp, sin
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'} # poly, exp, sin
     # ---------------------------------------------------------
 
     # Metric

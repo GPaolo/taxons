@@ -18,16 +18,20 @@ class NoveltySearch(BaseBaseline):
     done = False
     cumulated_reward = 0
 
-    obs = utils.obs_formatting(self.params.env_tag, self.env.reset())
+
+    obs = self.env.reset()
     t = 0
     while not done:
-      agent_input = t
-      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
+      if 'FastsimSimpleNavigation' in self.params.env_tag:
+        agent_input = [obs, t/self.params.max_episode_len] # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
+        action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
+      else:
+        agent_input = t
+        action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
+
       obs, reward, done, info = self.env.step(action)
-      obs = utils.obs_formatting(self.params.env_tag, obs, reward, done, info)
       t += 1
       cumulated_reward += reward
-
       if t >= self.params.max_episode_len:
         done = True
 
@@ -36,10 +40,11 @@ class NoveltySearch(BaseBaseline):
         if np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
 
-    if 'Ant' in self.params.env_tag:
-      agent['bs'] =  np.array([self.env.robot.body_xyz[:2]]) # xy position of CoM of the robot
-    else:
-      agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    agent['bs'] = utils.extact_hd_bs(self.env, obs, reward, done, info)
+    # if 'Ant' in self.params.env_tag:
+    #   agent['bs'] =  np.array([self.env.robot.body_xyz[:2]]) # xy position of CoM of the robot
+    # else:
+    #   agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
     agent['features'] = [agent['bs'][0], None]
     return cumulated_reward

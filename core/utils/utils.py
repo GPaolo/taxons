@@ -10,8 +10,7 @@ class FCLayer(object):
 
   def __init__(self, input, output, name='fc', bias=True):
     super().__init__()
-    std = np.random.uniform()
-    self.w = np.random.randn(input, output) * std
+    self.w = np.random.randn(input, output)
     if bias:
       self.bias = np.random.randn(1, output)
     else:
@@ -176,26 +175,27 @@ def action_formatting(env_tag, action):
     assert action.shape == (1,1), 'Shape is not of dimension {}. Has dimension {}'.format([1,1], action)
     return action[0]
   elif 'Fastsim' in env_tag:
-    return action[0]*5
+    return action[0]*5 # The NN generates actions in the [-1, 1] (tanh), we scale it to the max range of actions of the env [-5, 5]
   else:
     return action[0]
 
 
-def obs_formatting(env_tag, obs, reward=None, done=None, info=None):
+def extact_hd_bs(env, obs, reward=None, done=None, info=None):
   """
-    This function helps reformat the observations according to the environment
+    This function helps extract the hand designed BS used to compare the approaches
     :param env_tag: Environment name
     :param obs: Observation to reformat
     :return:
   """
+  env_tag = env.spec.id
   if env_tag == 'MountainCarContinuous-v0':
     return np.array([obs])
   elif env_tag == 'Billiard-v0':
-    return np.array([np.concatenate(obs)])
+    return np.array([[obs[0][0], obs[0][1]]])
   elif env_tag == 'BilliardHard-v0':
-    return np.array([np.concatenate(obs)])
+    return np.array([[obs[0][0], obs[0][1]]])
   elif env_tag == 'Ant-v2':
-    return np.array([obs[13:27]])
+    return np.array([env.robot.body_xyz[:2]]) # xy position of CoM of the robot
   elif env_tag == 'FastsimSimpleNavigation-v0':
     if info is None:
       return None
@@ -204,12 +204,36 @@ def obs_formatting(env_tag, obs, reward=None, done=None, info=None):
     return obs
 
 
+def get_projectpath():
+  cwd = os.getcwd()
+  folder = os.path.basename(cwd)
+  while not folder == 'rnd_qd':
+    cwd = os.path.dirname(cwd)
+    folder = os.path.basename(cwd)
+  return cwd
+
+
+def load_maze_image():
+  import netpbmfile as npbm
+  path = os.path.join(get_projectpath(), 'external/fastsim_gym/gym_fastsim/simple_nav/assets/maze_hard.pbm')
+  with open(path, 'rb') as f:
+    maze = np.array(npbm.imread(f))
+  return maze
+
+
 def show(bs_points, filepath, name=None, info=None, upper_limit=1.35, lower_limit=-1.35):
+
+  # maze = None
+  # if 'maze' in filepath or 'Maze' in filepath:
+  #   maze = load_maze_image()
+
   print('Seed {} - Behaviour space coverage representation.'.format(info['seed']))
   pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
   plt.rcParams["patch.force_edgecolor"] = True
   fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 6))
   axes[0].set_title('Final position')
+  # if maze is not None:
+  #   axes[0].imshow(maze)
   axes[0].scatter(pts[0], pts[1])
   axes[0].set_xlim(lower_limit, upper_limit)
   axes[0].set_ylim(lower_limit, upper_limit)
@@ -238,15 +262,6 @@ def show(bs_points, filepath, name=None, info=None, upper_limit=1.35, lower_limi
     print('Seed {} - Plot saved in {}'.format(info['seed'], filepath))
   plt.close(fig)
   return coverage
-
-
-def get_projectpath():
-  cwd = os.getcwd()
-  folder = os.path.basename(cwd)
-  while not folder == 'rnd_qd':
-    cwd = os.path.dirname(cwd)
-    folder = os.path.basename(cwd)
-  return cwd
 
 
 def split_array(a, batch_size=32):
