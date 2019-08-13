@@ -79,13 +79,17 @@ class RndQD(object):
     done = False
     cumulated_reward = 0
 
-    obs = utils.obs_formatting(self.params.env_tag, self.env.reset())
+    obs = self.env.reset()
     t = 0
     while not done:
-      agent_input = t
-      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
+      if 'FastsimSimpleNavigation' in self.params.env_tag:
+        agent_input = [obs, t/self.params.max_episode_len] # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
+        action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
+      else:
+        agent_input = t
+        action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
+
       obs, reward, done, info = self.env.step(action)
-      obs = utils.obs_formatting(self.params.env_tag, obs, reward, done, info)
       t += 1
       cumulated_reward += reward
 
@@ -99,11 +103,9 @@ class RndQD(object):
     state = self.env.render(mode='rgb_array')
     state = state/np.max((np.max(state), 1))
 
-    if 'Ant' in self.params.env_tag:
-      agent['bs'] =  np.array([self.env.robot.body_xyz[:2]]) # xy position of CoM of the robot
-    else:
-      agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
+    agent['bs'] = utils.extact_hd_bs(self.env, obs, reward, done, info)
     agent['reward'] = cumulated_reward
+    # Here we use instead the features of the AE to calculate the BD. This is done outside this function, in update_agents
     return state, None, cumulated_reward # TODO check why there is a None here
   # ---------------------------------------------------
 

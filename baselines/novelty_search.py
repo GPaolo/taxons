@@ -46,7 +46,7 @@ class NoveltySearch(BaseBaseline):
     # else:
     #   agent['bs'] = np.array([[obs[0][0], obs[0][1]]])
     agent['reward'] = cumulated_reward
-    agent['features'] = [agent['bs'][0], None]
+    agent['features'] = [agent['bs'][0], None] # NS uses the actual position as feature to calculate the BD
     return cumulated_reward
   # ---------------------------------------------------
 
