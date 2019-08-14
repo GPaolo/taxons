@@ -50,11 +50,11 @@ class PolicySpace(BaseBaseline):
       if isinstance(k, dict):
         for i in k:
           if i is not 'name':
-            feat.append(k[i])
+            feat.append(k[i].flatten())
       else:
-        feat.append(k)
+        feat.append(np.array([k]))
 
-    agent['features'] = [np.array(feat), None] #PS uses the genome as feature to calculate the BD
+    agent['features'] = [np.concatenate(np.array(feat)), None] #PS uses the genome as feature to calculate the BD
     return cumulated_reward
   # ---------------------------------------------------
 
