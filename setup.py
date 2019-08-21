@@ -6,6 +6,7 @@ setup(author='Giuseppe Paolo',
       install_requires=[
             'numpy',
             'torch',
+            'torchvision',
             'pytest',
             'gym',
             'pygame',
