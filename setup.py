@@ -13,6 +13,7 @@ setup(author='Giuseppe Paolo',
             'Box2D',
             'simplejson',
             'pandas',
-            'mujoco-py<2.1,>=2.0'
+            'matplotlib',
+            'ipython'
       ]
 )
