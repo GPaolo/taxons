@@ -50,7 +50,7 @@ class PolicySpace(BaseBaseline):
       if isinstance(k, dict):
         for i in k:
           if i is not 'name':
-            feat.append(k[i].flatten())
+            feat.append(np.array(k[i]).flatten())
       else:
         feat.append(np.array([k]))
 
