@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class GenPlot(object):
 
-  def __init__(self, folders=None):
+  def __init__(self, folders=None, total_gens=500):
     self.folders = folders
     params = {'legend.fontsize': 'x-large',
               'figure.figsize': (15, 5),
@@ -18,9 +18,11 @@ class GenPlot(object):
               'ytick.labelsize': 'x-large'}
     plt.rcParams.update(params)
 
-    self.total_gens = 500
+    self.total_gens = total_gens
 
   def load_exp_data(self, folder):
+    if not os.path.exists(folder):
+      return None, None, None
     # Load data
     seeds = list(os.walk(folder))[0][1]
     coverage = []
@@ -40,10 +42,11 @@ class GenPlot(object):
     gen_surprise = np.array(gen_surprise)
     archive_size = np.array(archive_size)
     gens = np.array(gens)
-    return coverage, gen_surprise, archive_size, gens
+    return coverage, gen_surprise, archive_size
 
-  def plot_data(self, gens, data, title, labels, cmap, y_axis):
+  def plot_data(self, data, title, labels, cmap, y_axis):
     # Create plots
+    gens = np.array(list(range(self.total_gens)))
     fig, axes = plt.subplots(nrows=1, ncols=1)
     colors = [cmap(k) for k in range(len(data))]
 
@@ -64,14 +67,18 @@ class GenPlot(object):
     plt.show()
     return fig
 
-  def plot_data_single_fig(self, gens, data, title, labels, cmap, y_axis, axes, use_std=False):
+  def plot_data_single_fig(self, data, title, labels, cmap, y_axis, axes, use_std=False):
     colors = [cmap(k) for k in range(len(data))]
-    for exp, c, l in zip(data, colors, labels):
-      std = np.std(exp, 0)
-      mean = np.mean(exp, 0)
+    gens = np.array(list(range(self.total_gens)))
+    for d, c, l in zip(data, colors, labels):
+      if d is None:
+        continue
+      experiment = d[:, :self.total_gens]
+      std = np.std(experiment, 0)
+      mean = np.mean(experiment, 0)
       if not use_std:
-        max = np.max(exp, 0)
-        min = np.min(exp, 0)
+        max = np.max(experiment, 0)
+        min = np.min(experiment, 0)
       else:
         max = mean + std
         min = mean - std
@@ -86,16 +93,19 @@ class GenPlot(object):
 
 
 if __name__ == '__main__':
-  plotter = GenPlot()
+  plotter = GenPlot(total_gens=1000)
 
-  c_mix, s_mix, a_mix, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed')
-  c_nt, s_nt, a_nt, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_NoTrain')
-  c_aen, s_aen, a_aen, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Novelty')
-  c_aes, s_aes, a_aes, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Surprise')
-  c_ns, s_ns, a_ns, g = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_NS')
-  c_ps, s_ps, a_ps, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_PS')
-  c_rbd, s_rbd, a_rbd, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_RBD')
-  c_rs, s_rs, a_rs, _ = plotter.load_exp_data('/home/giuseppe/src/rnd_qd/experiments/Billiard_RS')
+  base_path = '/media/giuseppe/Storage/AE NS/Experiments/Maze'
+  experiment = 'Maze'
+
+  c_mix, s_mix, a_mix = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Mixed'.format(experiment)))
+  c_nt, s_nt, a_nt = plotter.load_exp_data(os.path.join(base_path,'{}_AE_NoTrain'.format(experiment)))
+  c_aen, s_aen, a_aen = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Novelty'.format(experiment)))
+  c_aes, s_aes, a_aes = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Surprise'.format(experiment)))
+  c_ns, s_ns, a_ns = plotter.load_exp_data(os.path.join(base_path,'{}_NS'.format(experiment)))
+  c_ps, s_ps, a_ps = plotter.load_exp_data(os.path.join(base_path,'{}_PS'.format(experiment)))
+  c_rbd, s_rbd, a_rbd = plotter.load_exp_data(os.path.join(base_path,'{}_RBD'.format(experiment)))
+  c_rs, s_rs, a_rs = plotter.load_exp_data(os.path.join(base_path,'{}_RS'.format(experiment)))
 
   # plotter.plot_data(g, [c_nt, c_ps, c_aen, c_aes, c_ns],
   #                   labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
@@ -118,19 +128,19 @@ if __name__ == '__main__':
 
   fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(60, 10))
 
-  plotter.plot_data_single_fig(g, [c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs],
+  plotter.plot_data_single_fig([c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs],
                     labels=labels,
                     cmap=colors,
                     title='Coverage', y_axis='Coverage %', axes=axes[0],
                     use_std=use_std)
 
-  plotter.plot_data_single_fig(g, [s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs],
+  plotter.plot_data_single_fig([s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs],
                    labels=labels,
                    cmap=colors,
                    title='Rec. Error', y_axis='Reconstruction error', axes=axes[1],
                    use_std = use_std)
 
-  plotter.plot_data_single_fig(g, [a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs],
+  plotter.plot_data_single_fig([a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs],
                     labels=labels,
                     cmap=colors,
                     title='Archive Size', y_axis='Number of agents', axes=axes[2],
@@ -141,6 +151,6 @@ if __name__ == '__main__':
   plt.subplots_adjust(left=0.1, right=.99, top=0.9, bottom=0.1, wspace=0.4)
   plt.show()
 
-  fig.savefig('/home/giuseppe/src/rnd_qd/experiments/billiard_plots.pdf')
+  fig.savefig(os.path.join(base_path,'billiard_plots.pdf'))
 
   # plt.figure(figsize=(5, 10))

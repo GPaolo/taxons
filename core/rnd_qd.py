@@ -130,12 +130,33 @@ class RndQD(object):
     """
     if not len(self.archive) == 0:
       feats = self.archive['features'].values
-      state = torch.Tensor([f[1] for f in feats]).to(self.device)
-      surprise, feature, _ = self.metric(state)
-      surprise = surprise.cpu().data.numpy()  # Has dimension [pop_size]
+      state = torch.Tensor([f[1] for f in feats])
+      mini_batches = utils.split_array(state, batch_size=128, shuffle=False) # This is done for when the archive gets sobig that it does not fit in the GPU
+
+      min_batch_feat = []
+      min_batch_surpr = []
+      for data in mini_batches:
+        surprise, feature, _ = self.metric(data.to(self.device))
+        min_batch_surpr.append(surprise.cpu().data.numpy())
+        min_batch_feat.append(np.atleast_2d(feature.cpu().data.numpy()))
+
+      try:
+        feature = np.concatenate(min_batch_feat)
+        surprise = np.concatenate(min_batch_surpr) # Has dimension [pop_size]
+      except Exception as e:
+        print(str(e))
+        print('F')
+        for u in min_batch_feat:
+          print(u.shape)
+          print(u)
+        print('S')
+        for u in min_batch_surpr:
+          print(u.shape)
+          print(u)
+
 
       for agent, feat in zip(self.archive, feature):
-        agent['features'][0] = feat.flatten().cpu().data.numpy()
+        agent['features'][0] = feat.flatten()
       self.archive.pop['surprise'] = surprise
   # ---------------------------------------------------
 
@@ -148,19 +169,15 @@ class RndQD(object):
     # Take archive data
     if not len(self.archive) == 0 and self.params.train_on_archive:
       feats = self.archive['features'].values
-      archi_state = torch.Tensor([f[1] for f in feats]).to(self.device)
-      total_state = torch.cat((states.to(self.device), archi_state), 0)
+      archi_state = torch.Tensor([f[1] for f in feats])
+      total_state = torch.cat((states, archi_state), 0)
     else:
-      total_state = states.to(self.device)
-    # old_states = old_states.to(self.device)
-    # Split the batch in 3 minibatches to have better learning
+      total_state = states
+    # Split the batch in minibatches of size 128 to have better learning
     mini_batches = utils.split_array(total_state, batch_size=128)
-    # old_mini_batches = utils.split_array(old_states, batch_size=64)
-    # for data, old_data in zip(mini_batches, old_mini_batches):
     for data in mini_batches:
-      loss, f, _ = self.metric.training_step(data)
+      loss, f, _ = self.metric.training_step(data.to(self.device))
       self.metric_update_steps += 1
-    # print("Loss at {}: {}".format(self.metric_update_steps, loss))
     return f
   # ---------------------------------------------------
 
@@ -190,17 +207,18 @@ class RndQD(object):
       avg_gen_surprise = np.mean(self.update_agents(states))
       max_rew = np.max(self.population['reward'].values)
 
-      if self.params.update_metric and not self.params.optimizer_type == 'Surprise':
-        self.update_archive_feat()
+      # Pop and archive need to have features from the same update step.
       self.opt.step()
 
-      # Has to be done after the archive features have been updated cause pop and archive need to have features from the same update step.
       if self.params.update_metric and self.elapsed_gen % self.params.update_interval == 0 and self.elapsed_gen > 0:
         for epoch in range(5):
           f = self.update_metric(inputs)
           print(f[0].cpu().data)
         del inputs
         inputs = None
+        # Pop and archive need to have features from the same update step, so the archive features are updated everytime the metric is updated
+        if not self.params.optimizer_type == 'Surprise':
+          self.update_archive_feat()
 
       # if hasattr(self.metric, 'lr_scheduler') and self.elapsed_gen % 100 == 0 and self.elapsed_gen > 0:
       #   self.metric.lr_scheduler.step()

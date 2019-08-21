@@ -7,14 +7,14 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Maxe with pure NS based on robot position in the maze. Neural agents.'
+    self.info = 'Maxe with NS done on NoTrain AE. Neural agents.'
 
-    self.exp_name = 'Maze_NS'
+    self.exp_name = 'Maze_AE_Novelty'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
-    self.baseline = 'NS' # None, 'NS', 'PS', 'RS', 'RBD'
+    self.baseline = None # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------
@@ -24,7 +24,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 500
+    self.generations = 1000
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9

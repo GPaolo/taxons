@@ -264,10 +264,11 @@ def show(bs_points, filepath, name=None, info=None, upper_limit=1.35, lower_limi
   return coverage
 
 
-def split_array(a, batch_size=32):
+def split_array(a, batch_size=32, shuffle=True):
   length = len(a)
   parts = int(np.ceil(length/batch_size))
-  np.random.shuffle(a)
+  if shuffle:
+    np.random.shuffle(a)
   return [a[k*batch_size:min(length, (k+1)*batch_size)] for k in range(parts)]
 
 

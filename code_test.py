@@ -13,13 +13,13 @@ print(obs)
 plt.figure()
 
 
-for k in range(10000):
+for k in range(2000):
   o, r, eo, info = env.step(env.action_space.sample())
   env.render()
   # plt.draw()
   print(env.robot.body_xyz)
 image = env.render(mode="rgb_array", top_bottom=True)
-print(image.shape)
+print(image.dtype)
 plt.imshow(image)
 plt.show()
 

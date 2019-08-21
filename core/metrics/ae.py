@@ -202,13 +202,15 @@ class FFAE(BaseAE):
   """
   # ----------------------------------------------------------------
   def _define_encoder(self):
-    self.encoder = nn.Sequential(nn.Conv2d(3, 3, 3, bias=False), nn.SELU(),
-                                 nn.BatchNorm2d(3),
-                                 View((-1, 62 * 62 * 3)),
-                                 nn.Linear(62 * 62 * 3, 5120, bias=False), nn.SELU(),
+    self.encoder = nn.Sequential(View((-1, 64 * 64 * 3)),
+                                 nn.Linear(64 * 64 * 3, 5120, bias=False), nn.SELU(),
+                                 nn.BatchNorm1d(5120),
                                  nn.Linear(5120, 2560, bias=False), nn.SELU(),
+                                 nn.BatchNorm1d(2560),
                                  nn.Linear(2560, 512, bias=False), nn.SELU(),
+                                 nn.BatchNorm1d(512),
                                  nn.Linear(512, 128, bias=False), nn.SELU(),
+                                 nn.BatchNorm1d(128),
                                  nn.Linear(128, self.encoding_shape, bias=False), nn.SELU(),
                                  )
   # ----------------------------------------------------------------
@@ -216,12 +218,13 @@ class FFAE(BaseAE):
   # ----------------------------------------------------------------
   def _define_decoder(self):
     self.decoder = nn.Sequential(nn.Linear(self.encoding_shape, 512, bias=False), nn.SELU(),
+                                 nn.BatchNorm1d(512),
                                  nn.Linear(512, 2560, bias=False), nn.SELU(),
+                                 nn.BatchNorm1d(2560),
                                  nn.Linear(2560, 5120, bias=False), nn.SELU(),
-                                 nn.Linear(5120, 62*62*3, bias=False), nn.SELU(),
-                                 View((-1, 3, 62, 62)),
-                                 nn.BatchNorm2d(3),
-                                 nn.ConvTranspose2d(3, 3, 3), nn.ReLU()
+                                 nn.BatchNorm1d(5120),
+                                 nn.Linear(5120, 64*64*3, bias=False), nn.ReLU(),
+                                 View((-1, 3, 64, 64)),
                                  )
   # ----------------------------------------------------------------
 
