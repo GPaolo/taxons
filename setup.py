@@ -6,6 +6,7 @@ setup(author='Giuseppe Paolo',
       install_requires=[
             'numpy',
             'torch',
+            'torchvision',
             'pytest',
             'gym',
             'pygame',
@@ -13,6 +14,7 @@ setup(author='Giuseppe Paolo',
             'Box2D',
             'simplejson',
             'pandas',
-            'mujoco-py<2.1,>=2.0'
+            'matplotlib',
+            'ipython'
       ]
 )
