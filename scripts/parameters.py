@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Maxe with NS done on NoTrain AE. Neural agents.'
+    self.info = 'Maxe with NS done on Surprise AE. Neural agents.'
 
-    self.exp_name = 'Maze_AE_Novelty'
+    self.exp_name = 'Maze_AE_Surprise'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -51,7 +51,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto', 'Novelty'
+    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto', 'Novelty'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------

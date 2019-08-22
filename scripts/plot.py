@@ -5,6 +5,7 @@ import numpy as np
 import json
 import os
 import matplotlib.pyplot as plt
+from core.utils import utils
 
 class GenPlot(object):
 
@@ -93,7 +94,7 @@ class GenPlot(object):
 
 
 if __name__ == '__main__':
-  plotter = GenPlot(total_gens=1000)
+  plotter = GenPlot(total_gens=500)
 
   base_path = '/media/giuseppe/Storage/AE NS/Experiments/Maze'
   experiment = 'Maze'
@@ -125,25 +126,35 @@ if __name__ == '__main__':
   colors = plt.get_cmap('Set1')
   plt.rc('grid', linestyle="dotted", color='gray')
   labels = ['MIX', 'NT', 'AEN', 'AES', 'NS', 'PS', 'RBD', 'RS']
+  coverage_list = [c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs]
+  surprise_list = [s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs]
+  archive_list = [a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs]
+  overlapping_list = []
 
   fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(60, 10))
 
-  plotter.plot_data_single_fig([c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs],
+  plotter.plot_data_single_fig(coverage_list,
                     labels=labels,
                     cmap=colors,
                     title='Coverage', y_axis='Coverage %', axes=axes[0],
                     use_std=use_std)
 
-  plotter.plot_data_single_fig([s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs],
+  plotter.plot_data_single_fig(surprise_list,
                    labels=labels,
                    cmap=colors,
                    title='Rec. Error', y_axis='Reconstruction error', axes=axes[1],
                    use_std = use_std)
 
-  plotter.plot_data_single_fig([a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs],
+  for a, c in zip(archive_list, coverage_list):
+    if a is not None:
+      overlapping_list.append(utils.calc_overlapping((50, 50), a, c))
+    else:
+      overlapping_list.append(None)
+
+  plotter.plot_data_single_fig(overlapping_list,
                     labels=labels,
                     cmap=colors,
-                    title='Archive Size', y_axis='Number of agents', axes=axes[2],
+                    title='Overlapping', y_axis='Overlapping %', axes=axes[2],
                     use_std=use_std)
 
   handles, labels = axes[0].get_legend_handles_labels()
@@ -151,6 +162,6 @@ if __name__ == '__main__':
   plt.subplots_adjust(left=0.1, right=.99, top=0.9, bottom=0.1, wspace=0.4)
   plt.show()
 
-  fig.savefig(os.path.join(base_path,'billiard_plots.pdf'))
+  fig.savefig(os.path.join(base_path,'plots.pdf'))
 
   # plt.figure(figsize=(5, 10))

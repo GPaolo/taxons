@@ -275,3 +275,13 @@ def split_array(a, batch_size=32, shuffle=True):
 def rgb2gray(img):
   gray = 0.2989 * img[:,:,:,0] + 0.5870 * img[:,:,:,1] + 0.1140 * img[:,:,:,2]
   return np.expand_dims(gray, -1)
+
+
+def calc_overlapping(grid_size, archive, coverage):
+  total_area = grid_size[0] * grid_size[1]
+  occupied_cells = total_area * coverage/100
+  overlapping = 1 - occupied_cells/archive
+  return overlapping*100
+
+
+
