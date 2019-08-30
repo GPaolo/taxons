@@ -277,11 +277,16 @@ def rgb2gray(img):
   return np.expand_dims(gray, -1)
 
 
-def calc_overlapping(grid_size, archive, coverage):
+def calc_avg_chi_sq_test(grid_size, archive, coverage):
   total_area = grid_size[0] * grid_size[1]
   occupied_cells = total_area * coverage/100
-  overlapping = 1 - occupied_cells/archive
-  return overlapping*100
+  # overlapping = 1 - occupied_cells/archive
+  O = archive/occupied_cells
+  E = archive/total_area
+
+  avg_chi = ((O-E)**2)/E
+  avg_chi = np.log(avg_chi)
+  return avg_chi
 
 
 

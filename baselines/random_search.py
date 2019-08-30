@@ -19,7 +19,9 @@ class RandomSearch(BaseBaseline):
     self.population = population.Population(agent=self.agent_type,
                                             shapes=self.agents_shapes,
                                             pop_size=self.pop_size)
-    self.archive = None
+    self.archive = population.Population(agent=self.agent_type,
+                                           shapes=self.agents_shapes,
+                                           pop_size=0)
     self.opt = self.params.optimizer(self.population, archive=self.archive, mutation_rate=self.params.mutation_rate,
                                      metric_update_interval=self.params.update_interval)
   # ---------------------------------------------------
@@ -67,31 +69,38 @@ class RandomSearch(BaseBaseline):
   def train(self, *args, **kwargs):
     for idx, agent in enumerate(self.population):
       self.evaluate_agent(agent)
+      self.archive.add(self.pop.copy(idx, with_data=True))
       if idx % 100 == 0:
         gc.collect()
         print('Seed {} - Agent {}'.format(self.params.seed, idx))
 
-    max_rew = np.max(self.population['reward'].values)
+      if idx % 5 == 0 and idx != 0: # Every 5 agents there is a generation. This is done to keep the logs consistent with the other experiments
+        self.elapsed_gen += 1
 
-    bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
-    if 'Ant' in self.params.env_tag:
-      u_limit = 3.5
-      l_limit = -u_limit
-    elif 'FastsimSimpleNavigation' in self.params.env_tag:
-      u_limit = 600
-      l_limit = 0
-    else:
-      u_limit = 1.35
-      l_limit = -u_limit
+        bs_points = np.concatenate(self.archive['bs'].values)
+        if 'Ant' in self.params.env_tag:
+          u_limit = 3.5
+          l_limit = -u_limit
+        elif 'FastsimSimpleNavigation' in self.params.env_tag:
+          u_limit = 600
+          l_limit = 0
+        else:
+          u_limit = 1.35
+          l_limit = -u_limit
 
-    coverage = utils.show(bs_points, filepath=self.save_path,
-                          info={'gen': self.elapsed_gen, 'seed': self.params.seed},
-                          upper_limit=u_limit, lower_limit=l_limit)
+        max_rew = np.max(self.archive['reward'].values)
+        coverage = utils.show(bs_points, filepath=self.save_path,
+                              info={'gen': self.elapsed_gen, 'seed': self.params.seed},
+                              upper_limit=u_limit, lower_limit=l_limit)
 
-    self.logs['Generation'] = [str(self.elapsed_gen)] * self.params.generations
-    self.logs['Avg gen surprise'] = ['0'] * self.params.generations
-    self.logs['Max reward'] = [str(max_rew)] * self.params.generations
-    self.logs['Archive size'] = [str(self.population.size)] * self.params.generations
-    self.logs['Coverage'] = [str(coverage)] * self.params.generations
+        self.logs['Generation'].append(str(self.elapsed_gen))
+        self.logs['Avg gen surprise'].append('0')
+        self.logs['Max reward'].append(str(max_rew))
+        self.logs['Archive size'].append(str(self.archive.size))
+        self.logs['Coverage'].append(str(coverage))
+      if self.END:
+        print('Seed {} - Quitting.'.format(self.params.seed))
+        break
+
     gc.collect()
   # ---------------------------------------------------
