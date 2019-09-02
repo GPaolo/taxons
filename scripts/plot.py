@@ -115,7 +115,7 @@ class GenPlot(object):
 
 
 if __name__ == '__main__':
-  plotter = GenPlot(total_gens=2000)
+  plotter = GenPlot(total_gens=1999)
 
   base_path = '/media/giuseppe/Storage/AE NS/Experiments/Billiard 2k'
   experiment = 'Billiard'

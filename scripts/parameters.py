@@ -7,14 +7,14 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Maxe with Mixed strategy. Neural agents.'
+    self.info = 'Ant with Maze, for 1k episodes, with Neural Agents'
 
-    self.exp_name = 'Maze_AE_Mixed'
+    self.exp_name = 'Maze_NS'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
-    self.baseline = None # None, 'NS', 'PS', 'RS', 'RBD'
+    self.baseline = 'NS' # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------
@@ -24,7 +24,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 2000
+    self.generations = 1000
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9
@@ -33,7 +33,7 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 5, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'} # poly, exp, sin
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'sin'} # poly, exp, sin
     # ---------------------------------------------------------
 
     # Metric
@@ -51,7 +51,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto', 'Novelty'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto', 'Novelty'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------

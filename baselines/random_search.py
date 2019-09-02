@@ -69,12 +69,14 @@ class RandomSearch(BaseBaseline):
   def train(self, *args, **kwargs):
     for idx, agent in enumerate(self.population):
       self.evaluate_agent(agent)
-      self.archive.add(self.pop.copy(idx, with_data=True))
+      self.archive.add(self.population.copy(idx, with_data=True))
       if idx % 100 == 0:
         gc.collect()
         print('Seed {} - Agent {}'.format(self.params.seed, idx))
 
-      if idx % 5 == 0 and idx != 0: # Every 5 agents there is a generation. This is done to keep the logs consistent with the other experiments
+      # Every 5 agents there is a generation. This is done to keep the logs consistent with the other experiments
+      # We do idx + 1 cause idx goes from 0 not from 1
+      if idx + 1 % 5 == 0 and idx != 0:
         self.elapsed_gen += 1
 
         bs_points = np.concatenate(self.archive['bs'].values)
