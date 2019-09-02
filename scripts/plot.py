@@ -148,7 +148,7 @@ if __name__ == '__main__':
 
   colors = plt.get_cmap('Set1')
   plt.rc('grid', linestyle="dotted", color='gray')
-  labels = ['TAXONS', 'NT', 'AEN', 'AES', 'NS', 'PS', 'RBD', 'RS']
+  labels = ['TAXONS', 'NT', 'TAXO-N', 'TAXO-S', 'NS', 'PS', 'RBD', 'RS']
   coverage_list = [c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs]
   surprise_list = [s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs]
   archive_list = [a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs]

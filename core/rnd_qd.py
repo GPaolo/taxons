@@ -100,7 +100,7 @@ class RndQD(object):
         CoM = np.array([self.env.robot.body_xyz[:2]])
         if np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
-    state = self.env.render(mode='rgb_array')
+    state = self.env.render(mode='rgb_array', top_bottom=True)
     state = state/np.max((np.max(state), 1))
 
     agent['bs'] = utils.extact_hd_bs(self.env, obs, reward, done, info)
