@@ -93,12 +93,13 @@ class Population(object):
     save_ckpt['Genome'] = {}
 
     for a in self:
-      save_ckpt['Genome'][a['name']] = {'gen': a['agent'].genome, 'feat': a['features']}
+      save_ckpt['Genome'][a['name']] = {'gen': a['agent'].genome, 'feat': a['features'], 'bs': a['bs']}
     try:
       with open(os.path.join(filepath, 'qd_{}.pkl'.format(name)), 'wb') as file:
         pkl.dump(save_ckpt, file)
-    except:
+    except Exception as e:
       print('Cannot Save {}.'.format(name))
+      print('Exception {}'.format(e))
 
   def load_pop(self, filepath):
     if not os.path.exists(filepath):
@@ -121,6 +122,7 @@ class Population(object):
       try:
         agent_genome = ckpt['Genome'][agent_name]['gen']
         agent['features'] = ckpt['Genome'][agent_name]['feat']
+        # agent['bs'] = ckpt['Genome'][agent_name]['bs']
       except:
         print('Agents without features!')
         agent_genome = ckpt['Genome'][agent_name]

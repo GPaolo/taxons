@@ -73,7 +73,7 @@ class Params(object):
     assert os.path.exists(load_path), 'Specified parameter file does not exists in {}.'.format(load_path)
     with open(load_path) as f:
       data = json.load(f)
-    data['_seed'] = 1190
+    # data['_seed'] = 1190
     for key in data:
       setattr(self, key, data[key])
       assert self.__dict__[key] == data[key], 'Could not set {} parameter.'.format(key)

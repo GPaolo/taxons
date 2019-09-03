@@ -189,17 +189,17 @@ def extact_hd_bs(env, obs, reward=None, done=None, info=None):
   """
   env_tag = env.spec.id
   if env_tag == 'MountainCarContinuous-v0':
-    return np.array([obs])
+    return np.array(obs)
   elif env_tag == 'Billiard-v0':
-    return np.array([[obs[0][0], obs[0][1]]])
+    return np.array([obs[0][0], obs[0][1]])
   elif env_tag == 'BilliardHard-v0':
-    return np.array([[obs[0][0], obs[0][1]]])
+    return np.array([obs[0][0], obs[0][1]])
   elif env_tag == 'AntMuJoCoEnv-v0':
-    return np.array([env.robot.body_xyz[:2]]) # xy position of CoM of the robot
+    return np.array(env.robot.body_xyz[:2]) # xy position of CoM of the robot
   elif env_tag == 'FastsimSimpleNavigation-v0':
     if info is None:
       return None
-    return np.array([info['robot_pos'][:2]])
+    return np.array(info['robot_pos'][:2])
   else:
     return obs
 
