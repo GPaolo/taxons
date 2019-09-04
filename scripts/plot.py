@@ -12,12 +12,12 @@ class GenPlot(object):
   def __init__(self, folders=None, total_gens=500):
     self.folders = folders
     params = {'legend.fontsize': 'x-large',
-              'figure.figsize': (15, 5),
+#              'figure.figsize': (15, 5),
               'axes.labelsize': 'xx-large',
               'axes.titlesize': 'xx-large',
               'xtick.labelsize': 'x-large',
               'ytick.labelsize': 'x-large'}
-    plt.rcParams.update(params)
+    # plt.rcParams.update(params)
 
     self.total_gens = total_gens
 
@@ -48,7 +48,7 @@ class GenPlot(object):
       return coverage, gen_surprise, archive_size
     if np.max(gens) < self.total_gens-1:
       return None, None, None
-    return coverage, gen_surprise, archive_size
+    return coverage[:, :self.total_gens], gen_surprise[:, :self.total_gens], archive_size[:, :self.total_gens]
 
   def plot_data(self, data, title, labels, cmap, y_axis, gen=True):
     # Create plots
@@ -81,7 +81,7 @@ class GenPlot(object):
     plt.show()
     return fig
 
-  def plot_data_single_fig(self, data, title, labels, cmap, y_axis, axes, use_std=False, gen=True):
+  def plot_curves(self, data, title, labels, cmap, y_axis, axes, use_std=False, gen=True):
     colors = [cmap(k) for k in range(len(data))]
     axes.yaxis.grid(True)
     if gen:
@@ -102,8 +102,16 @@ class GenPlot(object):
         max = mean + std
         min = mean - std
 
-      # axes.grid(True)
-      axes.plot(x_data, mean, color=c, label=l)
+      if len(l) >= 4:
+        linestyle = '-'
+      else:
+        linestyle = '-.'
+
+      if l == 'TAXONS' or linestyle == '-.':
+        linewidth = 2
+      else:
+        linewidth = 1
+      axes.plot(x_data, mean, color=c, label=l, linestyle=linestyle, linewidth=linewidth)
       axes.fill_between(x_data, max, min, facecolor=c, alpha=0.3)
 
     axes.set_title(title)
@@ -113,55 +121,133 @@ class GenPlot(object):
       axes.set_xlabel('Number of controllers')
     axes.set_ylabel(y_axis)
 
+  def plot_violins(self, data, title, labels, cmap, y_axis, axes):
+    colors = [cmap(k) for k in range(len(data))]
+    axes.grid(True)
+    axes.grid(linestyle='dotted')
+
+    violin_data = []
+    pos = []
+    violin_colors = []
+    # Reformat data
+    for d, l, c in zip(data, labels, colors):
+      if d is None:
+        continue
+      violin_data.append(d[:,-1])
+      pos.append(l)
+      violin_colors.append(list(c))
+
+    parts = axes.violinplot(violin_data,
+                            showmeans=False,
+                            showmedians=False,
+                            showextrema=False)
+
+    axes.get_xaxis().set_tick_params(direction='out',labelrotation=45)
+    axes.xaxis.set_ticks_position('bottom')
+    axes.set_xticks(np.arange(1, len(pos) + 1))
+    axes.set_xticklabels(pos)
+    axes.set_xlim(0.25, len(pos) + 0.75)
+
+    for body, c in zip(parts['bodies'], violin_colors):
+      c[-1] = 0.3
+      body.set_facecolor(c)
+      c[-1] = 1
+      body.set_edgecolor(c)
+
+    # def adjacent_values(vals, q1, q3):
+    #   upper_adjacent_value = q3 + (q3 - q1) * 1.5
+    #   upper_adjacent_value = np.clip(upper_adjacent_value, q3, vals[-1])
+    #
+    #   lower_adjacent_value = q1 - (q3 - q1) * 1.5
+    #   lower_adjacent_value = np.clip(lower_adjacent_value, vals[0], q1)
+    #   return lower_adjacent_value, upper_adjacent_value
+
+    quartile1 = []
+    quartile3 = []
+    medians = []
+    for vd in violin_data:
+      q1, m, q3 = np.percentile(vd, [25, 50, 75], axis=0)
+      quartile1.append(q1)
+      quartile3.append(q3)
+      medians.append(m)
+
+
+    whiskers = []
+    for d in violin_data:
+      whiskers.append([min(d), max(d)])
+    # whiskers = np.array([adjacent_values(sorted_array, q1, q3)
+    #   for sorted_array, q1, q3 in zip(violin_data, quartile1, quartile3)])
+    # whiskersMin, whiskersMax = whiskers[:, 0], whiskers[:, 1]
+
+
+
+    inds = np.arange(1, len(medians) + 1)
+    for idx, m, q1, q3, c, w in  zip(inds, medians, quartile1, quartile3, violin_colors, whiskers):
+      # axis.vlines(idx, w[0], w[1], color='k', linestyle='-', lw=1)
+      # axis.vlines(idx, w[0] - 0.15, w[0] + 0.15, color='k', linestyle='-', lw=6)
+      # axis.vlines(idx, w[1] - 0.15, w[1] + 0.15, color='k', linestyle='-', lw=10)
+      axes.vlines(idx, m-0.15, m+0.12, color=c, alpha=1, linestyle='-', lw=20)
+      axes.vlines(idx, q1, q3, color=c, linestyle='-', lw=5, alpha=1)
+
+    axes.set_ylabel(y_axis)
+    axes.set_title(title)
+
+
 
 if __name__ == '__main__':
-  plotter = GenPlot(total_gens=1999)
+  total_gens = [1999, 500, 1000]
+  violins = False
+  fig, axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
+  name = ['Billiard', 'Ant', 'Maze']
 
-  base_path = '/media/giuseppe/Storage/AE NS/Experiments/Billiard 2k'
-  experiment = 'Billiard'
+  for experiment, ax, gens in zip(name, axes, total_gens):
+    base_path = '/media/giuseppe/Storage/AE NS/Experiments/{}'.format(experiment)
 
-  c_mix, s_mix, a_mix = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Mixed'.format(experiment)))
-  c_nt, s_nt, a_nt = plotter.load_exp_data(os.path.join(base_path,'{}_AE_NoTrain'.format(experiment)))
-  c_nt, s_nt, a_nt = None, None, None
-  c_aen, s_aen, a_aen = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Novelty'.format(experiment)))
-  c_aes, s_aes, a_aes = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Surprise'.format(experiment)))
-  c_ns, s_ns, a_ns = plotter.load_exp_data(os.path.join(base_path,'{}_NS'.format(experiment)))
-  c_ps, s_ps, a_ps = plotter.load_exp_data(os.path.join(base_path,'{}_PS'.format(experiment)))
-  c_rbd, s_rbd, a_rbd = plotter.load_exp_data(os.path.join(base_path,'{}_RBD'.format(experiment)))
-  c_rs, s_rs, a_rs = plotter.load_exp_data(os.path.join(base_path,'{}_RS'.format(experiment)))
+    plotter = GenPlot(total_gens=gens)
 
-  # plotter.plot_data(g, [c_nt, c_ps, c_aen, c_aes, c_ns],
-  #                   labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
-  #                   colors=['red', 'blue', 'yellow', 'green', 'violet'],
-  #                   title='Coverage', y_axis='Coverage %')
-  # plotter.plot_data(g, [s_nt, s_ps, s_aen, s_aes, s_ns],
-  #                   labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
-  #                   colors=['red', 'blue', 'yellow', 'green', 'violet'],
-  #                   title='Surprise', y_axis='Reconstruction error')
-  # plotter.plot_data(g, [a_nt, a_ps, a_aen, a_aes, a_ns],
-  #                   labels=['NT', 'PS', 'AEN', 'AES', 'NS'],
-  #                   colors=['red', 'blue', 'yellow', 'green', 'violet'],
-  #                   title='Archive Size', y_axis='Number of agents')
+    c_mix, s_mix, a_mix = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Mixed'.format(experiment)))
+    # c_nt, s_nt, a_nt = plotter.load_exp_data(os.path.join(base_path,'{}_AE_NoTrain'.format(experiment)))
+    c_nt, s_nt, a_nt = None, None, None
+    c_aen, s_aen, a_aen = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Novelty'.format(experiment)))
+    c_aes, s_aes, a_aes = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Surprise'.format(experiment)))
+    c_ns, s_ns, a_ns = plotter.load_exp_data(os.path.join(base_path,'{}_NS'.format(experiment)))
+    c_ps, s_ps, a_ps = plotter.load_exp_data(os.path.join(base_path,'{}_PS'.format(experiment)))
+    c_rbd, s_rbd, a_rbd = plotter.load_exp_data(os.path.join(base_path,'{}_RBD'.format(experiment)))
+    c_rs, s_rs, a_rs = plotter.load_exp_data(os.path.join(base_path,'{}_RS'.format(experiment)))
 
-  use_std = True
-  gen_on_x = False
 
-  colors = plt.get_cmap('Set1')
-  plt.rc('grid', linestyle="dotted", color='gray')
-  labels = ['TAXONS', 'NT', 'TAXO-N', 'TAXO-S', 'NS', 'PS', 'RBD', 'RS']
-  coverage_list = [c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs]
-  surprise_list = [s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs]
-  archive_list = [a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs]
-  overlapping_list = []
+    use_std = True
+    gen_on_x = False
 
-  fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(60, 10))
+    colors = plt.get_cmap('Dark2')
+    plt.rc('grid', linestyle="dotted", color='gray')
+    labels = ['TAXONS', 'NT', 'TAXO-N', 'TAXO-S', 'NS', 'PS', 'RBD', 'RS']
+    coverage_list = [c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs]
+    surprise_list = [s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs]
+    archive_list = [a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs]
+    overlapping_list = []
 
-  plotter.plot_data_single_fig(coverage_list,
-                    labels=labels,
-                    cmap=colors,
-                    title='Coverage', y_axis='Coverage %', axes=axes[0],
-                    use_std=use_std,
-                    gen=gen_on_x)
+
+    if not violins:
+      plotter.plot_curves(coverage_list,
+                          labels=labels,
+                          cmap=colors,
+                          title=experiment, y_axis='Coverage %', axes=ax,
+                          use_std=use_std,
+                          gen=gen_on_x)
+    else:
+      plotter.plot_violins(coverage_list,
+                          labels=labels,
+                          cmap=colors,
+                          title=experiment, y_axis='Coverage %', axes=ax)
+
+
+  # plotter.plot_violins(coverage_list,
+  #                      labels=labels,
+  #                      cmap=colors,
+  #                      title='Coverage',
+  #                      y_axis='Coverage %',
+  #                      axis=axes[1])
 
   # plotter.plot_data_single_fig(surprise_list,
   #                  labels=labels,
@@ -170,24 +256,28 @@ if __name__ == '__main__':
   #                  use_std = use_std,
   #                   gen=gen_on_x)
 
-  for a, c in zip(archive_list, coverage_list):
-    if a is not None:
-      overlapping_list.append(utils.calc_avg_chi_sq_test((50, 50), a, c))
-    else:
-      overlapping_list.append(None)
+  # for a, c in zip(archive_list, coverage_list):
+  #   if a is not None:
+  #     overlapping_list.append(utils.calc_avg_chi_sq_test((50, 50), a, c))
+  #   else:
+  #     overlapping_list.append(None)
+  #
+  # plotter.plot_data_single_fig(overlapping_list,
+  #                   labels=labels,
+  #                   cmap=colors,
+  #                   title='Log Chi Squared', y_axis='Log distance from uniform', axes=axes[1],
+  #                   use_std=use_std,
+  #                   gen=gen_on_x)
 
-  plotter.plot_data_single_fig(overlapping_list,
-                    labels=labels,
-                    cmap=colors,
-                    title='Log Chi Squared', y_axis='Log distance from uniform', axes=axes[1],
-                    use_std=use_std,
-                    gen=gen_on_x)
+  if not violins:
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper left', fancybox=True)#, bbox_to_anchor=(1, 0.5))
+    plt.subplots_adjust(left=0.12, right=.99, top=0.91, bottom=0.18, wspace=0.13)
 
-  handles, labels = axes[0].get_legend_handles_labels()
-  fig.legend(handles, labels, loc='upper left')
-  plt.subplots_adjust(left=0.1, right=.99, top=0.9, bottom=0.1, wspace=0.4)
+  else:
+    plt.subplots_adjust(left=0.05, right=.99, top=0.91, bottom=0.18, wspace=0.13)
   plt.show()
 
-  fig.savefig(os.path.join(base_path,'plots.pdf'))
+  # fig.savefig(os.path.join(base_path,'plots.pdf'))
 
   # plt.figure(figsize=(5, 10))

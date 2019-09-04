@@ -7,14 +7,14 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Ant with Maze, for 1k episodes, with Neural Agents'
+    self.info = 'Maze, for 1k episodes, with Neural Agents doing RS'
 
-    self.exp_name = 'Maze_NS'
+    self.exp_name = 'Maze_RS'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
-    self.baseline = 'NS' # None, 'NS', 'PS', 'RS', 'RBD'
+    self.baseline = 'RS' # None, 'NS', 'PS', 'RS', 'RBD'
 
     # Environment
     # ---------------------------------------------------------

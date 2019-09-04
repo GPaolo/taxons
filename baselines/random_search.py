@@ -76,7 +76,7 @@ class RandomSearch(BaseBaseline):
 
       # Every 5 agents there is a generation. This is done to keep the logs consistent with the other experiments
       # We do idx + 1 cause idx goes from 0 not from 1
-      if idx + 1 % 5 == 0 and idx != 0:
+      if (idx + 1) % 5 == 0 and idx != 0:
         self.elapsed_gen += 1
 
         bs_points = np.concatenate(self.archive['bs'].values)
