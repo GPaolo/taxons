@@ -12,7 +12,10 @@ import pickle as pkl
 import progressbar
 import json
 import matplotlib.pyplot as plt
+import matplotlib
 import gc
+from sklearn.decomposition import PCA
+
 
 class ChiSquaredTest(object):
   # -----------------------------------------------
@@ -116,7 +119,7 @@ class ChiSquaredTest(object):
   # -----------------------------------------------
 
   # -----------------------------------------------
-  def show_bs_points(self, bs_points, upper_limit=1.35, lower_limit=-1.35, axes=None):
+  def show_bs_points(self, bs_points, upper_limit=1.35, lower_limit=-1.35, axes=None, color=None):
     pts = ([x[0] for x in bs_points if x is not None], [y[1] for y in bs_points if y is not None])
 
     plt.rcParams["patch.force_edgecolor"] = True
@@ -124,16 +127,31 @@ class ChiSquaredTest(object):
       fig, axes = plt.subplots(nrows=1, ncols=1)
 
     axes.set_title('Final positions of {} agents'.format(len(pts[0])))
-    axes.scatter(pts[0], pts[1])
+    if color is None:
+      axes.scatter(pts[0], pts[1])
+    else:
+      axes.scatter(pts[0], pts[1], color=color)
     axes.set_xlim(lower_limit, upper_limit)
     axes.set_ylim(lower_limit, upper_limit)
   # -----------------------------------------------
 
   # -----------------------------------------------
   def get_bs_by_gen(self, gen):
+    if gen >= len(self.exp_data['archive_size']):
+      gen = len(self.exp_data['archive_size']) - 1
     agents_num = self.exp_data['archive_size'][gen]
     bs = self.pop['bs'].values[:agents_num]
     return bs
+  # -----------------------------------------------
+
+  # -----------------------------------------------
+  def feat_pca(self):
+    print('Doing PCA')
+    feats = self.pop['features'].values
+    feats = np.array([k[0] for k in feats])
+    self.pca = PCA(n_components=2, whiten=True)
+    self.pca.fit(feats)
+    print('Done.')
   # -----------------------------------------------
 
   # -----------------------------------------------
@@ -152,18 +170,35 @@ class ChiSquaredTest(object):
         self.evaluate_agent_xy()
         self.pop.save_pop(os.path.join(folder_name, 'models'), 'archive')
 
-      gens = 0
-      fig, axes = plt.subplots()
-      plt.ion()
+      pca_feat = self.feat_pca()
+
+      cmap = matplotlib.cm.get_cmap('viridis')
+      bs = self.get_bs_by_gen(2000)
+      normalize = matplotlib.colors.Normalize(vmin=0, vmax=len(bs))
+      colors = [cmap(normalize(value)) for value in range(len(bs))]
+      fig, axes = plt.subplots(nrows=1, ncols=2)
+      self.show_bs_points(bs, axes=axes[0], color=colors)
+      self.show_bs_points(pca_feat, axes=axes[1], color=colors)
       plt.show()
-      while gens >= 0:
-        gens = int(input('Number of gens to show '))
-        bs = self.get_bs_by_gen(gens)
-        self.show_bs_points(bs, axes=axes)
+
+      #gens = 0
+      #fig, axes = plt.subplots(nrows=2, ncols=3)
+      #plt.ion()
+      #plt.show()
+      #while gens >= 0:
+      #  gens = int(input('Number of gens to show '))
+      #  bs = self.get_bs_by_gen(gens)
+      #  self.show_bs_points(bs, axes=axes)
       # bs = self.get_bs_by_gen(300)
       # self.show_bs_points(bs, axes=axes[1])
-        plt.draw()
-        plt.pause(.01)
+      #  plt.draw()
+      #  plt.pause(.01)
+      #gens = [[10, 50, 150], [300, 600, 999]]
+      #for r in range(2):
+      #  for c in range(3):
+      #    bs = self.get_bs_by_gen(gens[r][c])
+      #    self.show_bs_points(bs, axes=axes[r][c])
+      #plt.show()
 
       gc.collect()
   # -----------------------------------------------
