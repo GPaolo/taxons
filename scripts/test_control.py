@@ -3,7 +3,7 @@
 
 from scripts import parameters
 import gym, torch
-import gym_billiard
+import gym_billiard, gym_fastsim
 import numpy as np
 from core.metrics import ae, rnd
 from core.qd import population, agents
@@ -14,6 +14,8 @@ from matplotlib import cm
 import pickle as pkl
 import progressbar
 import gc
+import pyfastsim as fs
+
 
 
 
@@ -354,7 +356,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Ant_AE_Mixed/15'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed/42'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -407,7 +409,7 @@ if __name__ == "__main__":
   # if "Billiard" in params.env_tag:
   #   env.env.params.RANDOM_BALL_INIT_POSE = False
   # -----------------------------------------------
-  target_pose = [1., 1.]
+  target_pose = [450., 500.]
   # Generate target image
   if "Billiard" in params.env_tag:
     env.reset()
@@ -423,6 +425,16 @@ if __name__ == "__main__":
     qvel = np.zeros(14)
     qpos[:2] = np.array(target_pose)
     env.env.set_state(qpos, qvel)
+    target_image = env.render(mode='rgb_array')
+    plt.figure()
+    plt.imshow(target_image)
+    plt.show()
+  elif 'Fastsim' in params.env_tag:
+    obs = env.reset()
+    pose = target_pose + env.initPos[-1:]
+    p = fs.Posture(*pose)
+    env.robot.set_pos(p)
+    env.enable_display()
     target_image = env.render(mode='rgb_array')
     plt.figure()
     plt.imshow(target_image)
@@ -523,14 +535,14 @@ if __name__ == "__main__":
   # Get agent with smallest distance in BS space
   closest_agent = np.argmin(dists)
   selected = pop[closest_agent]
-  print("Selected agent {}".format(closest_agent))
+  print("Selected agent {} - Distance {}".format(closest_agent, dists[closest_agent]))
   # -----------------------------------------------
 
   # Testing agent
   # -----------------------------------------------
   done = False
   t = 0
-  obs = params.env_tag, env.reset()
+  obs = env.reset()
   env.seed(15)
   while not done:
     env.render()
@@ -554,11 +566,11 @@ if __name__ == "__main__":
       f_pose = CoM
       if np.any(np.abs(CoM) >= np.array([3, 3])):
         done = True
-    elif 'Billiard' in params.env_tag:
-      f_pose = obs[0][:2]
 
   if 'Billiard' in params.env_tag:
     env.env.params.SHOW_ARM_IN_ARRAY = True
+
+  f_pose = utils.extact_hd_bs(env, obs, reward, done, info)
 
   state = env.render(mode='rgb_array')#, top_bottom=True)
   state = state / np.max((np.max(state), 1))
@@ -568,6 +580,8 @@ if __name__ == "__main__":
       for j in range(state.shape[1]):
         if np.all(state[i, j] == np.zeros(3)):
           state[i, j] = np.ones(3)
+  elif 'Fastsim' in params.env_tag:
+    state = 1 - state
 
 
   final_distance = np.sqrt(np.sum((target_pose - f_pose) ** 2))
