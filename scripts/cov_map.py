@@ -17,9 +17,9 @@ import gc
 from sklearn.decomposition import PCA
 
 
-class ChiSquaredTest(object):
+class CoverageMap(object):
   # -----------------------------------------------
-  def __init__(self, exp_folder=None, reeval_bs=False, render=False):
+  def __init__(self, exp_folder=None, reeval_bs=False, render=False, seed=11):
     assert os.path.exists(exp_folder), 'Experiment folder {} does not exist'.format(exp_folder)
     self.folder = exp_folder
     self.params = None
@@ -27,7 +27,8 @@ class ChiSquaredTest(object):
     self.render_test = render
 
     # Get all the seeds
-    self.seeds = list(os.walk(self.folder))[0][1]
+    # self.seeds = list(os.walk(self.folder))[0][1]
+    self.seed = seed
 
     if 'Billiard' in self.folder:
       self.env_tag = 'Billiard-v0'
@@ -82,11 +83,6 @@ class ChiSquaredTest(object):
   # -----------------------------------------------
 
   # -----------------------------------------------
-  def calc_chi2(self):
-    return
-  # -----------------------------------------------
-
-  # -----------------------------------------------
   def evaluate_agent_xy(self):
     print('Calculating agent XY final pose')
     with progressbar.ProgressBar(max_value=len(self.pop)) as bar:
@@ -126,11 +122,13 @@ class ChiSquaredTest(object):
     if axes is None:
       fig, axes = plt.subplots(nrows=1, ncols=1)
 
-    axes.set_title('Final positions of {} agents'.format(len(pts[0])))
+    # axes.set_title('Final positions of agents'.format(len(pts[0])))
     if color is None:
       axes.scatter(pts[0], pts[1])
     else:
       axes.scatter(pts[0], pts[1], color=color)
+    axes.set_xlabel('x')
+    axes.set_ylabel('y')
     axes.set_xlim(lower_limit, upper_limit)
     axes.set_ylim(lower_limit, upper_limit)
   # -----------------------------------------------
@@ -155,40 +153,42 @@ class ChiSquaredTest(object):
   # -----------------------------------------------
 
   # -----------------------------------------------
-  def main(self):
-    for seed in self.seeds:
-      print('Working on seed {}'.format(seed))
-      folder_name = os.path.join(self.folder, seed)
-      self.load_params(folder_name)
-      self.load_archive(folder_name)
-      self.load_logs(folder_name)
-      self.env.seed(int(seed))
-      np.random.seed(int(seed))
-      self.env.reset()
+  def main(self, gen=1000, highlights=None):
+    print('Working on seed {}'.format(self.seed))
+    folder_name = os.path.join(self.folder, self.seed)
+    self.load_params(folder_name)
+    self.load_archive(folder_name)
+    self.load_logs(folder_name)
+    self.env.seed(int(self.seed))
+    np.random.seed(int(self.seed))
+    self.env.reset()
 
-      if None in self.pop['bs'].values:
-        self.evaluate_agent_xy()
-        self.pop.save_pop(os.path.join(folder_name, 'models'), 'archive')
-
-      pca_feat = self.feat_pca()
-
-      cmap = matplotlib.cm.get_cmap('viridis')
-      bs = self.get_bs_by_gen(2000)
-      normalize = matplotlib.colors.Normalize(vmin=0, vmax=len(bs))
-      colors = [cmap(normalize(value)) for value in range(len(bs))]
-      fig, axes = plt.subplots(nrows=1, ncols=2)
-      self.show_bs_points(bs, axes=axes[0], color=colors)
-      self.show_bs_points(pca_feat, axes=axes[1], color=colors)
-      plt.show()
+    if None in self.pop['bs'].values:
+      self.evaluate_agent_xy()
+      self.pop.save_pop(os.path.join(folder_name, 'models'), 'archive')
+    #
+    # pca_feat = self.feat_pca()
+    #
+    # cmap = matplotlib.cm.get_cmap('viridis')
+    # bs = self.get_bs_by_gen(gen)
+    # normalize = matplotlib.colors.Normalize(vmin=0, vmax=len(bs))
+    # colors = [cmap(normalize(value)) for value in range(len(bs))]
+    # fig, axes = plt.subplots(nrows=1, ncols=2)
+    # self.show_bs_points(bs, axes=axes[0], color=colors)
+    # self.show_bs_points(pca_feat, axes=axes[1], color=colors)
+    # plt.show()
 
       #gens = 0
-      #fig, axes = plt.subplots(nrows=2, ncols=3)
+    fig, axes = plt.subplots(nrows=1, ncols=1)
       #plt.ion()
       #plt.show()
       #while gens >= 0:
       #  gens = int(input('Number of gens to show '))
-      #  bs = self.get_bs_by_gen(gens)
-      #  self.show_bs_points(bs, axes=axes)
+    bs = self.get_bs_by_gen(gen)
+    # Show actual policies
+    self.show_bs_points(bs, axes=axes)
+    if highlights is not None:
+      self.show_bs_points(highlights, axes=axes, color='red')
       # bs = self.get_bs_by_gen(300)
       # self.show_bs_points(bs, axes=axes[1])
       #  plt.draw()
@@ -198,9 +198,9 @@ class ChiSquaredTest(object):
       #  for c in range(3):
       #    bs = self.get_bs_by_gen(gens[r][c])
       #    self.show_bs_points(bs, axes=axes[r][c])
-      #plt.show()
+    plt.show()
 
-      gc.collect()
+    gc.collect()
   # -----------------------------------------------
 
 
@@ -208,7 +208,11 @@ if __name__ == "__main__":
 
 
   base_path = '/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed'
+  seed = 11
+  highlights = np.array([[1, -0.8],
+                         [0, 0.5],
+                         [1.1, 1.1]
+                         ])
 
-
-  metric = ChiSquaredTest(exp_folder=base_path, reeval_bs=True, render=False)
-  metric.main()
+  metric = CoverageMap(exp_folder=base_path, reeval_bs=True, render=False, seed=str(seed))
+  metric.main(gen=2000, highlights=highlights)
