@@ -122,7 +122,10 @@ class Population(object):
       try:
         agent_genome = ckpt['Genome'][agent_name]['gen']
         agent['features'] = ckpt['Genome'][agent_name]['feat']
-        # agent['bs'] = ckpt['Genome'][agent_name]['bs']
+        try:
+          agent['bs'] = ckpt['Genome'][agent_name]['bs']
+        except:
+          print('Agents without bs')
       except:
         print('Agents without features!')
         agent_genome = ckpt['Genome'][agent_name]
