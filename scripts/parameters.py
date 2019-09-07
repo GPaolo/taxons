@@ -7,9 +7,9 @@ import json
 
 class Params(object):
   def __init__(self):
-    self.info = 'Maxe with NS done on Surprise AE. Neural agents.'
+    self.info = 'Ant with 500 gens and 500 ts. Mixed'
 
-    self.exp_name = 'Maze_AE_Surprise'
+    self.exp_name = 'Ant_AE_Mixed'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -18,22 +18,22 @@ class Params(object):
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.max_episode_len = 2000
+    self.env_tag = 'AntMuJoCoEnv-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
+    self.max_episode_len = 500
     # ---------------------------------------------------------
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 1000
+    self.generations = 500
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9
 
-    self.qd_agent = 'Neural'  # 'DMP
+    self.qd_agent = 'DMP'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 5, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'} # poly, exp, sin
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'sin'} # poly, exp, sin
     # ---------------------------------------------------------
 
     # Metric
@@ -51,7 +51,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Surprise' # 'Surprise', 'Pareto', 'Novelty'
+    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto', 'Novelty'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------
@@ -73,7 +73,7 @@ class Params(object):
     assert os.path.exists(load_path), 'Specified parameter file does not exists in {}.'.format(load_path)
     with open(load_path) as f:
       data = json.load(f)
-    data['_seed'] = 1190
+    # data['_seed'] = 1190
     for key in data:
       setattr(self, key, data[key])
       assert self.__dict__[key] == data[key], 'Could not set {} parameter.'.format(key)

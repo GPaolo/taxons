@@ -106,7 +106,7 @@ class DMPSin(object):
   def __init__(self, name='dmp', **kwargs):
     self.name = name
     self.amplitude = np.random.randn()
-    self.period = np.random.uniform()
+    self.period = np.random.uniform(10, 50) # self.period = np.random.uniform() # MUJOCO
 
   def __call__(self, t):
     x = self.amplitude * np.sin(2*np.pi*t/self.period)
@@ -189,17 +189,17 @@ def extact_hd_bs(env, obs, reward=None, done=None, info=None):
   """
   env_tag = env.spec.id
   if env_tag == 'MountainCarContinuous-v0':
-    return np.array([obs])
+    return np.array(obs)
   elif env_tag == 'Billiard-v0':
-    return np.array([[obs[0][0], obs[0][1]]])
+    return np.array([obs[0][0], obs[0][1]])
   elif env_tag == 'BilliardHard-v0':
-    return np.array([[obs[0][0], obs[0][1]]])
-  elif env_tag == 'Ant-v2':
+    return np.array([obs[0][0], obs[0][1]])
+  elif env_tag == 'AntMuJoCoEnv-v0':
     return np.array([env.robot.body_xyz[:2]]) # xy position of CoM of the robot
   elif env_tag == 'FastsimSimpleNavigation-v0':
     if info is None:
       return None
-    return np.array([info['robot_pos'][:2]])
+    return np.array(info['robot_pos'][:2])
   else:
     return obs
 
@@ -277,11 +277,16 @@ def rgb2gray(img):
   return np.expand_dims(gray, -1)
 
 
-def calc_overlapping(grid_size, archive, coverage):
+def calc_avg_chi_sq_test(grid_size, archive, coverage):
   total_area = grid_size[0] * grid_size[1]
   occupied_cells = total_area * coverage/100
-  overlapping = 1 - occupied_cells/archive
-  return overlapping*100
+  # overlapping = 1 - occupied_cells/archive
+  O = archive/occupied_cells
+  E = archive/total_area
+
+  avg_chi = ((O-E)**2)/E
+  avg_chi = np.log(avg_chi)
+  return avg_chi
 
 
 

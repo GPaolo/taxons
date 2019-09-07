@@ -3,7 +3,7 @@
 
 from scripts import parameters
 import gym, torch
-import gym_billiard
+import gym_billiard, gym_fastsim
 import numpy as np
 from core.metrics import ae, rnd
 from core.qd import population, agents
@@ -14,6 +14,8 @@ from matplotlib import cm
 import pickle as pkl
 import progressbar
 import gc
+import pyfastsim as fs
+
 
 
 
@@ -337,11 +339,11 @@ class Eval(object):
 
 
 if __name__ == "__main__":
-  evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Test_maze_NS', targets=10, render_test=True)
+  # evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/11', targets=30, render_test=True)
 
 
-  errors = evaluator.run_test()
-  evaluator.plot_errors(errors)
+  # errors = evaluator.run_test()
+  # evaluator.plot_errors(errors)
 
   # print("")
   # for key in errors:
@@ -352,19 +354,18 @@ if __name__ == "__main__":
 
 
 
-  # # Parameters
-  # # -----------------------------------------------
-  # load_path = '/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/11'
-  #
-  # params = parameters.Params()
-  # params.load(os.path.join(load_path, 'params.json'))
-  #
-  # env = gym.make(params.env_tag)
-  # env.reset()
-  # # -----------------------------------------------
-  #
-  # # Possible targets
-  # # -----------------------------------------------
+  # Parameters
+  # -----------------------------------------------
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/11'
+
+  params = parameters.Params()
+  params.load(os.path.join(load_path, 'params.json'))
+
+  env = gym.make(params.env_tag)
+  # -----------------------------------------------
+
+  # Possible targets
+  # -----------------------------------------------
   # x = []
   # target_poses = []
   # if "Billiard" in params.env_tag:
@@ -407,142 +408,204 @@ if __name__ == "__main__":
   #
   # if "Billiard" in params.env_tag:
   #   env.env.params.RANDOM_BALL_INIT_POSE = False
-  # # -----------------------------------------------
+  # -----------------------------------------------
+  target_pose = [0., 0.5]
+  # Generate target image
+  if "Billiard" in params.env_tag:
+    env.reset()
+    obs = env.reset(desired_ball_pose=target_pose)
+    target_image = env.render(mode='rgb_array')
+    plt.figure()
+    plt.imshow(target_image)
+    plt.show()
+  elif "Ant" in params.env_tag:
+    env.render()
+    env.reset()
+    qpos = np.zeros(15)
+    qvel = np.zeros(14)
+    qpos[:2] = np.array(target_pose)
+    env.env.set_state(qpos, qvel)
+    target_image = env.render(mode='rgb_array')
+    plt.figure()
+    plt.imshow(target_image)
+    plt.show()
+  elif 'Fastsim' in params.env_tag:
+    obs = env.reset()
+    pose = target_pose + env.initPos[-1:]
+    p = fs.Posture(*pose)
+    env.robot.set_pos(p)
+    env.enable_display()
+    target_image = env.render(mode='rgb_array')
+    plt.figure()
+    plt.imshow(target_image)
+    plt.show()
+
+
+  # Load metric
+  # -----------------------------------------------
+  print('Loading metric...')
+  if params.gpu:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  else:
+    device = torch.device('cpu')
+
+  if params.metric == 'AE':
+    selector = ae.AutoEncoder(device=device, encoding_shape=params.feature_size)
+    selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
+  elif params.metric == 'RND':
+    selector = rnd.RND(params.feature_size)
+    selector.load(os.path.join(load_path, 'models/ckpt_rnd.pth'))
+  else:
+    raise ValueError('Wrong metric selected: {}'.format(params.metric))
+  # -----------------------------------------------
+
+  # Load archive
+  # -----------------------------------------------
+  print('Loading agents...')
+  if params.qd_agent == 'Neural':
+    agent_type = agents.FFNeuralAgent
+  elif params.qd_agent == 'DMP':
+    agent_type = agents.DMPAgent
+  else:
+    raise ValueError('Wrong agent type selected: {}'.format(params.qd_agent))
+
+  pop = population.Population(agent=agent_type, pop_size=0, shapes=params.agent_shapes)
+  pop.load_pop(os.path.join(load_path, 'models/qd_archive.pkl'))
+  # -----------------------------------------------
+
+  # Evaluate archive agents BS points
+  # -----------------------------------------------
+  if pop[0]['features'] is None:
+    for i, agent in enumerate(pop):
+      if i % 50 == 0:
+        print('Evaluating agent {}'.format(i))
+      done = False
+      obs = env.reset()
+      t = 0
+      while not done:
+        agent_input = t
+        action = utils.action_formatting(params.env_tag, agent['agent'](agent_input))
+
+        obs, reward, done, info = env.step(action)
+        t += 1
+
+        if t >= params.max_episode_len:
+          done = True
+
+        if "Ant" in params.env_tag:
+          CoM = np.array([env.env.data.qpos[:2]])
+          if np.any(np.abs(CoM) >= np.array([3, 3])):
+            done = True
+
+      state = env.render(mode='rgb_array')
+      state = state/np.max((np.max(state), 1))
+      state = selector.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0).to(device))
+      surprise, bs_point, y = selector(state)
+      bs_point = bs_point.flatten().cpu().data.numpy()
+      agent['features'] = [bs_point]
+  # -----------------------------------------------
   #
-  # # Load metric
-  # # -----------------------------------------------
-  # print('Loading metric...')
-  # if params.gpu:
-  #   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  # else:
-  #   device = torch.device('cpu')
-  #
-  # if params.metric == 'AE':
-  #   selector = ae.AutoEncoder(device=device, encoding_shape=params.feature_size)
-  #   selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
-  # elif params.metric == 'RND':
-  #   selector = rnd.RND(params.feature_size)
-  #   selector.load(os.path.join(load_path, 'models/ckpt_rnd.pth'))
-  # else:
-  #   raise ValueError('Wrong metric selected: {}'.format(params.metric))
-  # # -----------------------------------------------
-  #
-  # # Load archive
-  # # -----------------------------------------------
-  # print('Loading agents...')
-  # if params.qd_agent == 'Neural':
-  #   agent_type = agents.FFNeuralAgent
-  # elif params.qd_agent == 'DMP':
-  #   agent_type = agents.DMPAgent
-  # else:
-  #   raise ValueError('Wrong agent type selected: {}'.format(params.qd_agent))
-  #
-  # pop = population.Population(agent=agent_type, pop_size=0, shapes=params.agent_shapes)
-  # pop.load_pop(os.path.join(load_path, 'models/qd_archive.pkl'))
-  # # -----------------------------------------------
-  #
-  # # Evaluate archive agents BS points
-  # # -----------------------------------------------
-  # if pop[0]['features'] is None:
-  #   for i, agent in enumerate(pop):
-  #     if i % 50 == 0:
-  #       print('Evaluating agent {}'.format(i))
-  #     done = False
-  #     obs = utils.obs_formatting(params.env_tag, env.reset())
-  #     t = 0
-  #     while not done:
-  #       agent_input = t
-  #       action = utils.action_formatting(params.env_tag, agent['agent'](agent_input))
-  #
-  #       obs, reward, done, info = env.step(action)
-  #       obs = utils.obs_formatting(params.env_tag, obs, reward, done, info)
-  #       t += 1
-  #
-  #       if t >= params.max_episode_len:
-  #         done = True
-  #
-  #       if "Ant" in params.env_tag:
-  #         CoM = np.array([env.env.data.qpos[:2]])
-  #         if np.any(np.abs(CoM) >= np.array([3, 3])):
-  #           done = True
-  #
-  #     state = env.render(mode='rgb_array')
-  #     state = state/np.max((np.max(state), 1))
-  #     state = selector.subsample(torch.Tensor(state).permute(2, 0, 1).unsqueeze(0).to(device))
-  #     surprise, bs_point, y = selector(state)
-  #     bs_point = bs_point.flatten().cpu().data.numpy()
-  #     agent['features'] = [bs_point]
-  # # -----------------------------------------------
-  #
-  # # Automatic testing
-  # # -----------------------------------------------
-  # print('Starting testing...')
+  # Automatic testing
+  # -----------------------------------------------
+  print('Starting testing...')
   # final_pose = []
   # final_state = []
-  #
+
   # for target_idx in range(len(x)):
   #   print('Testing target {}'.format(target_idx))
+
+  # Get target image BS point
+  goal = torch.Tensor(np.ascontiguousarray(target_image)).permute(2, 0, 1).unsqueeze(0).to(device)
+  goal = goal/torch.max(torch.Tensor(np.array([torch.max(goal).cpu().data, 1]))) #Normalize in [0,1]
+  surprise, bs_point, reconstr = selector(goal)
+  bs_point = bs_point.flatten().cpu().data.numpy()
+  print('Target surprise {}'.format(surprise.cpu().data))
+  print('Target bs point {}'.format(bs_point))
+  print('')
+  plt.figure()
+  plt.imshow(reconstr.permute(0, 2, 3, 1)[0].cpu().data)
+  plt.show()
   #
-  #   # Get target image BS point
-  #   goal = torch.Tensor(x[target_idx]).permute(2, 0, 1).unsqueeze(0).to(device)
-  #   goal = goal/torch.max(torch.Tensor(np.array([torch.max(goal).cpu().data, 1]))) #Normalize in [0,1]
-  #   surprise, bs_point, reconstr = selector(goal)
-  #   bs_point = bs_point.flatten().cpu().data.numpy()
-  #   print('Target {} surprise {}'.format(target_idx, surprise.cpu().data))
-  #   print('Target bs point {}'.format(bs_point))
-  #   print('')
-  #
-  #   # Get closest agent
-  #   # -----------------------------------------------
-  #   bs_space = np.stack([a[0] for a in pop['features'].values])
-  #   # Get distances
-  #   diff = np.atleast_2d(bs_space - bs_point)
-  #   dists = np.sqrt(np.sum(diff * diff, axis=1))
-  #   # Get agent with smallest distance in BS space
-  #   closest_agent = np.argmin(dists)
-  #   selected = pop[closest_agent]
-  #   print("Selected agent {}".format(closest_agent))
-  #   # -----------------------------------------------
-  #
-  #   # Testing agent
-  #   # -----------------------------------------------
-  #   done = False
-  #   ts = 0
-  #   obs = utils.obs_formatting(params.env_tag, env.reset())
-  #   while not done:
-  #     # env.render()
-  #     agent_input = ts
-  #     action = utils.action_formatting(params.env_tag, selected['agent'](agent_input))
-  #
-  #     obs, reward, done, info = env.step(action)
-  #     obs = utils.obs_formatting(params.env_tag, obs, reward, done, info)
-  #     ts += 1
-  #
-  #     if ts >= params.max_episode_len:
-  #       done = True
-  #
-  #     if 'Ant' in params.env_tag:
-  #       CoM = np.array([env.env.data.qpos[:2]])
-  #       f_pose = CoM
-  #       if np.any(np.abs(CoM) >= np.array([3, 3])):
-  #         done =True
-  #     elif 'Billiard' in params.env_tag:
-  #       f_pose = obs[0][:2]
-  #
-  #   state = env.render(mode='rgb_array')
-  #   final_state.append(state / np.max((np.max(state), 1)))
-  #   final_pose.append((f_pose))
-  #
-  #   final_distance = np.sqrt(np.sum((target_poses[target_idx] - f_pose) ** 2))
-  #   print('Positional error: {}'.format(final_distance))
-  #   # -----------------------------------------------
-  # final_state = np.stack(final_state)
-  # final_pose = np.stack(final_pose)
-  #
-  # final_pose_error = np.sqrt(np.sum((target_poses - final_pose) ** 2, axis=1))
-  # # -----------------------------------------------
-  #
-  #
+  # Get closest agent
+  # -----------------------------------------------
+  bs_space = np.stack([a[0] for a in pop['features'].values])
+  # Get distances
+  diff = np.atleast_2d(bs_space - bs_point)
+  dists = np.sqrt(np.sum(diff * diff, axis=1))
+  # Get agent with smallest distance in BS space
+  closest_agent = np.argmin(dists)
+  selected = pop[closest_agent]
+  print("Selected agent {} - Distance {}".format(closest_agent, dists[closest_agent]))
+  # -----------------------------------------------
+
+  # Testing agent
+  # -----------------------------------------------
+  done = False
+  t = 0
+  obs = env.reset()
+  env.seed(11)
+  saved_balls_pose = []
+  saved_joints_pose = []
+  while not done:
+    env.render()
+    # agent_input = ts
+    # action = utils.action_formatting(params.env_tag, selected['agent'](agent_input))
+
+    if 'FastsimSimpleNavigation' in params.env_tag:
+      agent_input = [obs, t / params.max_episode_len]  # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
+    elif 'Ant' in params.env_tag:
+      agent_input = t
+    else:
+      agent_input = t/ params.max_episode_len
+
+    action = utils.action_formatting(params.env_tag, selected['agent'](agent_input))
+
+    obs, reward, done, info = env.step(action)
+    t += 1
+    if t >= params.max_episode_len:
+      done = True
+
+    if 'Ant' in params.env_tag:
+      CoM = np.array([env.env.data.qpos[:2]])  # CoM = np.array([self.env.robot.body_xyz[:2]]) MUJOCO
+      f_pose = CoM
+      if np.any(np.abs(CoM) >= np.array([3, 3])):
+        done = True
+
+    saved_balls_pose.append(obs[0])
+    saved_joints_pose.append(obs[1])
+
+  if 'Billiard' in params.env_tag:
+    env.env.params.SHOW_ARM_IN_ARRAY = True
+
+  f_pose = utils.extact_hd_bs(env, obs, reward, done, info)
+  saved_balls_pose = np.array(saved_balls_pose)*np.array([100., -100.]) + np.array([150., 150.])
+  saved_joints_pose = np.array(saved_joints_pose)
+
+  point_pose = np.array([np.sin(saved_joints_pose[:, 0]) + np.cos(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0]),
+                         np.cos(saved_joints_pose[:, 0]) + np.sin(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0])]).transpose()
+  point_pose = point_pose*np.array([100., -100.]) + np.array([150., 300.])
+
+
+  state = env.render(mode='rgb_array')#, top_bottom=True)
+  state = state / np.max((np.max(state), 1))
+
+  if 'Billiard' in params.env_tag:
+    for i in range(state.shape[0]):
+      for j in range(state.shape[1]):
+        if np.all(state[i, j] == np.zeros(3)):
+          state[i, j] = np.ones(3)
+  elif 'Fastsim' in params.env_tag:
+    state = 1 - state
+
+
+  final_distance = np.sqrt(np.sum((target_pose - f_pose) ** 2))
+  print('Positional error: {}'.format(final_distance))
+  plt.figure()
+  plt.imshow(state)
+  # plt.scatter(saved_balls_pose[:, 0], saved_balls_pose[:, 1], c='b-')
+  plt.scatter(point_pose[::-1, 0], point_pose[::-1, 1], 'r-')
+
+  plt.show()
 
   # # Testing
   # # -----------------------------------------------
