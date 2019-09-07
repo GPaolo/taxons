@@ -356,7 +356,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed/42'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/11'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -409,7 +409,7 @@ if __name__ == "__main__":
   # if "Billiard" in params.env_tag:
   #   env.env.params.RANDOM_BALL_INIT_POSE = False
   # -----------------------------------------------
-  target_pose = [450., 500.]
+  target_pose = [0., 0.5]
   # Generate target image
   if "Billiard" in params.env_tag:
     env.reset()
@@ -543,7 +543,9 @@ if __name__ == "__main__":
   done = False
   t = 0
   obs = env.reset()
-  env.seed(15)
+  env.seed(11)
+  saved_balls_pose = []
+  saved_joints_pose = []
   while not done:
     env.render()
     # agent_input = ts
@@ -551,10 +553,12 @@ if __name__ == "__main__":
 
     if 'FastsimSimpleNavigation' in params.env_tag:
       agent_input = [obs, t / params.max_episode_len]  # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
-      action = utils.action_formatting(params.env_tag, selected['agent'](agent_input))
-    else:
+    elif 'Ant' in params.env_tag:
       agent_input = t
-      action = utils.action_formatting(params.env_tag, selected['agent'](agent_input))# / params.max_episode_len))
+    else:
+      agent_input = t/ params.max_episode_len
+
+    action = utils.action_formatting(params.env_tag, selected['agent'](agent_input))
 
     obs, reward, done, info = env.step(action)
     t += 1
@@ -567,10 +571,20 @@ if __name__ == "__main__":
       if np.any(np.abs(CoM) >= np.array([3, 3])):
         done = True
 
+    saved_balls_pose.append(obs[0])
+    saved_joints_pose.append(obs[1])
+
   if 'Billiard' in params.env_tag:
     env.env.params.SHOW_ARM_IN_ARRAY = True
 
   f_pose = utils.extact_hd_bs(env, obs, reward, done, info)
+  saved_balls_pose = np.array(saved_balls_pose)*np.array([100., -100.]) + np.array([150., 150.])
+  saved_joints_pose = np.array(saved_joints_pose)
+
+  point_pose = np.array([np.sin(saved_joints_pose[:, 0]) + np.cos(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0]),
+                         np.cos(saved_joints_pose[:, 0]) + np.sin(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0])]).transpose()
+  point_pose = point_pose*np.array([100., -100.]) + np.array([150., 300.])
+
 
   state = env.render(mode='rgb_array')#, top_bottom=True)
   state = state / np.max((np.max(state), 1))
@@ -588,6 +602,9 @@ if __name__ == "__main__":
   print('Positional error: {}'.format(final_distance))
   plt.figure()
   plt.imshow(state)
+  # plt.scatter(saved_balls_pose[:, 0], saved_balls_pose[:, 1], c='b-')
+  plt.scatter(point_pose[::-1, 0], point_pose[::-1, 1], 'r-')
+
   plt.show()
 
   # # Testing

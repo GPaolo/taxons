@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import gc
 from sklearn.decomposition import PCA
+import pandas as pd
 
 
 class CoverageMap(object):
@@ -139,6 +140,9 @@ class CoverageMap(object):
       gen = len(self.exp_data['archive_size']) - 1
     agents_num = self.exp_data['archive_size'][gen]
     bs = self.pop['bs'].values[:agents_num]
+    if 'Fastsim' in self.params.env_tag:
+      for k in range(len(bs)):
+        bs[k][1] = 600. - bs[k][1]
     return bs
   # -----------------------------------------------
 
@@ -147,18 +151,19 @@ class CoverageMap(object):
     print('Doing PCA')
     feats = self.pop['features'].values
     feats = np.array([k[0] for k in feats])
-    self.pca = PCA(n_components=2, whiten=True)
-    self.pca.fit(feats)
+    self.pca = PCA(n_components=2, whiten=False)
+    pca_feat = self.pca.fit_transform(feats)
     print('Done.')
+    return pca_feat
   # -----------------------------------------------
 
   # -----------------------------------------------
-  def main(self, gen=1000, highlights=None):
+  def main(self, gen=1000, highlights=None, plot_coverage=True):
     print('Working on seed {}'.format(self.seed))
     folder_name = os.path.join(self.folder, self.seed)
     self.load_params(folder_name)
-    self.load_archive(folder_name)
     self.load_logs(folder_name)
+    self.load_archive(folder_name)
     self.env.seed(int(self.seed))
     np.random.seed(int(self.seed))
     self.env.reset()
@@ -166,6 +171,16 @@ class CoverageMap(object):
     if None in self.pop['bs'].values:
       self.evaluate_agent_xy()
       self.pop.save_pop(os.path.join(folder_name, 'models'), 'archive')
+
+    if 'Ant' in self.params.env_tag:
+      u_limit = 3.5
+      l_limit = -u_limit
+    elif 'FastsimSimpleNavigation' in self.params.env_tag:
+      u_limit = 600
+      l_limit = 0
+    else:
+      u_limit = 1.35
+      l_limit = -u_limit
     #
     # pca_feat = self.feat_pca()
     #
@@ -178,27 +193,57 @@ class CoverageMap(object):
     # self.show_bs_points(pca_feat, axes=axes[1], color=colors)
     # plt.show()
 
-      #gens = 0
-    fig, axes = plt.subplots(nrows=1, ncols=1)
-      #plt.ion()
-      #plt.show()
-      #while gens >= 0:
-      #  gens = int(input('Number of gens to show '))
     bs = self.get_bs_by_gen(gen)
-    # Show actual policies
-    self.show_bs_points(bs, axes=axes)
-    if highlights is not None:
-      self.show_bs_points(highlights, axes=axes, color='red')
-      # bs = self.get_bs_by_gen(300)
-      # self.show_bs_points(bs, axes=axes[1])
-      #  plt.draw()
-      #  plt.pause(.01)
-      #gens = [[10, 50, 150], [300, 600, 999]]
-      #for r in range(2):
-      #  for c in range(3):
-      #    bs = self.get_bs_by_gen(gens[r][c])
-      #    self.show_bs_points(bs, axes=axes[r][c])
-    plt.show()
+    if plot_coverage:
+      fig, axes = plt.subplots(nrows=1, ncols=1)
+      # Show actual policies
+      self.show_bs_points(bs, axes=axes, lower_limit=l_limit, upper_limit=u_limit)
+      if highlights is not None:
+        self.show_bs_points(highlights, axes=axes, color='red', lower_limit=l_limit, upper_limit=u_limit)
+      plt.show()
+    else:
+      pca_feat = self.feat_pca()
+      pca_feat = pca_feat[:len(bs)]
+      cmap = matplotlib.cm.get_cmap('viridis')
+      normalize = matplotlib.colors.Normalize(vmin=0, vmax=len(bs))
+      colors = [cmap(normalize(value)) for value in range(len(bs))]
+      bs_x = []
+      bs_y = []
+      feat_x = []
+      feat_y = []
+      for k in range(len(bs)):
+        bs_x.append(bs[k][0])
+        bs_y.append(bs[k][1])
+        feat_x.append(pca_feat[k][0])
+        feat_y.append(pca_feat[k][1])
+      bs_x_M, bs_x_m = np.max(bs_x), np.min(bs_x)
+      bs_y_M, bs_y_m = np.max(bs_y), np.min(bs_y)
+      feat_x_M, feat_x_m = np.max(feat_x), np.min(feat_x)
+      feat_y_M, feat_y_m = np.max(feat_y), np.min(feat_y)
+
+
+      data = pd.DataFrame({'x': bs_x, 'y': bs_y, 'feat_x': feat_x, 'feat_y': feat_y})
+      data.sort_values(['x', 'y'], ascending=True, inplace=True)
+      data.reset_index(drop=True, inplace=True)
+      fig, axes = plt.subplots(nrows=1, ncols=2)
+
+      axes[0].set_xlim(bs_x_m, bs_x_M)
+      axes[0].set_ylim(bs_y_m, bs_y_M)
+      axes[1].set_xlim(feat_x_m, feat_x_M)
+      axes[1].set_ylim(feat_y_m, feat_y_M)
+
+      for k, c in zip(range(len(data)), colors):
+        line = data.iloc[k]
+        axes[0].scatter(line['x'], line['y'], c=c)
+        axes[1].scatter(line['feat_x'], line['feat_y'], c=c)
+
+      plt.show()
+
+
+      # for x, y, fx, fy, c
+
+
+
 
     gc.collect()
   # -----------------------------------------------
@@ -207,12 +252,12 @@ class CoverageMap(object):
 if __name__ == "__main__":
 
 
-  base_path = '/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed'
-  seed = 11
-  highlights = np.array([[1, -0.8],
-                         [0, 0.5],
-                         [1.1, 1.1]
+  base_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed'
+  seed = 10
+  highlights = np.array([[450, 150],
+                         [100, 190],
+                         [450, 500]
                          ])
 
   metric = CoverageMap(exp_folder=base_path, reeval_bs=True, render=False, seed=str(seed))
-  metric.main(gen=2000, highlights=highlights)
+  metric.main(gen=1000, highlights=highlights, plot_coverage=False)

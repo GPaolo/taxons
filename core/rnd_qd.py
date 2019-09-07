@@ -83,11 +83,13 @@ class RndQD(object):
     t = 0
     while not done:
       if 'FastsimSimpleNavigation' in self.params.env_tag:
-        agent_input = [obs, t/self.params.max_episode_len] # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
-        action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
-      else:
+        agent_input = [obs, t / self.params.max_episode_len]  # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
+      elif 'Ant' in self.params.env_tag: # TODO metti questi anche nelle baselines
         agent_input = t
-        action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input/self.params.max_episode_len))
+      else:
+        agent_input = t / self.params.max_episode_len
+
+      action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
 
       obs, reward, done, info = self.env.step(action)
       t += 1

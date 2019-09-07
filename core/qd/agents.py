@@ -154,7 +154,7 @@ class DMPAgent(BaseAgent):
   def evaluate(self, x):
     output = np.zeros(self.dof)
 
-    if x <= self.action_len:
+    if x/500. <= self.action_len: #if x <= self.action_len: MUJOCO
       for i, dmp in enumerate(self._genome):
         output[i] = dmp(x)
 
