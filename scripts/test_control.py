@@ -3,7 +3,7 @@
 
 from scripts import parameters
 import gym, torch
-import gym_billiard, gym_fastsim
+import gym_billiard#, gym_fastsim
 import numpy as np
 from core.metrics import ae, rnd
 from core.qd import population, agents
@@ -14,7 +14,7 @@ from matplotlib import cm
 import pickle as pkl
 import progressbar
 import gc
-import pyfastsim as fs
+# import pyfastsim as fs
 
 
 
@@ -356,7 +356,7 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/11'
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed/10'
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -409,7 +409,7 @@ if __name__ == "__main__":
   # if "Billiard" in params.env_tag:
   #   env.env.params.RANDOM_BALL_INIT_POSE = False
   # -----------------------------------------------
-  target_pose = [0., 0.5]
+  target_pose = [1.1, 1.1]
   # Generate target image
   if "Billiard" in params.env_tag:
     env.reset()
@@ -575,36 +575,34 @@ if __name__ == "__main__":
     saved_joints_pose.append(obs[1])
 
   if 'Billiard' in params.env_tag:
-    env.env.params.SHOW_ARM_IN_ARRAY = True
+    env.params.SHOW_ARM_IN_ARRAY = True
+    saved_balls_pose = np.array(saved_balls_pose) * np.array([100., -100.]) + np.array([150., 150.])
+    saved_joints_pose = np.array(saved_joints_pose)
+    point_pose = np.array([np.sin(saved_joints_pose[:, 0]) + .9 * np.cos(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0]),
+                           np.cos(saved_joints_pose[:, 0]) + .9 * np.sin(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0])]).transpose()
+    point_pose = point_pose * np.array([-100., -100.]) + np.array([150., 300.])
 
   f_pose = utils.extact_hd_bs(env, obs, reward, done, info)
-  saved_balls_pose = np.array(saved_balls_pose)*np.array([100., -100.]) + np.array([150., 150.])
-  saved_joints_pose = np.array(saved_joints_pose)
-
-  point_pose = np.array([np.sin(saved_joints_pose[:, 0]) + np.cos(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0]),
-                         np.cos(saved_joints_pose[:, 0]) + np.sin(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0])]).transpose()
-  point_pose = point_pose*np.array([100., -100.]) + np.array([150., 300.])
-
 
   state = env.render(mode='rgb_array')#, top_bottom=True)
   state = state / np.max((np.max(state), 1))
 
+  plt.figure()
   if 'Billiard' in params.env_tag:
     for i in range(state.shape[0]):
       for j in range(state.shape[1]):
         if np.all(state[i, j] == np.zeros(3)):
           state[i, j] = np.ones(3)
+    plt.imshow(state)
+    plt.plot(saved_balls_pose[:, 0], saved_balls_pose[:, 1], 'r-')
+    plt.plot(point_pose[:, 0], point_pose[:, 1], 'b-')
   elif 'Fastsim' in params.env_tag:
     state = 1 - state
+    plt.imshow(state)
 
 
   final_distance = np.sqrt(np.sum((target_pose - f_pose) ** 2))
   print('Positional error: {}'.format(final_distance))
-  plt.figure()
-  plt.imshow(state)
-  # plt.scatter(saved_balls_pose[:, 0], saved_balls_pose[:, 1], c='b-')
-  plt.scatter(point_pose[::-1, 0], point_pose[::-1, 1], 'r-')
-
   plt.show()
 
   # # Testing
