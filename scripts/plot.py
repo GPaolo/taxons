@@ -6,10 +6,12 @@ import json
 import os
 import matplotlib.pyplot as plt
 from core.utils import utils
+from scipy.stats import mannwhitneyu
+from pprint import pprint
 
 class GenPlot(object):
 
-  def __init__(self, folders=None, total_gens=500):
+  def __init__(self, folders=None, total_gens=500, cmaps=['Dark2']):
     self.folders = folders
     params = {'legend.fontsize': 'x-large',
 #              'figure.figsize': (15, 5),
@@ -20,6 +22,8 @@ class GenPlot(object):
     # plt.rcParams.update(params)
 
     self.total_gens = total_gens
+    self.cmaps = [plt.get_cmap(map) for map in cmaps]
+
 
   def load_exp_data(self, folder):
     if not os.path.exists(folder):
@@ -81,8 +85,31 @@ class GenPlot(object):
     plt.show()
     return fig
 
-  def plot_curves(self, data, title, labels, cmap, y_axis, axes, use_std=False, gen=True):
-    colors = [cmap(k) for k in range(len(data))]
+  def get_colors(self, data_size):
+    colors = []
+    # For baselines
+    cmap = plt.get_cmap('Dark2')
+    colors.append(cmap(5))
+    colors.append(cmap(6))
+    colors.append(cmap(7))
+    colors.append(cmap(2))
+
+    # For TAXO
+    cmap = plt.get_cmap('Set1')
+    #colors.append(cmap(0.2))
+    #colors.append(cmap(0.0))
+    #colors.append(cmap(0.45))
+    #colors.append(cmap(0.9))
+    colors.append(cmap(3))
+    colors.append(cmap(1))
+    colors.append(cmap(2))
+    colors.append(cmap(0))
+
+
+    return colors
+
+  def plot_curves(self, data, title, labels, y_axis, axes, use_std=False, gen=True):
+    colors = self.get_colors(len(data))
     axes.yaxis.grid(True)
     if gen:
       x_data = np.array(list(range(self.total_gens)))
@@ -102,17 +129,18 @@ class GenPlot(object):
         max = mean + std
         min = mean - std
 
-      if len(l) >= 4:
+      if l == 'TAXONS':
         linestyle = '-'
-      else:
-        linestyle = '-.'
-
-      if l == 'TAXONS' or linestyle == '-.':
+        linewidth = 2
+      elif len(l) >= 4:
+        linestyle = '-'
         linewidth = 2
       else:
-        linewidth = 1
+        linestyle = '-.'
+        linewidth = 2
+
       axes.plot(x_data, mean, color=c, label=l, linestyle=linestyle, linewidth=linewidth)
-      axes.fill_between(x_data, max, min, facecolor=c, alpha=0.3)
+      axes.fill_between(x_data, max, min, facecolor=c, alpha=0.15)
 
     axes.set_title(title)
     if gen:
@@ -121,8 +149,8 @@ class GenPlot(object):
       axes.set_xlabel('Number of controllers')
     axes.set_ylabel(y_axis)
 
-  def plot_violins(self, data, title, labels, cmap, y_axis, axes):
-    colors = [cmap(k) for k in range(len(data))]
+  def plot_violins(self, data, title, labels, y_axis, axes):
+    colors = self.get_colors(len(data))
     axes.grid(True)
     axes.grid(linestyle='dotted')
 
@@ -133,9 +161,14 @@ class GenPlot(object):
     for d, l, c in zip(data, labels, colors):
       if d is None:
         continue
+      print(l)
+      print(np.mean(np.array(d[:,-1])))
+
       violin_data.append(d[:,-1])
       pos.append(l)
       violin_colors.append(list(c))
+
+    print(np.mean(np.array(violin_data)))
 
     parts = axes.violinplot(violin_data,
                             showmeans=False,
@@ -192,18 +225,44 @@ class GenPlot(object):
     axes.set_ylabel(y_axis)
     axes.set_title(title)
 
+  def mwu(self, coverage_data, names):
+    results = {}
+    for i in range(len(coverage_data)):
+      if coverage_data[i] is None:
+        continue
+      for j in range(i+1, len(coverage_data)):
+        if coverage_data[j] is None:
+          continue
+        x = coverage_data[i][:, -1]
+        y = coverage_data[j][:, -1]
+        name_x = names[i]
+        name_y = names[j]
+        name = '{}_{}'.format(name_x, name_y)
+        results[name] = mannwhitneyu(x, y)
+    return results
+
+  def holm_bonferroni(self, p_values):
+    from multipy.fwer import sidak
+    names = []
+    pvals = []
+    for name in p_values:
+      names.append(name)
+      pvals.append(p_values[name][1])
+
+    significant_pvals = sidak(pvals, alpha=0.05)
+    print([k for k in zip(['{}: {:.4f}'.format(name, p) for name, p in zip(names, pvals)], significant_pvals)])
 
 
 if __name__ == '__main__':
-  total_gens = [1999, 500, 1000]
-  violins = False
+  total_gens = [1999, 1000, 500]
+  violins = True
   fig, axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
-  name = ['Billiard', 'Ant', 'Maze']
+  name = ['Billiard', 'Maze', 'Ant']
 
   for experiment, ax, gens in zip(name, axes, total_gens):
     base_path = '/media/giuseppe/Storage/AE NS/Experiments/{}'.format(experiment)
 
-    plotter = GenPlot(total_gens=gens)
+    plotter = GenPlot(total_gens=gens, cmaps=['Dark2','gist_rainbow'])
 
     c_mix, s_mix, a_mix = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Mixed'.format(experiment)))
     # c_nt, s_nt, a_nt = plotter.load_exp_data(os.path.join(base_path,'{}_AE_NoTrain'.format(experiment)))
@@ -219,26 +278,30 @@ if __name__ == '__main__':
     use_std = True
     gen_on_x = False
 
-    colors = plt.get_cmap('Dark2')
     plt.rc('grid', linestyle="dotted", color='gray')
-    labels = ['TAXONS', 'NT', 'TAXO-N', 'TAXO-S', 'NS', 'PS', 'RBD', 'RS']
-    coverage_list = [c_mix, c_nt, c_aen, c_aes, c_ns, c_ps, c_rbd, c_rs]
-    surprise_list = [s_mix, s_nt, s_aen, s_aes, s_ns, s_ps, s_rbd, s_rs]
-    archive_list = [a_mix, a_nt, a_aen, a_aes, a_ns, a_ps, a_rbd, a_rs]
+    labels = ['PS', 'RBD', 'RS', 'NS', 'NT', 'TAXO-N', 'TAXO-S', 'TAXONS']
+    coverage_list = [c_ps, c_rbd, c_rs, c_ns, c_nt, c_aen, c_aes, c_mix]
+    surprise_list = [s_ps, s_rbd, s_rs, s_ns, s_nt, s_aen, s_aes, s_mix]
+    archive_list = [a_ps, a_rbd, a_rs, a_ns, a_nt, a_aen, a_aes, a_mix]
     overlapping_list = []
+
+    mwu = plotter.mwu(coverage_list, labels)
+    plotter.holm_bonferroni(mwu)
+    print('MWU for: {}\n'.format(experiment))
+    # for k in mwu:
+    #   print('{}:\n statistics: {} \n pvalue: {}\n'.format(k, mwu[k][0], mwu[k][1]))
+    # print()
 
 
     if not violins:
       plotter.plot_curves(coverage_list,
                           labels=labels,
-                          cmap=colors,
                           title=experiment, y_axis='Coverage %', axes=ax,
                           use_std=use_std,
                           gen=gen_on_x)
     else:
       plotter.plot_violins(coverage_list,
                           labels=labels,
-                          cmap=colors,
                           title=experiment, y_axis='Coverage %', axes=ax)
 
 
