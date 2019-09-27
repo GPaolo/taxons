@@ -3,7 +3,8 @@
 
 from scripts import parameters
 import gym, torch
-import gym_billiard#, gym_fastsim
+import gym_billiard, gym_fastsim, pybulletgym
+from gym.wrappers import Monitor
 import numpy as np
 from core.metrics import ae, rnd
 from core.qd import population, agents
@@ -14,7 +15,7 @@ from matplotlib import cm
 import pickle as pkl
 import progressbar
 import gc
-# import pyfastsim as fs
+import pyfastsim as fs
 
 
 
@@ -35,7 +36,7 @@ class Eval(object):
     if 'Billiard' in self.folder:
       self.env_tag = 'Billiard-v0'
     elif 'Ant' in self.folder:
-      self.env_tag = 'Ant-v2'
+      self.env_tag = 'AntMuJoCoEnv-v0'
     elif 'Maze' in self.folder:
       self.env_tag = 'FastsimSimpleNavigation-v0'
 
@@ -64,8 +65,8 @@ class Eval(object):
     target_poses = []
     if "Billiard" in self.env_tag:
       self.env.env.params.RANDOM_BALL_INIT_POSE = True
-    elif "Ant" in self.env_tag:
-      self.env.render()
+    #elif "Ant" in self.env_tag:
+    #  self.env.render()
 
     with progressbar.ProgressBar(max_value=targets) as bar:
       for k in range(targets):  # Generate target datapoints
@@ -356,7 +357,8 @@ if __name__ == "__main__":
 
   # Parameters
   # -----------------------------------------------
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed/10'
+  seed = 42
+  load_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed/{}'.format(seed)
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
@@ -409,7 +411,7 @@ if __name__ == "__main__":
   # if "Billiard" in params.env_tag:
   #   env.env.params.RANDOM_BALL_INIT_POSE = False
   # -----------------------------------------------
-  target_pose = [1.1, 1.1]
+  target_pose = [450, 500]
   # Generate target image
   if "Billiard" in params.env_tag:
     env.reset()
@@ -429,13 +431,18 @@ if __name__ == "__main__":
     plt.figure()
     plt.imshow(target_image)
     plt.show()
+    # env.env.robot_body.reset_position([target_pose[0], target_pose[1], 0.5])
+    # target_image = env.render(mode='rgb_array', top_bottom=True)
+    #plt.figure()
+    #plt.imshow(target_image)
+    #plt.show()
   elif 'Fastsim' in params.env_tag:
     obs = env.reset()
     pose = target_pose + env.initPos[-1:]
     p = fs.Posture(*pose)
     env.robot.set_pos(p)
     env.enable_display()
-    target_image = env.render(mode='rgb_array')
+    target_image = env.render(mode='rgb_array', target=False)
     plt.figure()
     plt.imshow(target_image)
     plt.show()
@@ -543,11 +550,26 @@ if __name__ == "__main__":
   done = False
   t = 0
   obs = env.reset()
-  env.seed(11)
-  saved_balls_pose = []
-  saved_joints_pose = []
+  np.random.seed(seed)
+  env.seed(seed)
+  images = []
+
+  if 'Billiard' in params.env_tag:
+    saved_balls_pose = []
+    saved_joints_pose = []
+  elif 'Fastsim' in params.env_tag:
+    saved_robot_pose = []
+    obs = env.reset()
+    pose = env.initPos
+    p = fs.Posture(*pose)
+    env.robot.set_pos(p)
+  else:
+    saved_robot_pose = []
+
+  print()
   while not done:
-    env.render()
+    images.append(env.render(mode='rgb_array'))
+
     # agent_input = ts
     # action = utils.action_formatting(params.env_tag, selected['agent'](agent_input))
 
@@ -566,14 +588,21 @@ if __name__ == "__main__":
       done = True
 
     if 'Ant' in params.env_tag:
-      CoM = np.array([env.env.data.qpos[:2]])  # CoM = np.array([self.env.robot.body_xyz[:2]]) MUJOCO
+      CoM = np.array([env.env.data.qpos[:2]])
+      # CoM = np.array([self.env.robot.body_xyz[:2]])
       f_pose = CoM
       if np.any(np.abs(CoM) >= np.array([3, 3])):
         done = True
+      saved_robot_pose.append(CoM)
+    elif 'Billiard' in params.env_tag:
+      saved_balls_pose.append(obs[0])
+      saved_joints_pose.append(obs[1])
+    elif 'Fastsim' in params.env_tag:
+      saved_robot_pose.append(np.array(info['robot_pos'][:2]))
 
-    saved_balls_pose.append(obs[0])
-    saved_joints_pose.append(obs[1])
-
+  images = np.array(images)
+  with open('./maze_video_images3.npy', 'wb') as file:
+    np.save(file, images)
   if 'Billiard' in params.env_tag:
     env.params.SHOW_ARM_IN_ARRAY = True
     saved_balls_pose = np.array(saved_balls_pose) * np.array([100., -100.]) + np.array([150., 150.])
@@ -581,6 +610,8 @@ if __name__ == "__main__":
     point_pose = np.array([np.sin(saved_joints_pose[:, 0]) + .9 * np.cos(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0]),
                            np.cos(saved_joints_pose[:, 0]) + .9 * np.sin(np.pi / 2. - saved_joints_pose[:, 1] - saved_joints_pose[:, 0])]).transpose()
     point_pose = point_pose * np.array([-100., -100.]) + np.array([150., 300.])
+  else:
+    saved_robot_pose = np.array(saved_robot_pose)
 
   f_pose = utils.extact_hd_bs(env, obs, reward, done, info)
 
@@ -599,6 +630,13 @@ if __name__ == "__main__":
   elif 'Fastsim' in params.env_tag:
     state = 1 - state
     plt.imshow(state)
+    saved_robot_pose = saved_robot_pose/3.
+    plt.plot(saved_robot_pose[:, 0], saved_robot_pose[:, 1], 'r-')
+  elif 'Ant' in params.env_tag:
+    plt.imshow(state)
+    saved_robot_pose = np.squeeze(saved_robot_pose)
+    saved_robot_pose = saved_robot_pose * np.array([80, -80]) + np.array([250, 250])
+    plt.plot(saved_robot_pose[:, 0], saved_robot_pose[:, 1], 'r-')
 
 
   final_distance = np.sqrt(np.sum((target_pose - f_pose) ** 2))

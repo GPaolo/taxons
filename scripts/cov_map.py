@@ -96,10 +96,11 @@ class CoverageMap(object):
             self.env.render()
           if 'FastsimSimpleNavigation' in self.params.env_tag:
             agent_input = [obs, t / self.params.max_episode_len]  # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
-            action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
-          else:
+          elif 'Ant' in self.params.env_tag:  # TODO metti questi anche nelle baselines
             agent_input = t
-            action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input / self.params.max_episode_len))
+          else:
+            agent_input = t / self.params.max_episode_len
+          action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
 
           obs, reward, done, info = self.env.step(action)
           t += 1
@@ -107,7 +108,7 @@ class CoverageMap(object):
             done = True
 
           if 'Ant' in self.params.env_tag:
-            CoM = np.array([self.env.robot.body_xyz[:2]])
+            CoM = np.array([self.env.env.data.qpos[:2]])#CoM = np.array([self.env.robot.body_xyz[:2]])
             if np.any(np.abs(CoM) >= np.array([3, 3])):
               done = True
 
@@ -143,6 +144,9 @@ class CoverageMap(object):
     if 'Fastsim' in self.params.env_tag:
       for k in range(len(bs)):
         bs[k][1] = 600. - bs[k][1]
+    if 'Ant' in self.params.env_tag:
+      for k in range(len(bs)):
+        bs[k] = np.squeeze(bs[k])
     return bs
   # -----------------------------------------------
 
@@ -168,7 +172,7 @@ class CoverageMap(object):
     np.random.seed(int(self.seed))
     self.env.reset()
 
-    if None in self.pop['bs'].values:
+    if True:# None in self.pop['bs'].values:
       self.evaluate_agent_xy()
       self.pop.save_pop(os.path.join(folder_name, 'models'), 'archive')
 
@@ -252,12 +256,12 @@ class CoverageMap(object):
 if __name__ == "__main__":
 
 
-  base_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed'
-  seed = 10
-  highlights = np.array([[450, 150],
-                         [100, 190],
-                         [450, 500]
+  base_path = '/media/giuseppe/Storage/AE NS/Experiments/Ant/Ant_AE_Mixed/'
+  seed = 15
+  highlights = np.array([[2., 1.3],
+                         [-1, -2],
+                         [0.5, 2.2]
                          ])
 
   metric = CoverageMap(exp_folder=base_path, reeval_bs=True, render=False, seed=str(seed))
-  metric.main(gen=1000, highlights=highlights, plot_coverage=False)
+  metric.main(gen=500, highlights=highlights, plot_coverage=True)

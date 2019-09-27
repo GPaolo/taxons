@@ -19,7 +19,7 @@ class Params(object):
     # Environment
     # ---------------------------------------------------------
     self.env_tag = 'AntMuJoCoEnv-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.max_episode_len = 500
+    self.max_episode_len = 2000
     # ---------------------------------------------------------
 
     # QD
