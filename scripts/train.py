@@ -2,7 +2,7 @@
 # Date: 15/02/19
 
 from core import rnd_qd
-from baselines import novelty_search, policy_space, random_search, random_bd
+from baselines import novelty_search, policy_space, random_search, random_bd, image_bd
 import gym, torch
 import gym_billiard, gym_fastsim, pybulletgym
 import numpy as np
@@ -39,6 +39,8 @@ def main(seed, params):
     evolver = random_search.RandomSearch(env=env, parameters=params)
   elif params.baseline == 'RBD':
     evolver = random_bd.RandomBD(env=env, parameters=params)
+  elif params.baseline == 'IBD':
+    evolver = image_bd.ImageBD(env=env, parameters=params)
   else:
     evolver = rnd_qd.RndQD(env=env, parameters=params)
 
@@ -85,14 +87,14 @@ def main(seed, params):
 
 
 if __name__ == "__main__":
-  parallel_threads = 3
-  seeds = [#11, 59,
-           #3, 6, 4,
-           #18, 13, 1,
-           #22, 34, 99,
+  parallel_threads = 2
+  seeds = [11, 59,
+           3, 6, 4,
+           18, 13, 1,
+           22, 34, 99,
            43, 100, 15,
-           #66, 10,7,
-           #9, 42, 2
+           66, 10,7,
+           9, 42, 2
      ]
   # seeds = [2]
 

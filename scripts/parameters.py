@@ -9,17 +9,17 @@ class Params(object):
   def __init__(self):
     self.info = 'Ant with 500 gens and 500 ts. Mixed'
 
-    self.exp_name = 'Ant_AE_Mixed'
+    self.exp_name = 'Billiard_IBD'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
-    self.baseline = None # None, 'NS', 'PS', 'RS', 'RBD'
+    self.baseline = 'IBD' # None, 'NS', 'PS', 'RS', 'RBD', 'IBD'
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'AntMuJoCoEnv-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.max_episode_len = 2000
+    self.env_tag = 'Billiard-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
+    self.max_episode_len = 300
     # ---------------------------------------------------------
 
     # QD
@@ -33,7 +33,7 @@ class Params(object):
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 5, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'sin'} # poly, exp, sin
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'} # poly, exp, sin
     # ---------------------------------------------------------
 
     # Metric
@@ -51,7 +51,7 @@ class Params(object):
 
     # Optimizer
     # ---------------------------------------------------------
-    self.optimizer_type = 'Pareto' # 'Surprise', 'Pareto', 'Novelty'
+    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto', 'Novelty'
     self._load_optimizer()
     # ---------------------------------------------------------
   # -----------------------------------------Setup----------------
