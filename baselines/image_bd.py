@@ -4,7 +4,7 @@
 import numpy as np
 from core.utils import utils
 from baselines.baseline import BaseBaseline
-import gc
+from skimage.transform import resize
 
 class ImageBD(BaseBaseline):
   """
@@ -44,6 +44,7 @@ class ImageBD(BaseBaseline):
 
     state = self.env.render(mode='rgb_array', top_bottom=True)
     state = state / np.max((np.max(state), 1))
+    state = resize(state, (64, 64))
 
     agent['bs'] = utils.extact_hd_bs(self.env, obs, reward, done, info)
     agent['reward'] = cumulated_reward

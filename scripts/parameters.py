@@ -24,7 +24,7 @@ class Params(object):
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 500
+    self.generations = 2000
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9
