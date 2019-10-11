@@ -2,7 +2,7 @@
 # Date: 16/07/2019
 
 import numpy as np
-from core.qd import population, agents
+from core.evolution import population, agents
 from core.utils import utils
 import os, gc, json
 
@@ -12,6 +12,11 @@ class BaseBaseline(object):
   """
   # ---------------------------------------------------
   def __init__(self, env, parameters):
+    """
+    Constructor
+    :param env: gym environment
+    :param parameters: parameters of the run
+    """
     self.params = parameters
     self.pop_size = self.params.pop_size
     self.env = env
@@ -44,18 +49,30 @@ class BaseBaseline(object):
 
   # ---------------------------------------------------
   def evaluate_agent(self, agent):
+    """
+    Evaluates the agent. This one needs to be reimplemented. It raises a NotImplementedError
+    :param agent:
+    :return:
+    """
     raise NotImplementedError
   # ---------------------------------------------------
 
   # ---------------------------------------------------
   def train(self, steps=10000):
+    """
+    Main function to run.
+    :param steps: number of steps to run the search.
+    :return:
+    """
     for self.elapsed_gen in range(steps):
+      # Evaluate all the agents
       for agent in self.population:
         self.evaluate_agent(agent)
 
       max_rew = np.max(self.population['reward'].values)
-      self.opt.step()
+      self.opt.step() # Perform optimization step, updating the archive and the population
 
+      # Every 10 generation print an overview of the process, save a checkpoint and perform garbage collection
       if self.elapsed_gen % 10 == 0:
         gc.collect()
         print('Seed {} - Generation {}'.format(self.params.seed, self.elapsed_gen))

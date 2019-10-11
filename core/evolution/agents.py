@@ -1,5 +1,5 @@
 import numpy as np
-from core.utils import utils
+from core.evolution import genome
 from abc import ABCMeta, abstractmethod # This is to force implementation of child class methods
 from copy import deepcopy
 
@@ -75,8 +75,8 @@ class FFNeuralAgent(BaseAgent):
     self.use_bias = True
 
     self.action_len = np.random.uniform(0.5, 1)
-    self._genome = [utils.FCLayer(self.input_shape, 5, 'fc1', bias=self.use_bias),
-                    utils.FCLayer(5, self.output_shape, 'fc2', bias=self.use_bias)]
+    self._genome = [genome.FCLayer(self.input_shape, 5, 'fc1', bias=self.use_bias),
+                    genome.FCLayer(5, self.output_shape, 'fc2', bias=self.use_bias)]
 
   def evaluate(self, x):
     # TODO REMOVE THIS OBSCENITY.
@@ -124,8 +124,7 @@ class FFNeuralAgent(BaseAgent):
     for p, g in zip(params[:-1], self._genome):
       assert np.all(np.shape(g.w) == np.shape(p['w'])), 'Wrong shape of weight for layer {} of agent {}'.format(self.name, agent_name)
       assert np.all(np.shape(g.bias) == np.shape(p['bias'])), 'Wrong shape of bias for layer {} of agent {}'.format(self.name, agent_name)
-      g.w = p['w']
-      g.bias = p['bias']
+      g.load(deepcopy(p))
 
 
 class DMPAgent(BaseAgent):
@@ -139,17 +138,17 @@ class DMPAgent(BaseAgent):
 
     self._genome = []
     if shapes['type'] == 'poly':
-      _dmp = utils.DMPPoly
+      _dmp = genome.DMPPoly
     elif shapes['type'] == 'exp':
-      _dmp = utils.DMPExp
+      _dmp = genome.DMPExp
     elif shapes['type'] == 'sin':
-      _dmp = utils.DMPSin
+      _dmp = genome.DMPSin
     else:
       print('Wrong DMP chosen')
       raise ValueError
 
     for i in range(self.dof):
-      self._genome.append(_dmp('dmp{}'.format(i), **shapes))
+      self._genome.append(_dmp('dmp{}'.format(i), shapes['degree']))
 
   def evaluate(self, x):
     output = np.zeros(self.dof)

@@ -2,7 +2,7 @@
 # Date: 08/07/2019
 
 import numpy as np
-from core.qd import population
+from core.evolution import population
 from core.utils import utils
 from baselines.baseline import BaseBaseline
 import gc

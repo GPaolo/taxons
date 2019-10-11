@@ -1,5 +1,5 @@
 import numpy as np
-from core.qd.agents import *
+from core.evolution.agents import *
 import pandas as pd
 import os
 import pickle as pkl

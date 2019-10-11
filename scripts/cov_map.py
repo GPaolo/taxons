@@ -6,7 +6,7 @@ import gym
 import gym_billiard, gym_fastsim, pybulletgym
 import os
 from scripts import parameters
-from core.qd import population, agents
+from core.evolution import population, agents
 from core.utils import utils
 import pickle as pkl
 import progressbar

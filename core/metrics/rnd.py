@@ -136,7 +136,7 @@ class RND(nn.Module):
     dims = list(range(1, len(loss.shape)))
     loss = torch.mean(loss, dim=dims)  # Reconstruction error for each sample
 
-    return loss, torch.squeeze(prediction), None
+    return loss, prediction, None
   # ----------------------------------------------------------------
 
   # ----------------------------------------------------------------

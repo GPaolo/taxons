@@ -18,7 +18,7 @@ class Tester(object):
     self.params.load(os.path.join(path, 'params.json'))
 
     print('Loading metric...')
-    self.selector = ae.AutoEncoder(device=device, encoding_shape=self.params.feature_size, learning_rate=0.0001, beta=1)
+    self.selector = ae.ConvAE(device=device, encoding_shape=self.params.feature_size, learning_rate=0.0001, beta=1)
 
     self.selector.load(os.path.join(path, 'models/ckpt/ckpt_ae.pth'))
     self.selector.training = False

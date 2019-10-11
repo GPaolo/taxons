@@ -1,6 +1,6 @@
 import numpy as np
 from core.metrics import rnd, ae
-from core.qd import population, agents
+from core.evolution import population, agents
 from core.utils import utils
 import torch
 import os
@@ -49,10 +49,10 @@ class RndQD(object):
     print("Seed {} - Using device: {}".format(self.params.seed, self.device))
 
     if self.params.metric == 'AE':
-      self.metric = ae.AutoEncoder(device=self.device,
-                                   learning_rate=self.params.learning_rate,
-                                   lr_scale=self.params.lr_scale_fact,
-                                   encoding_shape=self.params.feature_size)
+      self.metric = ae.ConvAE(device=self.device,
+                              learning_rate=self.params.learning_rate,
+                              lr_scale=self.params.lr_scale_fact,
+                              encoding_shape=self.params.feature_size)
     elif self.params.metric == 'FFAE':
       self.metric = ae.FFAE(device=self.device,
                             learning_rate=self.params.learning_rate,

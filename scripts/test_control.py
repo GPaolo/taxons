@@ -7,7 +7,7 @@ import gym_billiard, gym_fastsim, pybulletgym
 from gym.wrappers import Monitor
 import numpy as np
 from core.metrics import ae, rnd
-from core.qd import population, agents
+from core.evolution import population, agents
 from core.utils import utils
 import os
 import matplotlib.pyplot as plt
@@ -138,7 +138,7 @@ class Eval(object):
       self.device = torch.device('cpu')
 
     if self.params.metric == 'AE':
-      self.selector = ae.AutoEncoder(device=self.device, encoding_shape=self.params.feature_size)
+      self.selector = ae.ConvAE(device=self.device, encoding_shape=self.params.feature_size)
       self.selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
     elif self.params.metric == 'RND':
       self.selector = rnd.RND(self.params.feature_size)
@@ -457,7 +457,7 @@ if __name__ == "__main__":
     device = torch.device('cpu')
 
   if params.metric == 'AE':
-    selector = ae.AutoEncoder(device=device, encoding_shape=params.feature_size)
+    selector = ae.ConvAE(device=device, encoding_shape=params.feature_size)
     selector.load(os.path.join(load_path, 'models/ckpt_ae.pth'))
   elif params.metric == 'RND':
     selector = rnd.RND(params.feature_size)
