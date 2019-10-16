@@ -10,7 +10,14 @@ from core.utils import utils
 
 # ----------------------------------------------------------------
 class View(nn.Module):
+  """
+  This class is used to reshape tensors
+  """
   def __init__(self, size):
+    """
+    Constructor
+    :param size: final shape of the tensor
+    """
     super(View, self).__init__()
     self.size = size
 
@@ -20,8 +27,18 @@ class View(nn.Module):
 
 # ----------------------------------------------------------------
 class BaseAE(nn.Module):
+  """
+  This class defines the Base AutoEncoder.
+  """
   # ----------------------------------------------------------------
   def __init__(self, device=None, learning_rate=0.001, lr_scale=None, **kwargs):
+    """
+    Constructor
+    :param device: Device on which run the computation
+    :param learning_rate:
+    :param lr_scale: Learning rate scale for the lr scheduler
+    :param kwargs:
+    """
     super(BaseAE, self).__init__()
 
     if device is not None:
@@ -49,27 +66,21 @@ class BaseAE(nn.Module):
 
   # ----------------------------------------------------------------
   def _define_encoder(self):
+    """
+    Define encoder. Needs to be implemented in inheriting classes
+    """
     raise NotImplementedError
 
   def _define_decoder(self):
+    """
+    Define decoder. Needs to be implemented in inheriting classes
+    """
     raise NotImplementedError
 
   def _define_subsampler(self):
-    def resize_image(input_tensors):
-      final_output = None
-      #batch_size, channel, height, width = input_tensors.shape
-      for img in input_tensors:
-        img_PIL = torchvision.transforms.ToPILImage()(img)
-        img_PIL = torchvision.transforms.Resize([64, 64])(img_PIL)
-        img_PIL = torchvision.transforms.ToTensor()(img_PIL)
-        if final_output is None:
-          final_output = img_PIL
-        else:
-          final_output = torch.cat((final_output, img_PIL), 0)
-      return final_output
-
-
-
+    """
+    Define subsampler.
+    """
     self.first_subs = 256
     self.subsample = nn.Sequential(nn.AdaptiveAvgPool2d(self.first_subs),
                                    nn.AvgPool2d(2),
@@ -78,6 +89,10 @@ class BaseAE(nn.Module):
 
   # ----------------------------------------------------------------
   def save(self, filepath):
+    """
+    Saves AE to given filepath
+    :param filepath:
+    """
     save_ckpt = {
       'ae': self.state_dict(),
       'optimizer': self.optimizer.state_dict()
@@ -90,6 +105,10 @@ class BaseAE(nn.Module):
 
   # ----------------------------------------------------------------
   def load(self, filepath):
+    """
+    Load AE from given filepath
+    :param filepath:
+    """
     try:
       ckpt = torch.load(filepath, map_location=self.device)
     except Exception as e:
@@ -106,16 +125,11 @@ class BaseAE(nn.Module):
   # ----------------------------------------------------------------
 
   # ----------------------------------------------------------------
-  def init_layers(self, m):
-    classname = m.__class__.__name__
-    if 'Conv' in classname and not 'Encoder' in classname:
-      m.weight.data.normal_(0.0, 1/(m.kernel_size[0]*m.kernel_size[1]))
-    elif 'Linear' in classname:
-      m.weight.data.normal_(0.0, 1/m.in_features)
-  # ----------------------------------------------------------------
-
-  # ----------------------------------------------------------------
   def training_step(self, **kwargs):
+    """
+    Function that performs one training step. Needs to be implemented in inheriting classes
+    :param kwargs:
+    """
     raise NotImplementedError
   # ----------------------------------------------------------------
 # ----------------------------------------------------------------
@@ -127,6 +141,9 @@ class ConvAE(BaseAE):
   """
   # ----------------------------------------------------------------
   def _define_encoder(self):
+    """
+    Defines encoder
+    """
     self.encoder = nn.Sequential(nn.Conv2d(3, 32, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),  # 64->32
                                  nn.BatchNorm2d(32),
                                  nn.Conv2d(32, 128, kernel_size=4, stride=2, padding=1, bias=False), nn.SELU(),
@@ -146,6 +163,9 @@ class ConvAE(BaseAE):
 
   # ----------------------------------------------------------------
   def _define_decoder(self):
+    """
+    Defines the decoder
+    """
     self.decoder = nn.Sequential(nn.Linear(self.encoding_shape, 256, bias=False), nn.SELU(),
                                  nn.Linear(256, 32 * 4 * 4, bias=False), nn.SELU(),
                                  View((-1, 32, 4, 4)),
@@ -166,6 +186,11 @@ class ConvAE(BaseAE):
 
   # ----------------------------------------------------------------
   def forward(self, x):
+    """
+    Forward pass of the network.
+    :param x: Input as RGB array of images
+    :return: reconstruction error, features, reconstructed image
+    """
     if x.shape[-1] > self.first_subs/4:  # Only subsample if not done yet.
       x = self.subsample(x)
 
@@ -181,8 +206,13 @@ class ConvAE(BaseAE):
   # ----------------------------------------------------------------
 
   # ----------------------------------------------------------------
-  def training_step(self, x, old_x=None):
-    self.train()
+  def training_step(self, x):
+    """
+    Performs one training step of the network
+    :param x: Input
+    :return: Loss, features, reconstructed image
+    """
+    self.train() # Sets network to train mode
     rec_error, feat, y = self.forward(x)
     # Reconstruction Loss
     rec_loss = torch.mean(rec_error)
@@ -191,7 +221,7 @@ class ConvAE(BaseAE):
     self.zero_grad()
     loss.backward()
     self.optimizer.step()
-    self.eval()
+    self.eval() # Sets network to evaluation mode
     print('Rec Loss: {}'.format(rec_loss.cpu().data))
     print()
     return loss, feat, y
@@ -205,6 +235,9 @@ class FFAE(BaseAE):
   """
   # ----------------------------------------------------------------
   def _define_encoder(self):
+    """
+    Defines encoder of the network
+    """
     self.encoder = nn.Sequential(View((-1, 64 * 64 * 3)),
                                  nn.Linear(64 * 64 * 3, 5120, bias=False), nn.SELU(),
                                  nn.BatchNorm1d(5120),
@@ -220,6 +253,9 @@ class FFAE(BaseAE):
 
   # ----------------------------------------------------------------
   def _define_decoder(self):
+    """
+    Defines decoder of the network
+    """
     self.decoder = nn.Sequential(nn.Linear(self.encoding_shape, 512, bias=False), nn.SELU(),
                                  nn.BatchNorm1d(512),
                                  nn.Linear(512, 2560, bias=False), nn.SELU(),
@@ -233,6 +269,11 @@ class FFAE(BaseAE):
 
   # ----------------------------------------------------------------
   def forward(self, x):
+    """
+    Performs forward pass of the net
+    :param x: Input
+    :return: rec_error, features, reconstructed image
+    """
     if x.shape[-1] > self.first_subs/4:  # Only subsample if not done yet.
       x = self.subsample(x)
 
@@ -248,7 +289,12 @@ class FFAE(BaseAE):
   # ----------------------------------------------------------------
 
   # ----------------------------------------------------------------
-  def training_step(self, x, old_x=None):
+  def training_step(self, x):
+    """
+    Performs one training step of the network
+    :param x: Input
+    :return: Loss, features, reconstructed image
+    """
     self.train()
     rec_error, feat, y = self.forward(x)
     # Reconstruction Loss
@@ -267,12 +313,16 @@ class FFAE(BaseAE):
 
 # ----------------------------------------------------------------
 class BVAE(BaseAE):
+  """
+  Beta-VAE implementation taken from https://github.com/1Konny/Beta-VAE/blob/master/model.py
+  """
   # ----------------------------------------------------------------
   def __init__(self, device=None, learning_rate=0.001, lr_scale=None, **kwargs):
     """
-    Beta-VAE implementation taken from https://github.com/1Konny/Beta-VAE/blob/master/model.py
-    :param device:
+    Constructor
+    :param device: Device on which run the computation
     :param learning_rate:
+    :param lr_scale: Learning rate scale for the lr scheduler
     :param kwargs:
     """
     super(BVAE, self).__init__(device, learning_rate, lr_scale, **kwargs)
@@ -282,6 +332,9 @@ class BVAE(BaseAE):
 
   # ----------------------------------------------------------------
   def _define_encoder(self):
+    """
+    Defines encoder of the net
+    """
     self.encoder = nn.Sequential(nn.Conv2d(in_channels=3, out_channels=32, kernel_size=4, stride=2, padding=1),  # B,  32, 32, 32
                                  nn.SELU(),
                                  nn.Conv2d(32, 32, 4, 2, 1),  # B,  32, 16, 16
@@ -299,6 +352,9 @@ class BVAE(BaseAE):
 
   # ----------------------------------------------------------------
   def _define_decoder(self):
+    """
+    Define decoder of the net
+    """
     self.decoder = nn.Sequential(nn.Linear(self.encoding_shape, 256),  # B, 256
                                  View((-1, 256, 1, 1)),  # B, 256,  1,  1
                                  nn.SELU(),
@@ -317,6 +373,12 @@ class BVAE(BaseAE):
 
   # ----------------------------------------------------------------
   def reparametrize(self, mu, logvar):
+    """
+    Reparametrize the mu and logvar to obtain the features
+    :param mu:
+    :param logvar:
+    :return: mu + std * eps
+    """
     std = logvar.div(2).exp()
     eps = torch.Tensor(std.data.new(std.size()).normal_())
     return mu + std * eps
@@ -324,6 +386,12 @@ class BVAE(BaseAE):
 
   # ----------------------------------------------------------------
   def forward(self, x):
+    """
+    Forward pass of the network
+    :param x: Input
+    :return: If training: Rec_error, features, reconstructed image, mu, logvar
+             If not training: rec error, features, reconstructed image
+    """
     if x.shape[-1] > self.first_subs/4:  # Only subsample if not done yet.
       x = self.subsample(x)
 
@@ -346,6 +414,12 @@ class BVAE(BaseAE):
 
   # ----------------------------------------------------------------
   def kl_divergence(self, mu, logvar):
+    """
+    Calculate KL divergence
+    :param mu:
+    :param logvar:
+    :return: total kld, dimension wise kld, mean kld
+    """
     klds = -0.5 * (1 + logvar - mu.pow(2) - logvar.exp())
     total_kld = klds.sum(1).mean(0, True)
     dimension_wise_kld = klds.mean(0)
@@ -355,7 +429,12 @@ class BVAE(BaseAE):
   # ----------------------------------------------------------------
 
   # ----------------------------------------------------------------
-  def training_step(self, x, old_x=None):
+  def training_step(self, x):
+    """
+    Performs training step
+    :param x: Input
+    :return: loss, features, reconstructed image
+    """
     self.train()
     rec_error, feat, y, mu, logvar = self.forward(x)
     # Reconstruction Loss
