@@ -40,7 +40,7 @@ class RandomSearch(BaseBaseline):
     t = 0
     while not done:
       if 'FastsimSimpleNavigation' in self.params.env_tag:
-        agent_input = [obs, t/self.params.max_episode_len] # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
+        agent_input = [t/self.params.max_episode_len, obs] # Observation and time. The time is used to see when to stop the action.
         action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
       else:
         agent_input = t
@@ -61,7 +61,7 @@ class RandomSearch(BaseBaseline):
     agent['bs'] = utils.extact_hd_bs(self.env, obs, reward, done, info)
     agent['reward'] = cumulated_reward
 
-    agent['features'] = [None, None] #TODO check this!!! # RS does not uses any features cuz it does not do any evolution
+    agent['features'] = [None, None] # RS does not uses any features cuz it does not do any evolution
     return cumulated_reward
   # ---------------------------------------------------
 
