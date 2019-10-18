@@ -9,7 +9,7 @@ class Params(object):
   def __init__(self):
     self.info = 'Ant with 500 gens and 500 ts. Mixed'
 
-    self.exp_name = 'Billiard_IBD'
+    self.exp_name = 'Maze_IBD'
     # Save Path
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
@@ -18,18 +18,18 @@ class Params(object):
 
     # Environment
     # ---------------------------------------------------------
-    self.env_tag = 'Billiard-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.max_episode_len = 300
+    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
+    self.max_episode_len = 2000
     # ---------------------------------------------------------
 
     # QD
     # ---------------------------------------------------------
-    self.generations = 2000
+    self.generations = 1000
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9
 
-    self.qd_agent = 'DMP'  # 'DMP
+    self.qd_agent = 'Neural'  # 'DMP
     if self.qd_agent == 'Neural':
       self.agent_shapes = {'input_shape': 5, 'output_shape': self.action_shape}
     elif self.qd_agent == 'DMP':

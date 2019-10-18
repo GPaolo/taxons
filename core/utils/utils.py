@@ -43,6 +43,42 @@ class LRScheduler(_LRScheduler):
   # ---------------------------------------------------
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+class Logger(object):
+  """
+  This class works as a logger for the experiments
+  """
+  def __init__(self, log_dict):
+    """
+    Constructor
+    :param log_dict: This is the dict that will be used to log
+    """
+    self.log = log_dict
+
+  def register_log(self, key, value):
+    """
+    This function adds another value to the log
+    :param key: Which key of the log dict add the new value to
+    :param value: What value to add
+    """
+    self.log[key].append(str(value))
+
+  def save(self, filepath):
+    """
+    This function saves the logs to the given filepath
+    :param filepath:
+    :return:
+    """
+    cwd = os.getcwd()
+    try:
+      assert os.path.exists(filepath), 'Specified path for logs does not exists. Saving in {}'.format(cwd)
+    except:
+      filepath = cwd
+
+    with open(os.path.join(filepath, 'logs.json'), 'w') as f:
+      json.dump(self.log, f, indent=4)
+# ---------------------------------------------------------------------------
+
 
 # ---------------------------------------------------
 def action_formatting(env_tag, action):

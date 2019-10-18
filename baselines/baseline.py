@@ -24,7 +24,7 @@ class BaseBaseline(object):
     self.agents_shapes = self.params.agent_shapes
     self.agent_name = self.params.qd_agent
 
-    self.logs = {'Generation': [], 'Avg gen surprise': [], 'Max reward': [], 'Archive size': [], 'Coverage': []}
+    self.logs = utils.Logger({'Generation': [], 'Avg gen surprise': [], 'Max reward': [], 'Archive size': [], 'Coverage': []})
 
     if self.agent_name == 'Neural':
       self.agent_type = agents.FFNeuralAgent
@@ -85,7 +85,7 @@ class BaseBaseline(object):
         print()
 
       if self.archive is not None:
-        bs_points = np.concatenate(self.archive['bs'].values)
+        bs_points = np.stack(self.archive['bs'].to_list())
       else:
         bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
       if 'Ant' in self.params.env_tag:
@@ -102,11 +102,11 @@ class BaseBaseline(object):
                             info={'gen': self.elapsed_gen, 'seed': self.params.seed},
                             upper_limit=u_limit, lower_limit=l_limit)
 
-      self.logs['Generation'].append(str(self.elapsed_gen))
-      self.logs['Avg gen surprise'].append('0')
-      self.logs['Max reward'].append(str(max_rew))
-      self.logs['Archive size'].append(str(self.archive.size))
-      self.logs['Coverage'].append(str(coverage))
+      self.logs.register_log('Generation', self.elapsed_gen)
+      self.logs.register_log('Avg gen surprise', 0)
+      self.logs.register_log('Max reward', max_rew)
+      self.logs.register_log('Archive size', self.archive.size)
+      self.logs.register_log('Coverage', coverage)
       if self.END:
         print('Seed {} - Quitting.'.format(self.params.seed))
         break
@@ -130,7 +130,6 @@ class BaseBaseline(object):
     if self.archive is not None:
       self.archive.save_pop(save_subf, 'archive')
 
-    with open(os.path.join(self.save_path, 'logs.json'), 'w') as f:
-      json.dump(self.logs, f, indent=4)
+    self.logs.save(self.save_path)
     print('Seed {} - Done'.format(self.params.seed))
   # ---------------------------------------------------

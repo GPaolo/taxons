@@ -44,7 +44,7 @@ class BaseAgent(object):
     :param x: Agent input
     :return: Value of the output
     """
-    return self.evaluate(*args)
+    return self.evaluate(*args[0])
   # ---------------------------------
 
   # ---------------------------------

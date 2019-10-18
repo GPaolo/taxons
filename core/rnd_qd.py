@@ -25,12 +25,14 @@ class RndQD(object):
 
     self.metric_update_steps = 0
     self.metric_update_single_agent = self.params.per_agent_update
-    self.logs = {'Generation':[], 'Avg gen surprise':[], 'Max reward':[], 'Archive size':[], 'Coverage':[]}
+    self.logs = utils.Logger({'Generation':[], 'Avg gen surprise':[], 'Max reward':[], 'Archive size':[], 'Coverage':[]})
 
     if self.agent_name == 'Neural':
       agent_type = agents.FFNeuralAgent
     elif self.agent_name == 'DMP':
       agent_type = agents.DMPAgent
+    else:
+      raise ValueError('Wrong agent type specified: {}'.format(self.agent_name))
 
     self.population = population.Population(agent=agent_type,
                                             shapes=self.agents_shapes,
@@ -256,11 +258,11 @@ class RndQD(object):
                             info={'gen':self.elapsed_gen, 'seed':self.params.seed},
                             upper_limit=u_limit, lower_limit=l_limit)
 
-      self.logs['Generation'].append(str(self.elapsed_gen))
-      self.logs['Avg gen surprise'].append(str(avg_gen_surprise))
-      self.logs['Max reward'].append(str(max_rew))
-      self.logs['Archive size'].append(str(self.archive.size))
-      self.logs['Coverage'].append(str(coverage))
+      self.logs.register_log('Generation', self.elapsed_gen)
+      self.logs.register_log('Avg gen surprise', avg_gen_surprise)
+      self.logs.register_log('Max reward', max_rew)
+      self.logs.register_log('Archive size', self.archive.size)
+      self.logs.register_log('Coverage', coverage)
       if self.END:
         print('Seed {} - Quitting.'.format(self.params.seed))
         break
@@ -283,8 +285,6 @@ class RndQD(object):
     self.population.save_pop(save_subf, 'pop')
     self.archive.save_pop(save_subf, 'archive')
     self.metric.save(save_subf)
-
-    with open(os.path.join(self.save_path, 'logs.json'), 'w') as f:
-      json.dump(self.logs, f, indent=4)
+    self.logs.save(self.save_path)
     print('Seed {} - Done'.format(self.params.seed))
   # ---------------------------------------------------

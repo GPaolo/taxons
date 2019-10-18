@@ -88,8 +88,8 @@ def main(seed, params):
 
 if __name__ == "__main__":
   parallel_threads = 3
-  seeds = [# 11, 59,
-           # 3, 6, 4,
+  seeds = [11, 59,
+           3, 6, 4,
            18, 13, 1,
            22, 34, 99,
            43, 100, 15,

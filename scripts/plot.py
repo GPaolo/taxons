@@ -255,12 +255,13 @@ class GenPlot(object):
 
 if __name__ == '__main__':
   total_gens = [1999, 1000, 500]
-  violins = True
+  violins = False
   fig, axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
   name = ['Billiard', 'Maze', 'Ant']
+  name = ['Billiard']
 
   for experiment, ax, gens in zip(name, axes, total_gens):
-    base_path = '/media/giuseppe/Storage/AE NS/Experiments/{}'.format(experiment)
+    base_path = '/mnt/7e0bad1b-406b-4582-b7a1-84327ae60fc4/ICRA 2020/Experiments/{}'.format(experiment)
 
     plotter = GenPlot(total_gens=gens, cmaps=['Dark2','gist_rainbow'])
 
@@ -273,16 +274,17 @@ if __name__ == '__main__':
     c_ps, s_ps, a_ps = plotter.load_exp_data(os.path.join(base_path,'{}_PS'.format(experiment)))
     c_rbd, s_rbd, a_rbd = plotter.load_exp_data(os.path.join(base_path,'{}_RBD'.format(experiment)))
     c_rs, s_rs, a_rs = plotter.load_exp_data(os.path.join(base_path,'{}_RS'.format(experiment)))
+    c_ibd, s_ibd, a_ibd = plotter.load_exp_data(os.path.join(base_path,'{}_IBD'.format(experiment)))
 
 
     use_std = True
     gen_on_x = False
 
     plt.rc('grid', linestyle="dotted", color='gray')
-    labels = ['PS', 'RBD', 'RS', 'NS', 'NT', 'TAXO-N', 'TAXO-S', 'TAXONS']
-    coverage_list = [c_ps, c_rbd, c_rs, c_ns, c_nt, c_aen, c_aes, c_mix]
-    surprise_list = [s_ps, s_rbd, s_rs, s_ns, s_nt, s_aen, s_aes, s_mix]
-    archive_list = [a_ps, a_rbd, a_rs, a_ns, a_nt, a_aen, a_aes, a_mix]
+    labels = ['PS', 'RBD', 'RS', 'NS', 'NT', 'IBD', 'TAXO-N', 'TAXO-S', 'TAXONS']
+    coverage_list = [c_ps, c_rbd, c_rs, c_ns, c_nt, c_ibd, c_aen, c_aes, c_mix]
+    surprise_list = [s_ps, s_rbd, s_rs, s_ns, s_nt, s_ibd, s_aen, s_aes, s_mix]
+    archive_list = [a_ps, a_rbd, a_rs, a_ns, a_nt, a_ibd, a_aen, a_aes, a_mix]
     overlapping_list = []
 
     mwu = plotter.mwu(coverage_list, labels)
