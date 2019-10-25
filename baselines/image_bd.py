@@ -42,7 +42,10 @@ class ImageBD(BaseBaseline):
         if np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
 
-    state = self.env.render(mode='rgb_array')#, top_bottom=True)
+    try:
+      state = self.env.render(mode='rgb_array', top_bottom=True)
+    except:
+      state = self.env.render(mode='rgb_array')
     state = state / np.max((np.max(state), 1))
     state = resize(state, (64, 64))
 

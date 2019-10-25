@@ -33,26 +33,34 @@ class GenPlot(object):
     coverage = []
     gen_surprise = []
     archive_size = []
+    max_gens = self.total_gens
     for seed in seeds:
       logs_path = os.path.join(folder, seed, 'logs.json')
       with open(logs_path) as f:
         logs = json.load(f)
       gens = list(map(int, logs['Generation']))
-      if len(gens) < self.total_gens:
+      if len(gens) < max_gens:
         print('Experiment {} Seed {} has {} gens'.format(folder, seed, len(gens)))
+        max_gens = len(gens)
         continue
       coverage.append(np.array(list(map(np.float64, logs['Coverage']))))
       gen_surprise.append(np.array(list(map(np.float64, logs['Avg gen surprise']))))
       archive_size.append(np.array(list(map(int, logs['Archive size']))))
+
+    for i in range(len(seeds)):
+      coverage[i] = coverage[i][:max_gens]
+      gen_surprise[i] = gen_surprise[i][:max_gens]
+      archive_size[i] = archive_size[i][:max_gens]
+
     coverage = np.array(coverage)
     gen_surprise = np.array(gen_surprise)
     archive_size = np.array(archive_size)
-    gens = np.array(gens)
+    gens = np.array(list(range(max_gens)))
     if 'RS' in folder:
       return coverage, gen_surprise, archive_size
-    if np.max(gens) < self.total_gens-1:
+    if max_gens < self.total_gens-1:
       return None, None, None
-    return coverage[:, :self.total_gens], gen_surprise[:, :self.total_gens], archive_size[:, :self.total_gens]
+    return coverage, gen_surprise, archive_size
 
   def plot_data(self, data, title, labels, cmap, y_axis, gen=True):
     # Create plots
@@ -258,7 +266,7 @@ if __name__ == '__main__':
   violins = False
   fig, axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
   name = ['Billiard', 'Maze', 'Ant']
-  name = ['Billiard']
+  name = ['Billiard', 'Maze']
 
   for experiment, ax, gens in zip(name, axes, total_gens):
     base_path = '/mnt/7e0bad1b-406b-4582-b7a1-84327ae60fc4/ICRA 2020/Experiments/{}'.format(experiment)

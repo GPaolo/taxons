@@ -67,7 +67,7 @@ def main(seed, params):
   print('Seed {} - Training time {}'.format(seed, timedelta(seconds=total_train_time)))
 
   if evolver.archive is not None:
-    bs_points = np.concatenate(evolver.archive['bs'].values)
+    bs_points = np.stack(evolver.archive['bs'].to_list())
   else:
     bs_points = np.concatenate([a['bs'] for a in evolver.population if a['bs'] is not None])
   if 'Ant' in params.env_tag:
