@@ -12,10 +12,11 @@ setup(author='Giuseppe Paolo',
             'pybullet',
             'pygame',
             'pathos',
-            'Box2D',
+            'box2d-py',
             'simplejson',
             'pandas',
             'matplotlib',
-            'ipython'
+            'ipython',
+            'scikit-image'
       ]
 )
