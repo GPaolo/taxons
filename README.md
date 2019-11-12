@@ -28,20 +28,34 @@ Also for this one I am using a slightly modified version of it. The original can
 
 Fastsim needs libfastsim to be installed first.
 
+libfastsim needs to be install in pyfastsim, then patched with `patch -p1 < /path/to/your/file.patch`. Once this has been done you can install pyfastsim, then install fastsim-gym.
+
+##### Pyfastsim
+You can download it from `https://github.com/alexendy/pyfastsim`
+
 ##### Libfastsim
-To install it, activate the virtual env and enter the `external` folder. Then do:
+To install it, activate the virtual env and enter the `external/pyfastsim` folder. Then do:
 ```
 git clone https://github.com/GPaolo/libfastsim.git
+cd libfastsim
 git checkout patch-1
 git pull origin patch-1
-cd libfastsim
+patch -p1 < ../fastsim-boost2std-fixdisplay.patch
 ./waf configure
 ./waf build
+./waf install
 ```
 **NB** If it complains that cannot find boost, then install it by running:
 ```.env
 sudo apt-get install libboost-all-dev
 ```
+
+then go in the pyfastsim folder and install it by doing:
+```
+cd ..
+python setup.py install
+```
+
 ##### Fastsim-gym
 
 To install it, activate the virtual env and enter the `external` folder. Then do:
