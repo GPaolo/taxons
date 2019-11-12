@@ -31,15 +31,15 @@ def main(seed, params):
   if not os.path.exists(params.save_path):
     os.mkdir(params.save_path)
 
-  if params.baseline == 'NS':
+  if params.exp == 'NS':
     evolver = novelty_search.NoveltySearch(env=env, parameters=params)
-  elif params.baseline == 'PS':
+  elif params.exp== 'PS':
     evolver = policy_space.PolicySpace(env=env, parameters=params)
-  elif params.baseline == 'RS':
+  elif params.exp == 'RS':
     evolver = random_search.RandomSearch(env=env, parameters=params)
-  elif params.baseline == 'RBD':
+  elif params.exp == 'RBD':
     evolver = random_bd.RandomBD(env=env, parameters=params)
-  elif params.baseline == 'IBD':
+  elif params.exp == 'IBD':
     evolver = image_bd.ImageBD(env=env, parameters=params)
   else:
     evolver = rnd_qd.RndQD(env=env, parameters=params)
@@ -87,7 +87,8 @@ def main(seed, params):
 
 
 if __name__ == "__main__":
-  parallel_threads = 3
+  p = parameters.Params()
+  parallel_threads = p.threads
   seeds = [11, 59,
            3, 6, 4,
            18, 13, 1,
@@ -96,7 +97,6 @@ if __name__ == "__main__":
            66, 10,7,
            9, 42, 2
      ]
-  # seeds = [2]
 
   multiseeds = []
   for i in range(0, len(seeds), parallel_threads):

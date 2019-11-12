@@ -101,6 +101,7 @@ class GenPlot(object):
     colors.append(cmap(6))
     colors.append(cmap(7))
     colors.append(cmap(2))
+    colors.append(cmap(8))
 
     # For TAXO
     cmap = plt.get_cmap('Set1')
@@ -263,7 +264,7 @@ class GenPlot(object):
 
 if __name__ == '__main__':
   total_gens = [1999, 1000, 500]
-  violins = False
+  violins = True
   fig, axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
   name = ['Billiard', 'Maze', 'Ant']
   name = ['Billiard', 'Maze']

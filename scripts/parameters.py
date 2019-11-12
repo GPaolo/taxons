@@ -6,54 +6,84 @@ from core.utils import utils, optimizer
 import json
 
 class Params(object):
+  # ---------------------------------------------------------
   def __init__(self):
-    self.info = 'Ant with 500 gens and 500 ts. Mixed'
+    # Main parameters
+    # ----------------------
+    self.info = 'Maze with 1k gens. NT'
+    self.exp_name = 'Maze_NT'
 
-    self.exp_name = 'Maze_IBD'
-    # Save Path
+    self.exp = 'TAXONS' # 'TAXONS', 'TAXON', 'TAXOS', 'NT, 'NS', 'PS', 'RS', 'RBD', 'IBD'
+    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
+    self.threads = 4
+    # ----------------------
+
+    self.set_env_params()
+    self.set_exp_params()
+
+    # Other params
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
-    self.baseline = 'IBD' # None, 'NS', 'PS', 'RS', 'RBD', 'IBD'
 
-    # Environment
-    # ---------------------------------------------------------
-    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.max_episode_len = 2000
-    # ---------------------------------------------------------
-
-    # QD
-    # ---------------------------------------------------------
-    self.generations = 1000
     self.pop_size = 100
     self.use_archive = True
     self.mutation_rate = 0.9
 
-    self.qd_agent = 'Neural'  # 'DMP
-    if self.qd_agent == 'Neural':
-      self.agent_shapes = {'input_shape': 5, 'output_shape': self.action_shape}
-    elif self.qd_agent == 'DMP':
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'} # poly, exp, sin
-    # ---------------------------------------------------------
-
     # Metric
-    # ---------------------------------------------------------
-    self.gpu = True
     self.metric = 'AE'  # 'RND', 'BVAE', 'FFAE', 'AE'
     self.feature_size = 10
-    self.learning_rate = 0.001 # 0.0001 for RND
+    self.learning_rate = 0.001  # 0.0001 for RND
     self.lr_scale_fact = 0.5
     self.per_agent_update = False
-    self.update_metric = True
     self.train_on_archive = True
     self.update_interval = 30
-    # ---------------------------------------------------------
 
-    # Optimizer
-    # ---------------------------------------------------------
-    self.optimizer_type = 'Novelty' # 'Surprise', 'Pareto', 'Novelty'
-    self._load_optimizer()
-    # ---------------------------------------------------------
+  # ---------------------------------------------------------
+
+  # ---------------------------------------------------------
+  def set_env_params(self):
+    if 'Ant' in self.env_tag:
+      self.max_episode_len = 300
+      self.agent_shapes = {'dof': 8, 'degree': 5, 'type': 'sin'}
+      self.generations = 500
+    elif 'FastsimSimpleNavigation' in self.env_tag:
+      self.max_episode_len = 2000
+      self.agent_shapes = {'input_shape': 5, 'output_shape': 2}
+      self.generations = 1000
+    elif 'Billiard' in self.env_tag:
+      self.max_episode_len = 300
+      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'}
+      self.generations = 2000
+    else:
+      raise ValueError('Wrong environment name chosen')
+  # ---------------------------------------------------------
+
+  # ---------------------------------------------------------
+  def set_exp_params(self):
+    if self.exp == 'TAXONS':
+      self.optimizer = optimizer.NoveltySurpriseOptimizer
+      self.update_metric = True
+      self.gpu = True
+    elif self.exp == 'TAXON':
+      self.optimizer = optimizer.NoveltyOptimizer
+      self.update_metric = True
+      self.gpu = True
+    elif self.exp == 'TAXOS':
+      self.optimizer = optimizer.SurpriseOptimizer
+      self.update_metric = True
+      self.gpu = True
+    elif self.exp == 'NT':
+      self.optimizer = optimizer.NoveltyOptimizer
+      self.update_metric = False
+      self.gpu = True
+    else: # These are the baselines
+      self.optimizer = optimizer.NoveltyOptimizer
+      self.update_metric = True
+      self.gpu = True
+  # ---------------------------------------------------------
+
+
   # -----------------------------------------Setup----------------
 
   def _get_dict(self):
@@ -91,28 +121,5 @@ class Params(object):
   def seed(self, seed):
     self._seed = seed
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name, str(self.seed))
-  # ---------------------------------------------------------
-
-  # Load optimizer
-  def _load_optimizer(self):
-    if self.optimizer_type == 'Novelty':
-      self.optimizer = optimizer.NoveltyOptimizer
-    elif self.optimizer_type == 'Surprise':
-      self.optimizer = optimizer.SurpriseOptimizer
-    elif self.optimizer_type == 'Pareto':
-      self.optimizer = optimizer.ParetoOptimizer
-  # ---------------------------------------------------------
-
-  # Select action size
-  @property
-  def action_shape(self):
-    if 'Ant' in self.env_tag:
-      return 8
-    elif 'Billiard' in self.env_tag:
-      return 2
-    elif 'MountainCar' in self.env_tag:
-      return 2
-    elif 'FastsimSimpleNavigation' in self.env_tag:
-      return 2
   # ---------------------------------------------------------
 # ---------------------------------------------------------
