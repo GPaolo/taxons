@@ -86,10 +86,10 @@ class RndQD(object):
     while not done:
       if 'FastsimSimpleNavigation' in self.params.env_tag:
         agent_input = [t / self.params.max_episode_len, obs]  # Observation and time. The time is used to see when to stop the action. TODO move the action stopping outside of the agent
-      elif 'Ant' in self.params.env_tag: # TODO metti questi anche nelle baselines
-        agent_input = t
+      elif 'Ant' in self.params.env_tag:
+        agent_input = [t]
       else:
-        agent_input = t / self.params.max_episode_len
+        agent_input = [t / self.params.max_episode_len]
 
       action = utils.action_formatting(self.params.env_tag, agent['agent'](agent_input))
 
@@ -104,7 +104,7 @@ class RndQD(object):
         CoM = np.array([self.env.robot.body_xyz[:2]])
         if np.any(np.abs(CoM) >= np.array([3, 3])):
           done = True
-    state = self.env.render(mode='rgb_array', top_bottom=True)
+    state = self.env.render(mode='rgb_array')
     state = state/np.max((np.max(state), 1))
 
     agent['bs'] = utils.extact_hd_bs(self.env, obs, reward, done, info)
@@ -241,7 +241,7 @@ class RndQD(object):
         print()
 
       if self.archive is not None:
-        bs_points = np.concatenate(self.archive['bs'].values)
+        bs_points = np.stack(self.archive['bs'].to_list())
       else:
         bs_points = np.concatenate([a['bs'] for a in self.population if a['bs'] is not None])
       if 'Ant' in self.params.env_tag:
