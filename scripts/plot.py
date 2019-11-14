@@ -101,7 +101,7 @@ class GenPlot(object):
     colors.append(cmap(6))
     colors.append(cmap(7))
     colors.append(cmap(2))
-    colors.append(cmap(8))
+    colors.append(cmap(1))
 
     # For TAXO
     cmap = plt.get_cmap('Set1')
@@ -113,6 +113,7 @@ class GenPlot(object):
     colors.append(cmap(1))
     colors.append(cmap(2))
     colors.append(cmap(0))
+    colors.append(cmap(7))
 
 
     return colors
@@ -275,8 +276,8 @@ if __name__ == '__main__':
     plotter = GenPlot(total_gens=gens, cmaps=['Dark2','gist_rainbow'])
 
     c_mix, s_mix, a_mix = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Mixed'.format(experiment)))
-    # c_nt, s_nt, a_nt = plotter.load_exp_data(os.path.join(base_path,'{}_AE_NoTrain'.format(experiment)))
-    c_nt, s_nt, a_nt = None, None, None
+    c_nt, s_nt, a_nt = plotter.load_exp_data(os.path.join(base_path,'{}_AE_NoTrain'.format(experiment)))
+    # c_nt, s_nt, a_nt = None, None, None
     c_aen, s_aen, a_aen = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Novelty'.format(experiment)))
     c_aes, s_aes, a_aes = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Surprise'.format(experiment)))
     c_ns, s_ns, a_ns = plotter.load_exp_data(os.path.join(base_path,'{}_NS'.format(experiment)))

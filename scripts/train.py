@@ -24,6 +24,8 @@ def main(seed, params):
   env = gym.make(params.env_tag)
   params.seed = seed
   env.seed(seed)
+  env.action_space.seed(seed)
+  env.observation_space.seed(seed)
   np.random.seed(seed)
   torch.manual_seed(seed)
   params.save()

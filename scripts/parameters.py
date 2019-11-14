@@ -10,12 +10,12 @@ class Params(object):
   def __init__(self):
     # Main parameters
     # ----------------------
-    self.info = 'Maze with 1k gens. NT'
-    self.exp_name = 'Maze_NT'
+    self.info = 'Ant with 500 gens. NT'
+    self.exp_name = 'Ant_NT'
 
-    self.exp = 'TAXONS' # 'TAXONS', 'TAXON', 'TAXOS', 'NT, 'NS', 'PS', 'RS', 'RBD', 'IBD'
-    self.env_tag = 'FastsimSimpleNavigation-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.threads = 4
+    self.exp = 'NT' # 'TAXONS', 'TAXON', 'TAXOS', 'NT, 'NS', 'PS', 'RS', 'RBD', 'IBD'
+    self.env_tag = 'AntMuJoCoEnv-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
+    self.threads = 1
     # ----------------------
 
     self.set_env_params()
@@ -25,6 +25,8 @@ class Params(object):
     self.save_path = os.path.join(utils.get_projectpath(), 'experiments', self.exp_name)
     self.seed = 7
     self.parallel = True
+    if self.threads == 1:
+      self.parallel = False
 
     self.pop_size = 100
     self.use_archive = True
@@ -45,14 +47,17 @@ class Params(object):
   def set_env_params(self):
     if 'Ant' in self.env_tag:
       self.max_episode_len = 300
+      self.qd_agent = 'DMP'
       self.agent_shapes = {'dof': 8, 'degree': 5, 'type': 'sin'}
       self.generations = 500
     elif 'FastsimSimpleNavigation' in self.env_tag:
       self.max_episode_len = 2000
+      self.qd_agent = 'Neural'
       self.agent_shapes = {'input_shape': 5, 'output_shape': 2}
       self.generations = 1000
     elif 'Billiard' in self.env_tag:
       self.max_episode_len = 300
+      self.qd_agent = 'DMP'
       self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'}
       self.generations = 2000
     else:
