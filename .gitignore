@@ -2,5 +2,4 @@
 .venv/
 *.lock
 *.npy
-docs/
 external/
