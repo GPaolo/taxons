@@ -206,7 +206,3 @@ class Population(object):
       self.add(agent) # Add loaded agent to the population
     print("Done")
   # ---------------------------------
-
-if __name__ == "__main__":
-  pop = Population({'dof': 2, 'degree': 5, 'type': 'poly'}, agent=DMPAgent)
-  pop.load_pop("/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/1/models/qd_pop.pkl")

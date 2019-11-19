@@ -36,10 +36,10 @@ if __name__ == "__main__":
   name = 'Billiard_AE'
   device = torch.device('cpu')
 
-  load_path_AES = '/home/giuseppe/src/rnd_qd/experiments/{}_Surprise/{}'.format(name, seed)
-  load_path_AEN = '/home/giuseppe/src/rnd_qd/experiments/{}_Novelty/{}'.format(name, seed)
-  load_path_Mixed = '/home/giuseppe/src/rnd_qd/experiments/{}_Mixed/{}'.format(name, seed)
-  load_path_NT = '/home/giuseppe/src/rnd_qd/experiments/{}_NoTrain/{}'.format(name, seed)
+  load_path_AES = '/home/giuseppe/src/taxons/experiments/{}_Surprise/{}'.format(name, seed)
+  load_path_AEN = '/home/giuseppe/src/taxons/experiments/{}_Novelty/{}'.format(name, seed)
+  load_path_Mixed = '/home/giuseppe/src/taxons/experiments/{}_Mixed/{}'.format(name, seed)
+  load_path_NT = '/home/giuseppe/src/taxons/experiments/{}_NoTrain/{}'.format(name, seed)
 
   env_tag = "Billiard-v0"
   number_of_samples = 10

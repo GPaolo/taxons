@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(author='Giuseppe Paolo',
-      name='rnd_qd',
+      name='taxons',
       version='0.0.1',
       install_requires=[
             'numpy',

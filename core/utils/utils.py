@@ -137,7 +137,7 @@ def get_projectpath():
   """
   cwd = os.getcwd()
   folder = os.path.basename(cwd)
-  while not folder == 'rnd_qd':
+  while not folder == 'taxons':
     cwd = os.path.dirname(cwd)
     folder = os.path.basename(cwd)
   return cwd

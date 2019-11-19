@@ -340,7 +340,7 @@ class Eval(object):
 
 
 if __name__ == "__main__":
-  # evaluator = Eval(exp_folder='/home/giuseppe/src/rnd_qd/experiments/Billiard_AE_Mixed/11', targets=30, render_test=True)
+  # evaluator = Eval(exp_folder='/home/giuseppe/src/taxons/experiments/Billiard_AE_Mixed/11', targets=30, render_test=True)
 
 
   # errors = evaluator.run_test()
@@ -358,7 +358,7 @@ if __name__ == "__main__":
   # Parameters
   # -----------------------------------------------
   seed = 42
-  load_path = '/home/giuseppe/src/rnd_qd/experiments/Maze_AE_Mixed/{}'.format(seed)
+  load_path = '/home/giuseppe/src/taxons/experiments/Maze_AE_Mixed/{}'.format(seed)
 
   params = parameters.Params()
   params.load(os.path.join(load_path, 'params.json'))
