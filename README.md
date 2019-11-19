@@ -82,3 +82,16 @@ The file `.env` will be loaded automatically with `pipenv shell` or `pipenv run 
 
 ***NB***: within Pycharm you need the plugin Env File to load it automatically (access **Env File** tab from the Run/Debug configurations).
 **You will have to run PyCharm from the shell itself from inside the activated virtualenv**
+
+## Training
+To run the algorithm you just need to launch:
+```bash
+python scripy/train.py
+```
+
+If you want to change the experiment parameters, go to: `script/parameters.py`
+
+To plot the results, just run:
+```bash
+python scripts/plot.py
+```

@@ -863,10 +863,9 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = /home/giuseppe/src/rnd_qd/external \
-                         /home/giuseppe/src/rnd_qd/gym_billiard \
-                         /home/giuseppe/src/rnd_qd/experiments \
-                         /home/giuseppe/src/rnd_qd/pytorch_msssim
+EXCLUDE                = taxons/external \
+                         taxons/gym_billiard \
+                         taxons/experiments
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
