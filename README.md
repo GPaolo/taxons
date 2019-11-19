@@ -10,7 +10,7 @@ This is the code of the paper: [Unsupervised Learning and Exploration of Reachab
 To install run:
 ```
 pipenv shell --three
-pip install -e . --process-dependency-links
+python setup.py install
 ```
 ---
 ## Dependencies
@@ -29,18 +29,16 @@ pip install -e .
 If you want more informations, look at the `README` there.
 
 ### Fastsim
-Also for this one I am using a slightly modified version of it. The original can be found here: `https://github.com/alexendy/fastsim_gym`.
+TAXONS needs Fastsim to be installed. I am using a slightly modified version of the original.
 
-Fastsim needs libfastsim to be installed first.
-
-libfastsim needs to be install in pyfastsim, then patched with `patch -p1 < /path/to/your/file.patch`. Once this has been done you can install pyfastsim, then install fastsim-gym.
-
-##### Pyfastsim
-You can download it from `https://github.com/alexendy/pyfastsim`
-
-##### Libfastsim
-To install it, activate the virtual env and enter the `external/pyfastsim` folder. Then do:
+To install it we first need to download Pyfastsim:
+```bash
+git clone https://github.com/alexendy/pyfastsim
 ```
+
+Now we need to install `libfastsim` in pyfastsim. To do so, execute:
+```bash
+cd external/pyfastsim
 git clone https://github.com/GPaolo/libfastsim.git
 cd libfastsim
 git checkout patch-1
@@ -54,24 +52,20 @@ patch -p1 < ../fastsim-boost2std-fixdisplay.patch
 ```.env
 sudo apt-get install libboost-all-dev
 ```
-
-then go in the pyfastsim folder and install it by doing:
+Now we can install pyfastsim by running, in the `external/pyfastsim` folder:
 ```
-cd ..
 python setup.py install
 ```
 
-##### Fastsim-gym
-
-To install it, activate the virtual env and enter the `external` folder. Then do:
+**Finally we can install `fastsim-gym`**.
+To do so, activate the virtual env and enter the `external` folder. Then do:
 ```.env
+cd external
 git clone https://github.com/GPaolo/fastsim_gym.git
 git checkout patch-1
 git pull origin patch-1
-
+python setup.py install
 ```
-
-
 
 ---
 
