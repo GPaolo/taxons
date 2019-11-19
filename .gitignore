@@ -1,4 +1,6 @@
-*.npy
-*/__pycache__/*
-.venv/*
+.idea/
+.venv/
 *.lock
+*.npy
+docs/
+external/
