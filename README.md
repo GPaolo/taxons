@@ -12,6 +12,9 @@ To install run:
 pipenv shell --three
 python setup.py install
 ```
+
+We also provide a containerized version running in Singularity at: https://github.com/GPaolo/taxons_sif
+
 ---
 ## Dependencies
 **NB**: if you're using the virtualenv, activate it before installing the dependencies. 
