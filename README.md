@@ -1,6 +1,11 @@
 # TAXONS
 
-Task Agnostic eXploration of Outcome spaces through Novelty and Surprise
+Task Agnostic eXploration of Outcome spaces through Novelty and Surprise.
+
+This is the code of the paper: [Unsupervised Learning and Exploration of Reachable Outcome Space
+](https://arxiv.org/abs/1909.05508)
+
+---
 
 To install run:
 ```
