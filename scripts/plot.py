@@ -5,35 +5,44 @@ import numpy as np
 import json
 import os
 import matplotlib.pyplot as plt
-from core.utils import utils
 from scipy.stats import mannwhitneyu
-from pprint import pprint
 
 class GenPlot(object):
 
-  def __init__(self, folders=None, total_gens=500, cmaps=['Dark2']):
-    self.folders = folders
+  # ---------------------------------------------------
+  def __init__(self, total_gens=500):
+    """
+    Constructor
+    :param total_gens: Total generations to plot
+    """
     params = {'legend.fontsize': 'x-large',
-#              'figure.figsize': (15, 5),
               'axes.labelsize': 'xx-large',
               'axes.titlesize': 'xx-large',
               'xtick.labelsize': 'x-large',
               'ytick.labelsize': 'x-large'}
-    # plt.rcParams.update(params)
 
     self.total_gens = total_gens
-    self.cmaps = [plt.get_cmap(map) for map in cmaps]
+    self._get_colors()
+  # ---------------------------------------------------
 
-
+  # ---------------------------------------------------
   def load_exp_data(self, folder):
+    """
+    Function to load experimental data to plot
+    :param folder: Folder path in which the data are
+    :return: If path does not exist: None, None, None. If the path exists: coverage, gen_surprise, archive_size
+    """
+
     if not os.path.exists(folder):
       return None, None, None
+
     # Load data
     seeds = list(os.walk(folder))[0][1]
     coverage = []
     gen_surprise = []
     archive_size = []
     max_gens = self.total_gens
+
     for seed in seeds:
       logs_path = os.path.join(folder, seed, 'logs.json')
       with open(logs_path) as f:
@@ -47,6 +56,7 @@ class GenPlot(object):
       gen_surprise.append(np.array(list(map(np.float64, logs['Avg gen surprise']))))
       archive_size.append(np.array(list(map(int, logs['Archive size']))))
 
+    # Trim list of datas to the max_gens
     for i in range(len(seeds)):
       coverage[i] = coverage[i][:max_gens]
       gen_surprise[i] = gen_surprise[i][:max_gens]
@@ -55,45 +65,18 @@ class GenPlot(object):
     coverage = np.array(coverage)
     gen_surprise = np.array(gen_surprise)
     archive_size = np.array(archive_size)
-    gens = np.array(list(range(max_gens)))
-    if 'RS' in folder:
-      return coverage, gen_surprise, archive_size
+
     if max_gens < self.total_gens-1:
       return None, None, None
     return coverage, gen_surprise, archive_size
+  # ---------------------------------------------------
 
-  def plot_data(self, data, title, labels, cmap, y_axis, gen=True):
-    # Create plots
-    if gen:
-      x_data = np.array(list(range(self.total_gens)))
-    else:
-      x_data = np.array(list(range(0, self.total_gens*5, 5)))
-
-    fig, axes = plt.subplots(nrows=1, ncols=1)
-    colors = [cmap(k) for k in range(len(data))]
-    axes.yaxis.grid(True)
-
-    for exp, c, l in zip(data, colors, labels):
-      std = np.std(exp, 0)
-      mean = np.mean(exp, 0)
-      max = np.max(exp, 0)
-      min = np.min(exp, 0)
-
-      # axes.grid(True)
-      axes.plot(x_data, mean, color=c, label=l)
-      axes.fill_between(x_data, max, min, facecolor=c, alpha=0.3)
-
-    axes.set_title(title)
-    fig.legend(loc='upper left')
-    if gen:
-      axes.set_xlabel('Search steps')
-    else:
-      axes.set_xlabel('Number of controllers')
-    axes.set_ylabel(y_axis)
-    plt.show()
-    return fig
-
-  def get_colors(self, data_size):
+  # ---------------------------------------------------
+  def _get_colors(self):
+    """
+    This function extract the colors from the colormaps
+    :return:
+    """
     colors = []
     # For baselines
     cmap = plt.get_cmap('Dark2')
@@ -105,31 +88,38 @@ class GenPlot(object):
 
     # For TAXO
     cmap = plt.get_cmap('Set1')
-    #colors.append(cmap(0.2))
-    #colors.append(cmap(0.0))
-    #colors.append(cmap(0.45))
-    #colors.append(cmap(0.9))
     colors.append(cmap(3))
     colors.append(cmap(1))
     colors.append(cmap(2))
     colors.append(cmap(0))
     colors.append(cmap(7))
 
+    self.colors = colors
+  # ---------------------------------------------------
 
-    return colors
-
+  # ---------------------------------------------------
   def plot_curves(self, data, title, labels, y_axis, axes, use_std=False, gen=True):
-    colors = self.get_colors(len(data))
+    """
+    Plot the curves of the data
+    :param data: List of data lists. Dimensions are: [method, seed, gen]
+    :param title: Title of the graph
+    :param labels: Labels of each line
+    :param y_axis: Label of y axis
+    :param axes: Pyplot axes
+    :param use_std: Flag to choose if to use std deviation or min_max for the error bands
+    :param gen: Generations or number of agents along the x axis
+    """
     axes.yaxis.grid(True)
     if gen:
       x_data = np.array(list(range(self.total_gens)))
     else:
       x_data = np.array(list(range(0, self.total_gens*5, 5)))
 
-    for d, c, l in zip(data, colors, labels):
-      if d is None:
+    for d, c, l in zip(data, self.colors, labels):
+      if d is None: # If no data for the exp, skip it
         continue
-      experiment = d[:, :self.total_gens]
+      experiment = d[:, :self.total_gens] # Select max gens to plot
+
       std = np.std(experiment, 0)
       mean = np.mean(experiment, 0)
       if not use_std:
@@ -139,6 +129,7 @@ class GenPlot(object):
         max = mean + std
         min = mean - std
 
+      # Select line styles
       if l == 'TAXONS':
         linestyle = '-'
         linewidth = 2
@@ -149,8 +140,8 @@ class GenPlot(object):
         linestyle = '-.'
         linewidth = 2
 
-      axes.plot(x_data, mean, color=c, label=l, linestyle=linestyle, linewidth=linewidth)
-      axes.fill_between(x_data, max, min, facecolor=c, alpha=0.15)
+      axes.plot(x_data, mean, color=c, label=l, linestyle=linestyle, linewidth=linewidth) # Plot mean
+      axes.fill_between(x_data, max, min, facecolor=c, alpha=0.15) # Plot error bars
 
     axes.set_title(title)
     if gen:
@@ -158,53 +149,54 @@ class GenPlot(object):
     else:
       axes.set_xlabel('Number of controllers')
     axes.set_ylabel(y_axis)
+  # ---------------------------------------------------
 
+  # ---------------------------------------------------
   def plot_violins(self, data, title, labels, y_axis, axes):
-    colors = self.get_colors(len(data))
+    """
+    Plot violins plots
+    :param data: List of data lists. Dimensions are: [method, seed, gen]
+    :param title: Graph title
+    :param labels: Labels of each line
+    :param y_axis: Label of y axis
+    :param axes: Pyplot axes
+    """
     axes.grid(True)
     axes.grid(linestyle='dotted')
 
     violin_data = []
     pos = []
     violin_colors = []
+
     # Reformat data
-    for d, l, c in zip(data, labels, colors):
-      if d is None:
+    for d, l, c in zip(data, labels, self.colors):
+      if d is None:  # If no data for the exp, skip it
         continue
-      print(l)
-      print(np.mean(np.array(d[:,-1])))
 
       violin_data.append(d[:,-1])
       pos.append(l)
       violin_colors.append(list(c))
-
-    print(np.mean(np.array(violin_data)))
 
     parts = axes.violinplot(violin_data,
                             showmeans=False,
                             showmedians=False,
                             showextrema=False)
 
+    # Format x axis
     axes.get_xaxis().set_tick_params(direction='out',labelrotation=45)
     axes.xaxis.set_ticks_position('bottom')
     axes.set_xticks(np.arange(1, len(pos) + 1))
     axes.set_xticklabels(pos)
     axes.set_xlim(0.25, len(pos) + 0.75)
 
+    # Set colors for violins
     for body, c in zip(parts['bodies'], violin_colors):
       c[-1] = 0.3
       body.set_facecolor(c)
       c[-1] = 1
       body.set_edgecolor(c)
 
-    # def adjacent_values(vals, q1, q3):
-    #   upper_adjacent_value = q3 + (q3 - q1) * 1.5
-    #   upper_adjacent_value = np.clip(upper_adjacent_value, q3, vals[-1])
-    #
-    #   lower_adjacent_value = q1 - (q3 - q1) * 1.5
-    #   lower_adjacent_value = np.clip(lower_adjacent_value, vals[0], q1)
-    #   return lower_adjacent_value, upper_adjacent_value
-
+    # Calculate quartiles and medians
     quartile1 = []
     quartile3 = []
     medians = []
@@ -214,34 +206,36 @@ class GenPlot(object):
       quartile3.append(q3)
       medians.append(m)
 
-
+    # Calculate whiskers
     whiskers = []
     for d in violin_data:
       whiskers.append([min(d), max(d)])
-    # whiskers = np.array([adjacent_values(sorted_array, q1, q3)
-    #   for sorted_array, q1, q3 in zip(violin_data, quartile1, quartile3)])
-    # whiskersMin, whiskersMax = whiskers[:, 0], whiskers[:, 1]
 
-
-
+    # Plot violins
     inds = np.arange(1, len(medians) + 1)
     for idx, m, q1, q3, c, w in  zip(inds, medians, quartile1, quartile3, violin_colors, whiskers):
-      # axis.vlines(idx, w[0], w[1], color='k', linestyle='-', lw=1)
-      # axis.vlines(idx, w[0] - 0.15, w[0] + 0.15, color='k', linestyle='-', lw=6)
-      # axis.vlines(idx, w[1] - 0.15, w[1] + 0.15, color='k', linestyle='-', lw=10)
       axes.vlines(idx, m-0.15, m+0.12, color=c, alpha=1, linestyle='-', lw=20)
       axes.vlines(idx, q1, q3, color=c, linestyle='-', lw=5, alpha=1)
 
     axes.set_ylabel(y_axis)
     axes.set_title(title)
+  # ---------------------------------------------------
 
+  # ---------------------------------------------------
   def mwu(self, coverage_data, names):
+    """
+    Mann-Whitney U test calculator
+    :param coverage_data: Data on which to calculate the test
+    :param names: Methods names
+    :return:
+    """
     results = {}
+
     for i in range(len(coverage_data)):
-      if coverage_data[i] is None:
+      if coverage_data[i] is None: # Skip if no coverage data is present
         continue
       for j in range(i+1, len(coverage_data)):
-        if coverage_data[j] is None:
+        if coverage_data[j] is None: # Skip if no coverage data is present
           continue
         x = coverage_data[i][:, -1]
         y = coverage_data[j][:, -1]
@@ -249,9 +243,16 @@ class GenPlot(object):
         name_y = names[j]
         name = '{}_{}'.format(name_x, name_y)
         results[name] = mannwhitneyu(x, y)
-    return results
 
+    return results
+  # ---------------------------------------------------
+
+  # ---------------------------------------------------
   def holm_bonferroni(self, p_values):
+    """
+    Holm-Bonferroni method calculator. Prints the correlation between the methods
+    :param p_values: MWU p values
+    """
     from multipy.fwer import sidak
     names = []
     pvals = []
@@ -261,23 +262,27 @@ class GenPlot(object):
 
     significant_pvals = sidak(pvals, alpha=0.05)
     print([k for k in zip(['{}: {:.4f}'.format(name, p) for name, p in zip(names, pvals)], significant_pvals)])
+  # ---------------------------------------------------
 
 
 if __name__ == '__main__':
-  total_gens = [1999, 1000, 500]
-  violins = True
-  fig, axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
-  name = ['Billiard', 'Maze', 'Ant']
-  name = ['Billiard', 'Maze']
 
-  for experiment, ax, gens in zip(name, axes, total_gens):
-    base_path = '/mnt/7e0bad1b-406b-4582-b7a1-84327ae60fc4/ICRA 2020/Experiments/{}'.format(experiment)
+  save_plots = False
+  curves_fig, curves_axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
+  violins_fig, violins_axes = plt.subplots(nrows=1, ncols=3, sharey=True, figsize=(15,3.5))
 
-    plotter = GenPlot(total_gens=gens, cmaps=['Dark2','gist_rainbow'])
+  name = ['Billiard', 'Maze', 'Ant'] # Experiments names
+  total_gens = [1999, 1000, 500] # Generations per experiments to be plotted
 
+  for experiment, c_ax, v_ax, gens in zip(name, curves_axes, violins_axes, total_gens):
+    base_path = '/mnt/7e0bad1b-406b-4582-b7a1-84327ae60fc4/ICRA 2020/Experiments/{}'.format(experiment) # Data path
+    use_std = True
+    gen_on_x = False
+
+    plotter = GenPlot(total_gens=gens)
+    # Load data
     c_mix, s_mix, a_mix = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Mixed'.format(experiment)))
     c_nt, s_nt, a_nt = plotter.load_exp_data(os.path.join(base_path,'{}_AE_NoTrain'.format(experiment)))
-    # c_nt, s_nt, a_nt = None, None, None
     c_aen, s_aen, a_aen = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Novelty'.format(experiment)))
     c_aes, s_aes, a_aes = plotter.load_exp_data(os.path.join(base_path,'{}_AE_Surprise'.format(experiment)))
     c_ns, s_ns, a_ns = plotter.load_exp_data(os.path.join(base_path,'{}_NS'.format(experiment)))
@@ -286,10 +291,7 @@ if __name__ == '__main__':
     c_rs, s_rs, a_rs = plotter.load_exp_data(os.path.join(base_path,'{}_RS'.format(experiment)))
     c_ibd, s_ibd, a_ibd = plotter.load_exp_data(os.path.join(base_path,'{}_IBD'.format(experiment)))
 
-
-    use_std = True
-    gen_on_x = False
-
+    # Arrange loaded data
     plt.rc('grid', linestyle="dotted", color='gray')
     labels = ['PS', 'RBD', 'RS', 'NS', 'NT', 'IBD', 'TAXO-N', 'TAXO-S', 'TAXONS']
     coverage_list = [c_ps, c_rbd, c_rs, c_ns, c_nt, c_ibd, c_aen, c_aes, c_mix]
@@ -297,62 +299,30 @@ if __name__ == '__main__':
     archive_list = [a_ps, a_rbd, a_rs, a_ns, a_nt, a_ibd, a_aen, a_aes, a_mix]
     overlapping_list = []
 
+    # MWU and HB tests
     mwu = plotter.mwu(coverage_list, labels)
     plotter.holm_bonferroni(mwu)
     print('MWU for: {}\n'.format(experiment))
-    # for k in mwu:
-    #   print('{}:\n statistics: {} \n pvalue: {}\n'.format(k, mwu[k][0], mwu[k][1]))
-    # print()
 
+    plotter.plot_curves(coverage_list,
+                        labels=labels,
+                        title=experiment, y_axis='Coverage %', axes=c_ax,
+                        use_std=use_std,
+                        gen=gen_on_x)
 
-    if not violins:
-      plotter.plot_curves(coverage_list,
-                          labels=labels,
-                          title=experiment, y_axis='Coverage %', axes=ax,
-                          use_std=use_std,
-                          gen=gen_on_x)
-    else:
-      plotter.plot_violins(coverage_list,
-                          labels=labels,
-                          title=experiment, y_axis='Coverage %', axes=ax)
+    plotter.plot_violins(coverage_list,
+                         labels=labels,
+                         title=experiment, y_axis='Coverage %', axes=v_ax)
 
+  # Curves adjust and legend plot
+  handles, labels = curves_axes[0].get_legend_handles_labels()
+  curves_fig.legend(handles, labels, loc='upper left', fancybox=True)#, bbox_to_anchor=(1, 0.5))
+  curves_fig.subplots_adjust(left=0.12, right=.99, top=0.91, bottom=0.18, wspace=0.13)
 
-  # plotter.plot_violins(coverage_list,
-  #                      labels=labels,
-  #                      cmap=colors,
-  #                      title='Coverage',
-  #                      y_axis='Coverage %',
-  #                      axis=axes[1])
-
-  # plotter.plot_data_single_fig(surprise_list,
-  #                  labels=labels,
-  #                  cmap=colors,
-  #                  title='Rec. Error', y_axis='Reconstruction error', axes=axes[1],
-  #                  use_std = use_std,
-  #                   gen=gen_on_x)
-
-  # for a, c in zip(archive_list, coverage_list):
-  #   if a is not None:
-  #     overlapping_list.append(utils.calc_avg_chi_sq_test((50, 50), a, c))
-  #   else:
-  #     overlapping_list.append(None)
-  #
-  # plotter.plot_data_single_fig(overlapping_list,
-  #                   labels=labels,
-  #                   cmap=colors,
-  #                   title='Log Chi Squared', y_axis='Log distance from uniform', axes=axes[1],
-  #                   use_std=use_std,
-  #                   gen=gen_on_x)
-
-  if not violins:
-    handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper left', fancybox=True)#, bbox_to_anchor=(1, 0.5))
-    plt.subplots_adjust(left=0.12, right=.99, top=0.91, bottom=0.18, wspace=0.13)
-
-  else:
-    plt.subplots_adjust(left=0.05, right=.99, top=0.91, bottom=0.18, wspace=0.13)
+  # Violins adjust
+  violins_fig.subplots_adjust(left=0.05, right=.99, top=0.91, bottom=0.18, wspace=0.13)
   plt.show()
 
-  # fig.savefig(os.path.join(base_path,'plots.pdf'))
-
-  # plt.figure(figsize=(5, 10))
+  if save_plots:
+    violins_fig.savefig(os.path.join(base_path,'violins.pdf'))
+    curves_fig.savefig(os.path.join(base_path,'curves.pdf'))

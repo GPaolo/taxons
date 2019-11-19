@@ -11,11 +11,11 @@ class Params(object):
     # Main parameters
     # ----------------------
     self.info = 'Ant with 500 gens. NT'
-    self.exp_name = 'Ant_NT'
+    self.exp_name = 'Ant_IBD'
 
-    self.exp = 'NT' # 'TAXONS', 'TAXON', 'TAXOS', 'NT, 'NS', 'PS', 'RS', 'RBD', 'IBD'
+    self.exp = 'IBD' # 'TAXONS', 'TAXON', 'TAXOS', 'NT, 'NS', 'PS', 'RS', 'RBD', 'IBD'
     self.env_tag = 'AntMuJoCoEnv-v0' # Billiard-v0 AntMuJoCoEnv-v0 FastsimSimpleNavigation-v0
-    self.threads = 1
+    self.threads = 4
     # ----------------------
 
     self.set_env_params()
@@ -40,7 +40,6 @@ class Params(object):
     self.per_agent_update = False
     self.train_on_archive = True
     self.update_interval = 30
-
   # ---------------------------------------------------------
 
   # ---------------------------------------------------------
@@ -58,7 +57,7 @@ class Params(object):
     elif 'Billiard' in self.env_tag:
       self.max_episode_len = 300
       self.qd_agent = 'DMP'
-      self.agent_shapes = {'dof': self.action_shape, 'degree': 5, 'type': 'poly'}
+      self.agent_shapes = {'dof': 2, 'degree': 5, 'type': 'poly'}
       self.generations = 2000
     else:
       raise ValueError('Wrong environment name chosen')

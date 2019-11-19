@@ -21,7 +21,8 @@ torch.backends.cudnn.enabled = False # There is a issue with CUDNN and Pytorch h
 def main(seed, params):
   print('\nTraining with seed {}'.format(seed))
   total_train_time = 0
-  env = gym.make(params.env_tag)
+  env = gym.make(params.env_tag) # Create environment
+  # Set seed
   params.seed = seed
   env.seed(seed)
   env.action_space.seed(seed)
@@ -33,6 +34,7 @@ def main(seed, params):
   if not os.path.exists(params.save_path):
     os.mkdir(params.save_path)
 
+  # Load method evolver
   if params.exp == 'NS':
     evolver = novelty_search.NoveltySearch(env=env, parameters=params)
   elif params.exp== 'PS':
@@ -46,6 +48,7 @@ def main(seed, params):
   else:
     evolver = rnd_qd.RndQD(env=env, parameters=params)
 
+  # Start training
   start_time = time.monotonic()
   try:
     evolver.train(params.generations)
@@ -53,13 +56,14 @@ def main(seed, params):
     print('Seed {} - User Interruption.'.format(seed))
   except Exception as e:
     print("Seed {} - EXCEPTION: {}".format(seed, traceback.format_exc()))
-
   end_time = time.monotonic()
   total_train_time += (end_time - start_time)
 
+  # Save
   evolver.save()
   params.save()
 
+  # Print some informations
   if evolver.archive is None:
     pop = evolver.population
   else:
@@ -68,6 +72,7 @@ def main(seed, params):
   print('Seed {} - Archive length {}'.format(seed, pop.size))
   print('Seed {} - Training time {}'.format(seed, timedelta(seconds=total_train_time)))
 
+  # Plot coverage
   if evolver.archive is not None:
     bs_points = np.stack(evolver.archive['bs'].to_list())
   else:
@@ -92,14 +97,15 @@ if __name__ == "__main__":
   p = parameters.Params()
   parallel_threads = p.threads
   seeds = [11, 59,
-           3, 6, 4,
-           18, 13, 1,
-           22, 34, 99,
-           43, 100, 15,
-           66, 10,7,
-           9, 42, 2
-     ]
+          3, 6, 4,
+          18, 13, 1,
+          22, 34, 99,
+          43, 100, 15,
+          66, 10,7,
+          9, 42, 2
+          ]
 
+  # Selects seeds to run in parallel
   multiseeds = []
   for i in range(0, len(seeds), parallel_threads):
     multiseeds.append(seeds[i: min(i+parallel_threads, len(seeds))])
@@ -107,30 +113,33 @@ if __name__ == "__main__":
   total_train_time = 0
 
   for seeds in multiseeds:
-    params = [parameters.Params() for i in range(len(seeds))]
+    params = [parameters.Params() for i in range(len(seeds))] # Get parameters for seed
     print('Experiment description:\n{}'.format(params[0].info))
-    if params[0].parallel:
-      nodes = min(len(seeds), pathos.threading.cpu_count()-1)
+
+    if params[0].parallel: # Run in parallel
+      nodes = min(len(seeds), pathos.threading.cpu_count()-1) # Create threads
       print('Creating {} threads...'.format(nodes))
       with ProcessPool(nodes=nodes) as pool:
         start_time = time.monotonic()
         try:
-          results = pool.map(main, seeds, params)
+          results = pool.map(main, seeds, params) # Pool main functions to threads
         except KeyboardInterrupt:
           break
         end_time = time.monotonic()
       total_train_time += (end_time - start_time)
-    else:
+
+    else: # Run sequentially
       end = False
       for seed, par in zip(seeds, params):
         start_time = time.monotonic()
         try:
-          results = main(seed, par)
+          results = main(seed, par) # Launch main function
         except KeyboardInterrupt:
           end = True
         end_time = time.monotonic()
         total_train_time += (end_time - start_time)
         if end: break
+    # Do garbage collect
     gc.collect()
 
   print('\nTotal training time: \n{}\n'.format(timedelta(seconds=total_train_time)))
