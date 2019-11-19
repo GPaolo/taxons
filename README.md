@@ -1,6 +1,6 @@
-# RND_QD
+# TAXONS
 
-Quality-Diversity with Random Network Distillation as surprise metric
+Task Agnostic eXploration of Outcome spaces through Novelty and Surprise
 
 To install run:
 ```
