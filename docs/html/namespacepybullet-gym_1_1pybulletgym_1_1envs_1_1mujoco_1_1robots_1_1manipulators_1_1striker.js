@@ -1,4 +1,0 @@
-var namespacepybullet_gym_1_1pybulletgym_1_1envs_1_1mujoco_1_1robots_1_1manipulators_1_1striker =
-[
-    [ "Striker", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1mujoco_1_1robots_1_1manipulators_1_1striker_1_1_striker.html", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1mujoco_1_1robots_1_1manipulators_1_1striker_1_1_striker" ]
-];

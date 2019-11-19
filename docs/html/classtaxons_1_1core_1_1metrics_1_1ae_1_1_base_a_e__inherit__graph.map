@@ -1,5 +1,0 @@
-<map id="taxons.core.metrics.ae.BaseAE" name="taxons.core.metrics.ae.BaseAE">
-<area shape="rect" id="node3" href="$classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e.html" title="taxons.core.metrics.ae.BVAE" alt="" coords="379,5,573,32"/>
-<area shape="rect" id="node4" href="$classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e.html" title="taxons.core.metrics.ae.ConvAE" alt="" coords="372,56,580,83"/>
-<area shape="rect" id="node5" href="$classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e.html" title="taxons.core.metrics.ae.FFAE" alt="" coords="379,107,573,133"/>
-</map>

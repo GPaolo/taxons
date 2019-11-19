@@ -1,5 +1,0 @@
-var namespacepybullet_gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula =
-[
-    [ "interted_pendulum", "namespacepybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula_1_1interted__pendulum.html", "namespacepybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula_1_1interted__pendulum" ],
-    [ "inverted_double_pendulum", "namespacepybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula_1_1inverted__double__pendulum.html", "namespacepybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula_1_1inverted__double__pendulum" ]
-];

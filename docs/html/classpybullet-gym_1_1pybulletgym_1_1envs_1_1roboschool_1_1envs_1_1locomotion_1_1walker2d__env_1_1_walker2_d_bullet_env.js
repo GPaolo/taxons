@@ -1,5 +1,0 @@
-var classpybullet_gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1locomotion_1_1walker2d__env_1_1_walker2_d_bullet_env =
-[
-    [ "__init__", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1locomotion_1_1walker2d__env_1_1_walker2_d_bullet_env.html#a1b67e9c7cb5ae907deed7b7a2d7ba9b4", null ],
-    [ "robot", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1locomotion_1_1walker2d__env_1_1_walker2_d_bullet_env.html#a733970768724254fb6cc5065bd4562e2", null ]
-];

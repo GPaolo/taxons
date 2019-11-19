@@ -1,6 +1,0 @@
-var classpybullet_gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1locomotion_1_1humanoid__flagru3f2c7cfb3b7b479419ab25a1807bf084 =
-[
-    [ "__init__", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1locomotion_1_1humanoid__flagru3f2c7cfb3b7b479419ab25a1807bf084.html#a628f035cb0d020500e821ba42b5a08ff", null ],
-    [ "create_single_player_scene", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1locomotion_1_1humanoid__flagru3f2c7cfb3b7b479419ab25a1807bf084.html#a2ca350b2e55052350c8b6e513824e155", null ],
-    [ "robot", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1locomotion_1_1humanoid__flagru3f2c7cfb3b7b479419ab25a1807bf084.html#ab5b285513ba8e7ff586f782af5454f23", null ]
-];

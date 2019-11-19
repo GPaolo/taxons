@@ -1,4 +1,0 @@
-var namespacepybullet_gym_1_1pybulletgym_1_1examples_1_1roboschool_weights_1_1enjoy___t_f___humanoid9dba9dbbc727c9140c0c88eec28e43d0 =
-[
-    [ "SmallReactivePolicy", "classpybullet-gym_1_1pybulletgym_1_1examples_1_1roboschool-weights_1_1enjoy___t_f___humanoid_flaa6bac9845e6a011d8d2dbf7d1f577e42.html", "classpybullet-gym_1_1pybulletgym_1_1examples_1_1roboschool-weights_1_1enjoy___t_f___humanoid_flaa6bac9845e6a011d8d2dbf7d1f577e42" ]
-];

@@ -1,6 +1,0 @@
-<map id="taxons.core.utils.optimizer.BaseOptimizer" name="taxons.core.utils.optimizer.BaseOptimizer">
-<area shape="rect" id="node3" href="$classtaxons_1_1core_1_1utils_1_1optimizer_1_1_fitness_optimizer.html" title="taxons.core.utils.optimizer.\lFitnessOptimizer" alt="" coords="337,5,516,47"/>
-<area shape="rect" id="node4" href="$classtaxons_1_1core_1_1utils_1_1optimizer_1_1_novelty_optimizer.html" title="taxons.core.utils.optimizer.\lNoveltyOptimizer" alt="" coords="337,71,516,112"/>
-<area shape="rect" id="node5" href="$classtaxons_1_1core_1_1utils_1_1optimizer_1_1_novelty_surprise_optimizer.html" title="taxons.core.utils.optimizer.\lNoveltySurpriseOptimizer" alt="" coords="337,136,516,177"/>
-<area shape="rect" id="node6" href="$classtaxons_1_1core_1_1utils_1_1optimizer_1_1_surprise_optimizer.html" title="taxons.core.utils.optimizer.\lSurpriseOptimizer" alt="" coords="337,201,516,243"/>
-</map>

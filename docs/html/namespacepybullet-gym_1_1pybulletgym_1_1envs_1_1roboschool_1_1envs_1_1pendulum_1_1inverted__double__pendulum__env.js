@@ -1,4 +1,0 @@
-var namespacepybullet_gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1pendulum_1_1inverted__double__pendulum__env =
-[
-    [ "InvertedDoublePendulumBulletEnv", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1pendulum_1_1inverted__double__02ae3ce2c545b467956bc876f69901b4.html", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1envs_1_1pendulum_1_1inverted__double__02ae3ce2c545b467956bc876f69901b4" ]
-];

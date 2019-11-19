@@ -1,4 +1,0 @@
-var classpybullet_gym_1_1pybulletgym_1_1examples_1_1roboschool_weights_1_1enjoy___t_f___inverted_pen3eeac26d45db9f331291535c39eeed36 =
-[
-    [ "__init__", "classpybullet-gym_1_1pybulletgym_1_1examples_1_1roboschool-weights_1_1enjoy___t_f___inverted_pen3eeac26d45db9f331291535c39eeed36.html#a7c9f36b3104e28af436dad5c8360edce", null ]
-];
