@@ -21,3 +21,4 @@ runs/*
 *.lock
 .env
 .png
+docs/*
