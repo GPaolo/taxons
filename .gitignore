@@ -21,4 +21,4 @@ runs/*
 *.lock
 .env
 .png
-docs/*
+docs/latex/
