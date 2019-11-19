@@ -1,0 +1,5 @@
+<map id="fastsim::Robot" name="fastsim::Robot">
+<area shape="rect" id="node2" href="$structfastsim_1_1_robot_1_1_bounding_box.html" title="fastsim::Robot::BoundingBox" alt="" coords="5,5,199,32"/>
+<area shape="rect" id="node3" href="$classfastsim_1_1_posture.html" title="fastsim::Posture" alt="" coords="223,5,341,32"/>
+<area shape="rect" id="node4" href="$classfastsim_1_1_linear_camera.html" title="fastsim::LinearCamera" alt="" coords="365,5,519,32"/>
+</map>

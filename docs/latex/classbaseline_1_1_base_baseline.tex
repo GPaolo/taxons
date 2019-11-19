@@ -1,0 +1,165 @@
+\hypertarget{classbaseline_1_1_base_baseline}{}\section{baseline.\+Base\+Baseline Class Reference}
+\label{classbaseline_1_1_base_baseline}\index{baseline.\+Base\+Baseline@{baseline.\+Base\+Baseline}}
+
+
+Inheritance diagram for baseline.\+Base\+Baseline\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{classbaseline_1_1_base_baseline__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for baseline.\+Base\+Baseline\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{classbaseline_1_1_base_baseline__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classbaseline_1_1_base_baseline_a01486c19bcd1c4eb6085eb956f19ce66}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classbaseline_1_1_base_baseline_afb0d3522c7976304a758f54ff9c4989a}{env}, parameters)
+\item 
+def \hyperlink{classbaseline_1_1_base_baseline_a252a694ce925b8da0cc43aa88f1c5a5b}{evaluate\+\_\+agent} (self, agent)
+\item 
+def \hyperlink{classbaseline_1_1_base_baseline_a8406ff47b49ae553f67fcbae80f208fc}{train} (self, steps=10000)
+\item 
+def \hyperlink{classbaseline_1_1_base_baseline_aaccf8565e0367cfc6aebc3d4a6ec84cf}{save} (self, ckpt=False)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_adcea2415797956c07930e4db7598ad28}{params}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_aa7ff398e0c84c732fc65d0934c4870ce}{pop\+\_\+size}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_afb0d3522c7976304a758f54ff9c4989a}{env}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_a36559a4e95820ade0b95a175f0b39a2b}{save\+\_\+path}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_a8fb325474468a95f6a840499a4cdf913}{agents\+\_\+shapes}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_a416a8eb8cc77bb0652baa563fdaf4504}{agent\+\_\+name}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_a56bf3516ab521483df8f7a7ebb95c819}{logs}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_ab9221274313873c2320edbde768834ba}{agent\+\_\+type}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_a4ba25bf5a661ce06ced3040dc0a5df9b}{population}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_ac24bd116365383ac1d46402dd0ae9bed}{archive}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_a174fbe5c014bb79a05006b255c342a9f}{opt}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_abcafb27e04595f1add2863291b96655e}{E\+ND}
+\item 
+\hyperlink{classbaseline_1_1_base_baseline_acf118715fa2638fc8e59c74aefe2852d}{elapsed\+\_\+gen}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This is the base baseline from where to create all the other ones
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+(self, env, parameters)}{__init__(self, env, parameters)}}]{\setlength{\rightskip}{0pt plus 5cm}def baseline.\+Base\+Baseline.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{env, }
+\item[{}]{parameters}
+\end{DoxyParamCaption}
+)}\hypertarget{classbaseline_1_1_base_baseline_a01486c19bcd1c4eb6085eb956f19ce66}{}\label{classbaseline_1_1_base_baseline_a01486c19bcd1c4eb6085eb956f19ce66}
+\begin{DoxyVerb}Constructor
+:param env: gym environment
+:param parameters: parameters of the run
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!evaluate\+\_\+agent@{evaluate\+\_\+agent}}
+\index{evaluate\+\_\+agent@{evaluate\+\_\+agent}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{evaluate\+\_\+agent(self, agent)}{evaluate_agent(self, agent)}}]{\setlength{\rightskip}{0pt plus 5cm}def baseline.\+Base\+Baseline.\+evaluate\+\_\+agent (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{agent}
+\end{DoxyParamCaption}
+)}\hypertarget{classbaseline_1_1_base_baseline_a252a694ce925b8da0cc43aa88f1c5a5b}{}\label{classbaseline_1_1_base_baseline_a252a694ce925b8da0cc43aa88f1c5a5b}
+\begin{DoxyVerb}Evaluates the agent. This one needs to be reimplemented. It raises a NotImplementedError
+:param agent:
+:return:
+\end{DoxyVerb}
+ \index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!save@{save}}
+\index{save@{save}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{save(self, ckpt=\+False)}{save(self, ckpt=False)}}]{\setlength{\rightskip}{0pt plus 5cm}def baseline.\+Base\+Baseline.\+save (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{ckpt = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}\hypertarget{classbaseline_1_1_base_baseline_aaccf8565e0367cfc6aebc3d4a6ec84cf}{}\label{classbaseline_1_1_base_baseline_aaccf8565e0367cfc6aebc3d4a6ec84cf}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!train@{train}}
+\index{train@{train}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{train(self, steps=10000)}{train(self, steps=10000)}}]{\setlength{\rightskip}{0pt plus 5cm}def baseline.\+Base\+Baseline.\+train (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{steps = {\ttfamily 10000}}
+\end{DoxyParamCaption}
+)}\hypertarget{classbaseline_1_1_base_baseline_a8406ff47b49ae553f67fcbae80f208fc}{}\label{classbaseline_1_1_base_baseline_a8406ff47b49ae553f67fcbae80f208fc}
+\begin{DoxyVerb}Main function to run.
+:param steps: number of steps to run the search.
+:return:
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!agent\+\_\+name@{agent\+\_\+name}}
+\index{agent\+\_\+name@{agent\+\_\+name}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{agent\+\_\+name}{agent_name}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+agent\+\_\+name}\hypertarget{classbaseline_1_1_base_baseline_a416a8eb8cc77bb0652baa563fdaf4504}{}\label{classbaseline_1_1_base_baseline_a416a8eb8cc77bb0652baa563fdaf4504}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!agent\+\_\+type@{agent\+\_\+type}}
+\index{agent\+\_\+type@{agent\+\_\+type}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{agent\+\_\+type}{agent_type}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+agent\+\_\+type}\hypertarget{classbaseline_1_1_base_baseline_ab9221274313873c2320edbde768834ba}{}\label{classbaseline_1_1_base_baseline_ab9221274313873c2320edbde768834ba}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!agents\+\_\+shapes@{agents\+\_\+shapes}}
+\index{agents\+\_\+shapes@{agents\+\_\+shapes}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{agents\+\_\+shapes}{agents_shapes}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+agents\+\_\+shapes}\hypertarget{classbaseline_1_1_base_baseline_a8fb325474468a95f6a840499a4cdf913}{}\label{classbaseline_1_1_base_baseline_a8fb325474468a95f6a840499a4cdf913}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!archive@{archive}}
+\index{archive@{archive}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{archive}{archive}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+archive}\hypertarget{classbaseline_1_1_base_baseline_ac24bd116365383ac1d46402dd0ae9bed}{}\label{classbaseline_1_1_base_baseline_ac24bd116365383ac1d46402dd0ae9bed}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!elapsed\+\_\+gen@{elapsed\+\_\+gen}}
+\index{elapsed\+\_\+gen@{elapsed\+\_\+gen}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{elapsed\+\_\+gen}{elapsed_gen}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+elapsed\+\_\+gen}\hypertarget{classbaseline_1_1_base_baseline_acf118715fa2638fc8e59c74aefe2852d}{}\label{classbaseline_1_1_base_baseline_acf118715fa2638fc8e59c74aefe2852d}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!E\+ND@{E\+ND}}
+\index{E\+ND@{E\+ND}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{E\+ND}{END}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+E\+ND}\hypertarget{classbaseline_1_1_base_baseline_abcafb27e04595f1add2863291b96655e}{}\label{classbaseline_1_1_base_baseline_abcafb27e04595f1add2863291b96655e}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!env@{env}}
+\index{env@{env}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{env}{env}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+env}\hypertarget{classbaseline_1_1_base_baseline_afb0d3522c7976304a758f54ff9c4989a}{}\label{classbaseline_1_1_base_baseline_afb0d3522c7976304a758f54ff9c4989a}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!logs@{logs}}
+\index{logs@{logs}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{logs}{logs}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+logs}\hypertarget{classbaseline_1_1_base_baseline_a56bf3516ab521483df8f7a7ebb95c819}{}\label{classbaseline_1_1_base_baseline_a56bf3516ab521483df8f7a7ebb95c819}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!opt@{opt}}
+\index{opt@{opt}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{opt}{opt}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+opt}\hypertarget{classbaseline_1_1_base_baseline_a174fbe5c014bb79a05006b255c342a9f}{}\label{classbaseline_1_1_base_baseline_a174fbe5c014bb79a05006b255c342a9f}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!params@{params}}
+\index{params@{params}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{params}{params}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+params}\hypertarget{classbaseline_1_1_base_baseline_adcea2415797956c07930e4db7598ad28}{}\label{classbaseline_1_1_base_baseline_adcea2415797956c07930e4db7598ad28}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!pop\+\_\+size@{pop\+\_\+size}}
+\index{pop\+\_\+size@{pop\+\_\+size}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{pop\+\_\+size}{pop_size}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+pop\+\_\+size}\hypertarget{classbaseline_1_1_base_baseline_aa7ff398e0c84c732fc65d0934c4870ce}{}\label{classbaseline_1_1_base_baseline_aa7ff398e0c84c732fc65d0934c4870ce}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!population@{population}}
+\index{population@{population}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{population}{population}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+population}\hypertarget{classbaseline_1_1_base_baseline_a4ba25bf5a661ce06ced3040dc0a5df9b}{}\label{classbaseline_1_1_base_baseline_a4ba25bf5a661ce06ced3040dc0a5df9b}
+\index{baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}!save\+\_\+path@{save\+\_\+path}}
+\index{save\+\_\+path@{save\+\_\+path}!baseline\+::\+Base\+Baseline@{baseline\+::\+Base\+Baseline}}
+\subsubsection[{\texorpdfstring{save\+\_\+path}{save_path}}]{\setlength{\rightskip}{0pt plus 5cm}baseline.\+Base\+Baseline.\+save\+\_\+path}\hypertarget{classbaseline_1_1_base_baseline_a36559a4e95820ade0b95a175f0b39a2b}{}\label{classbaseline_1_1_base_baseline_a36559a4e95820ade0b95a175f0b39a2b}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+baselines/\hyperlink{baseline_8py}{baseline.\+py}\end{DoxyCompactItemize}

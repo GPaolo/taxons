@@ -1,0 +1,5 @@
+<map id="pybullet&#45;gym.pybulletgym.envs.roboschool.robots.robot_bases.XmlBasedRobot" name="pybullet&#45;gym.pybulletgym.envs.roboschool.robots.robot_bases.XmlBasedRobot">
+<area shape="rect" id="node2" href="$classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1robot__bases_1_1_m_j_c_f_based_robot.html" title="pybullet&#45;gym.pybulletgym.envs.roboschool.robots.robot\l_bases.MJCFBasedRobot" alt="" coords="396,5,739,47"/>
+<area shape="rect" id="node3" href="$classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1robot__bases_1_1_s_d_f_based_robot.html" title="pybullet&#45;gym.pybulletgym.envs.roboschool.robots.robot\l_bases.SDFBasedRobot" alt="" coords="396,71,739,112"/>
+<area shape="rect" id="node4" href="$classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1robot__bases_1_1_u_r_d_f_based_robot.html" title="pybullet&#45;gym.pybulletgym.envs.roboschool.robots.robot\l_bases.URDFBasedRobot" alt="" coords="396,136,739,177"/>
+</map>

@@ -1,0 +1,82 @@
+\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e}{}\section{taxons.\+core.\+metrics.\+ae.\+Conv\+AE Class Reference}
+\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e}\index{taxons.\+core.\+metrics.\+ae.\+Conv\+AE@{taxons.\+core.\+metrics.\+ae.\+Conv\+AE}}
+
+
+Inheritance diagram for taxons.\+core.\+metrics.\+ae.\+Conv\+AE\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for taxons.\+core.\+metrics.\+ae.\+Conv\+AE\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_ac016b2ab55fada0fb86249dd581ce34d}{forward} (self, x)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_ac2466423236dc9263e1b894c58d9fc0e}{training\+\_\+step} (self, x)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_a0d77209045e8097fab50ec3cb16cf6d4}{encoder}
+\item 
+\hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_a89ec0833ed8f6d1131d2d4d03be65786}{decoder}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This class implements the Convolutional Autoencoder
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\index{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}!forward@{forward}}
+\index{forward@{forward}!taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}}
+\subsubsection[{\texorpdfstring{forward(self, x)}{forward(self, x)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+Conv\+A\+E.\+forward (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_ac016b2ab55fada0fb86249dd581ce34d}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_ac016b2ab55fada0fb86249dd581ce34d}
+\begin{DoxyVerb}Forward pass of the network.
+:param x: Input as RGB array of images
+:return: reconstruction error, features, reconstructed image
+\end{DoxyVerb}
+ \index{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}!training\+\_\+step@{training\+\_\+step}}
+\index{training\+\_\+step@{training\+\_\+step}!taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}}
+\subsubsection[{\texorpdfstring{training\+\_\+step(self, x)}{training_step(self, x)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+Conv\+A\+E.\+training\+\_\+step (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_ac2466423236dc9263e1b894c58d9fc0e}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_ac2466423236dc9263e1b894c58d9fc0e}
+\begin{DoxyVerb}Performs one training step of the network
+:param x: Input
+:return: Loss, features, reconstructed image
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}!decoder@{decoder}}
+\index{decoder@{decoder}!taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}}
+\subsubsection[{\texorpdfstring{decoder}{decoder}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+metrics.\+ae.\+Conv\+A\+E.\+decoder}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_a89ec0833ed8f6d1131d2d4d03be65786}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_a89ec0833ed8f6d1131d2d4d03be65786}
+\index{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}!encoder@{encoder}}
+\index{encoder@{encoder}!taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE@{taxons\+::core\+::metrics\+::ae\+::\+Conv\+AE}}
+\subsubsection[{\texorpdfstring{encoder}{encoder}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+metrics.\+ae.\+Conv\+A\+E.\+encoder}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_a0d77209045e8097fab50ec3cb16cf6d4}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_conv_a_e_a0d77209045e8097fab50ec3cb16cf6d4}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/metrics/\hyperlink{ae_8py}{ae.\+py}\end{DoxyCompactItemize}

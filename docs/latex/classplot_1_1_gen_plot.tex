@@ -1,0 +1,154 @@
+\hypertarget{classplot_1_1_gen_plot}{}\section{plot.\+Gen\+Plot Class Reference}
+\label{classplot_1_1_gen_plot}\index{plot.\+Gen\+Plot@{plot.\+Gen\+Plot}}
+
+
+Inheritance diagram for plot.\+Gen\+Plot\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=151pt]{classplot_1_1_gen_plot__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for plot.\+Gen\+Plot\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=151pt]{classplot_1_1_gen_plot__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classplot_1_1_gen_plot_a0abc28cd70bf5e20a3727485edf27bd6}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classplot_1_1_gen_plot_aaae1c543dd09acbbf7f509d5ad6bc73c}{total\+\_\+gens}=500)
+\item 
+def \hyperlink{classplot_1_1_gen_plot_a6089783223ac1a5d2c17c1040342d9d8}{load\+\_\+exp\+\_\+data} (self, folder)
+\item 
+def \hyperlink{classplot_1_1_gen_plot_a3d9d7fb8df32d78d395bb809ba5543c8}{plot\+\_\+curves} (self, data, \hyperlink{namespaceplot_a510b71690609bcc71ced700548e41d9b}{title}, \hyperlink{namespaceplot_ab032e615e4066fa76e9f5076554291d5}{labels}, \hyperlink{namespaceplot_ada2789a07693a357434a610f6dd9bbd2}{y\+\_\+axis}, \hyperlink{namespaceplot_a061a30323ef25d1e33063970ee69b9c5}{axes}, \hyperlink{namespaceplot_a540837c6df4283b87730e2a21178b7da}{use\+\_\+std}=False, \hyperlink{namespaceplot_a1a657d42091f30a95dc7205dca944fe9}{gen}=\hyperlink{namespaceplot_a6d72802b3442c0fab73f4958144e3251}{True})
+\item 
+def \hyperlink{classplot_1_1_gen_plot_a2c053b75271386a308edcdf47dc8b246}{plot\+\_\+violins} (self, data, \hyperlink{namespaceplot_a510b71690609bcc71ced700548e41d9b}{title}, \hyperlink{namespaceplot_ab032e615e4066fa76e9f5076554291d5}{labels}, \hyperlink{namespaceplot_ada2789a07693a357434a610f6dd9bbd2}{y\+\_\+axis}, \hyperlink{namespaceplot_a061a30323ef25d1e33063970ee69b9c5}{axes})
+\item 
+def \hyperlink{classplot_1_1_gen_plot_a3f524d008b73f561ceba494098f54a8d}{mwu} (self, coverage\+\_\+data, names)
+\item 
+def \hyperlink{classplot_1_1_gen_plot_a7ac98998283193af1421b28f29b9e08a}{holm\+\_\+bonferroni} (self, p\+\_\+values)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classplot_1_1_gen_plot_aaae1c543dd09acbbf7f509d5ad6bc73c}{total\+\_\+gens}
+\item 
+\hyperlink{classplot_1_1_gen_plot_afa2d482bf54cc1002e281013949458a0}{colors}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+(self, total\+\_\+gens=500)}{__init__(self, total_gens=500)}}]{\setlength{\rightskip}{0pt plus 5cm}def plot.\+Gen\+Plot.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{total\+\_\+gens = {\ttfamily 500}}
+\end{DoxyParamCaption}
+)}\hypertarget{classplot_1_1_gen_plot_a0abc28cd70bf5e20a3727485edf27bd6}{}\label{classplot_1_1_gen_plot_a0abc28cd70bf5e20a3727485edf27bd6}
+\begin{DoxyVerb}Constructor
+:param total_gens: Total generations to plot
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!holm\+\_\+bonferroni@{holm\+\_\+bonferroni}}
+\index{holm\+\_\+bonferroni@{holm\+\_\+bonferroni}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{holm\+\_\+bonferroni(self, p\+\_\+values)}{holm_bonferroni(self, p_values)}}]{\setlength{\rightskip}{0pt plus 5cm}def plot.\+Gen\+Plot.\+holm\+\_\+bonferroni (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{p\+\_\+values}
+\end{DoxyParamCaption}
+)}\hypertarget{classplot_1_1_gen_plot_a7ac98998283193af1421b28f29b9e08a}{}\label{classplot_1_1_gen_plot_a7ac98998283193af1421b28f29b9e08a}
+\begin{DoxyVerb}Holm-Bonferroni method calculator. Prints the correlation between the methods
+:param p_values: MWU p values
+\end{DoxyVerb}
+ \index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!load\+\_\+exp\+\_\+data@{load\+\_\+exp\+\_\+data}}
+\index{load\+\_\+exp\+\_\+data@{load\+\_\+exp\+\_\+data}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{load\+\_\+exp\+\_\+data(self, folder)}{load_exp_data(self, folder)}}]{\setlength{\rightskip}{0pt plus 5cm}def plot.\+Gen\+Plot.\+load\+\_\+exp\+\_\+data (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{folder}
+\end{DoxyParamCaption}
+)}\hypertarget{classplot_1_1_gen_plot_a6089783223ac1a5d2c17c1040342d9d8}{}\label{classplot_1_1_gen_plot_a6089783223ac1a5d2c17c1040342d9d8}
+\begin{DoxyVerb}Function to load experimental data to plot
+:param folder: Folder path in which the data are
+:return: If path does not exist: None, None, None. If the path exists: coverage, gen_surprise, archive_size
+\end{DoxyVerb}
+ \index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!mwu@{mwu}}
+\index{mwu@{mwu}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{mwu(self, coverage\+\_\+data, names)}{mwu(self, coverage_data, names)}}]{\setlength{\rightskip}{0pt plus 5cm}def plot.\+Gen\+Plot.\+mwu (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{coverage\+\_\+data, }
+\item[{}]{names}
+\end{DoxyParamCaption}
+)}\hypertarget{classplot_1_1_gen_plot_a3f524d008b73f561ceba494098f54a8d}{}\label{classplot_1_1_gen_plot_a3f524d008b73f561ceba494098f54a8d}
+\begin{DoxyVerb}Mann-Whitney U test calculator
+:param coverage_data: Data on which to calculate the test
+:param names: Methods names
+:return:
+\end{DoxyVerb}
+ \index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!plot\+\_\+curves@{plot\+\_\+curves}}
+\index{plot\+\_\+curves@{plot\+\_\+curves}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{plot\+\_\+curves(self, data, title, labels, y\+\_\+axis, axes, use\+\_\+std=\+False, gen=\+True)}{plot_curves(self, data, title, labels, y_axis, axes, use_std=False, gen=True)}}]{\setlength{\rightskip}{0pt plus 5cm}def plot.\+Gen\+Plot.\+plot\+\_\+curves (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{data, }
+\item[{}]{title, }
+\item[{}]{labels, }
+\item[{}]{y\+\_\+axis, }
+\item[{}]{axes, }
+\item[{}]{use\+\_\+std = {\ttfamily False}, }
+\item[{}]{gen = {\ttfamily {\bf True}}}
+\end{DoxyParamCaption}
+)}\hypertarget{classplot_1_1_gen_plot_a3d9d7fb8df32d78d395bb809ba5543c8}{}\label{classplot_1_1_gen_plot_a3d9d7fb8df32d78d395bb809ba5543c8}
+\begin{DoxyVerb}Plot the curves of the data
+:param data: List of data lists. Dimensions are: [method, seed, gen]
+:param title: Title of the graph
+:param labels: Labels of each line
+:param y_axis: Label of y axis
+:param axes: Pyplot axes
+:param use_std: Flag to choose if to use std deviation or min_max for the error bands
+:param gen: Generations or number of agents along the x axis
+\end{DoxyVerb}
+ \index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!plot\+\_\+violins@{plot\+\_\+violins}}
+\index{plot\+\_\+violins@{plot\+\_\+violins}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{plot\+\_\+violins(self, data, title, labels, y\+\_\+axis, axes)}{plot_violins(self, data, title, labels, y_axis, axes)}}]{\setlength{\rightskip}{0pt plus 5cm}def plot.\+Gen\+Plot.\+plot\+\_\+violins (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{data, }
+\item[{}]{title, }
+\item[{}]{labels, }
+\item[{}]{y\+\_\+axis, }
+\item[{}]{axes}
+\end{DoxyParamCaption}
+)}\hypertarget{classplot_1_1_gen_plot_a2c053b75271386a308edcdf47dc8b246}{}\label{classplot_1_1_gen_plot_a2c053b75271386a308edcdf47dc8b246}
+\begin{DoxyVerb}Plot violins plots
+:param data: List of data lists. Dimensions are: [method, seed, gen]
+:param title: Graph title
+:param labels: Labels of each line
+:param y_axis: Label of y axis
+:param axes: Pyplot axes
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!colors@{colors}}
+\index{colors@{colors}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{colors}{colors}}]{\setlength{\rightskip}{0pt plus 5cm}plot.\+Gen\+Plot.\+colors}\hypertarget{classplot_1_1_gen_plot_afa2d482bf54cc1002e281013949458a0}{}\label{classplot_1_1_gen_plot_afa2d482bf54cc1002e281013949458a0}
+\index{plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}!total\+\_\+gens@{total\+\_\+gens}}
+\index{total\+\_\+gens@{total\+\_\+gens}!plot\+::\+Gen\+Plot@{plot\+::\+Gen\+Plot}}
+\subsubsection[{\texorpdfstring{total\+\_\+gens}{total_gens}}]{\setlength{\rightskip}{0pt plus 5cm}plot.\+Gen\+Plot.\+total\+\_\+gens}\hypertarget{classplot_1_1_gen_plot_aaae1c543dd09acbbf7f509d5ad6bc73c}{}\label{classplot_1_1_gen_plot_aaae1c543dd09acbbf7f509d5ad6bc73c}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+scripts/\hyperlink{plot_8py}{plot.\+py}\end{DoxyCompactItemize}

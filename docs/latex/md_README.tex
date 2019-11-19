@@ -1,0 +1,82 @@
+Task Agnostic e\+Xploration of Outcome spaces through Novelty and Surprise
+
+To install run\+: 
+\begin{DoxyCode}
+1 pipenv shell --three
+2 pip install -e . --process-dependency-links
+\end{DoxyCode}
+
+
+ \subsection*{Dependencies}
+
+{\bfseries NB}\+: if you\textquotesingle{}re using the virtualenv, activate it before installing the dependencies. \subsubsection*{Pybullet Gym}
+
+I am using a slightly modified version of pybulletgym than the original found here\+: {\ttfamily \href{https://github.com/benelot/pybullet-gym}{\tt https\+://github.\+com/benelot/pybullet-\/gym}}.
+
+To install it, activate the virtual env, go in the {\ttfamily external} folder and run\+:
+
+
+\begin{DoxyCode}
+1 git clone https://github.com/GPaolo/pybullet-gym.git
+2 cd pybullet-gym
+3 pip install -e .
+\end{DoxyCode}
+
+
+If you want more informations, look at the {\ttfamily R\+E\+A\+D\+ME} there.
+
+\subsubsection*{Fastsim}
+
+Also for this one I am using a slightly modified version of it. The original can be found here\+: {\ttfamily \href{https://github.com/alexendy/fastsim_gym}{\tt https\+://github.\+com/alexendy/fastsim\+\_\+gym}}.
+
+Fastsim needs libfastsim to be installed first.
+
+libfastsim needs to be install in pyfastsim, then patched with {\ttfamily patch -\/p1 $<$ /path/to/your/file.patch}. Once this has been done you can install pyfastsim, then install fastsim-\/gym.
+
+\subparagraph*{Pyfastsim}
+
+You can download it from {\ttfamily \href{https://github.com/alexendy/pyfastsim}{\tt https\+://github.\+com/alexendy/pyfastsim}}
+
+\subparagraph*{Libfastsim}
+
+To install it, activate the virtual env and enter the {\ttfamily external/pyfastsim} folder. Then do\+: 
+\begin{DoxyCode}
+1 git clone https://github.com/GPaolo/libfastsim.git
+2 cd libfastsim
+3 git checkout patch-1
+4 git pull origin patch-1
+5 patch -p1 < ../fastsim-boost2std-fixdisplay.patch
+6 ./waf configure
+7 ./waf build
+8 ./waf install
+\end{DoxyCode}
+ {\bfseries NB} If it complains that cannot find boost, then install it by running\+: 
+\begin{DoxyCode}
+1 sudo apt-get install libboost-all-dev
+\end{DoxyCode}
+
+
+then go in the pyfastsim folder and install it by doing\+: 
+\begin{DoxyCode}
+1 cd ..
+2 python setup.py install
+\end{DoxyCode}
+
+
+\subparagraph*{Fastsim-\/gym}
+
+To install it, activate the virtual env and enter the {\ttfamily external} folder. Then do\+: 
+\begin{DoxyCode}
+1 git clone https://github.com/GPaolo/fastsim\_gym.git
+2 git checkout patch-1
+3 git pull origin patch-1
+\end{DoxyCode}
+
+
+
+
+
+
+The file {\ttfamily .env} will be loaded automatically with {\ttfamily pipenv shell} or {\ttfamily pipenv run your\+\_\+command} and the environment variables will be available.
+
+$\ast$$\ast$$\ast$\+N\+B$\ast$$\ast$$\ast$\+: within Pycharm you need the plugin Env File to load it automatically (access {\bfseries Env File} tab from the Run/\+Debug configurations). {\bfseries You will have to run Py\+Charm from the shell itself from inside the activated virtualenv} 

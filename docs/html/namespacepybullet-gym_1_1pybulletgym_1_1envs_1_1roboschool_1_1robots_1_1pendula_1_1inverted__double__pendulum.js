@@ -1,0 +1,4 @@
+var namespacepybullet_gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula_1_1inverted__double__pendulum =
+[
+    [ "InvertedDoublePendulum", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula_1_1inverted__double_632710b238162c34f237573ee2b501d2.html", "classpybullet-gym_1_1pybulletgym_1_1envs_1_1roboschool_1_1robots_1_1pendula_1_1inverted__double_632710b238162c34f237573ee2b501d2" ]
+];

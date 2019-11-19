@@ -1,0 +1,97 @@
+\hypertarget{test__control_8py}{}\section{scripts/test\+\_\+control.py File Reference}
+\label{test__control_8py}\index{scripts/test\+\_\+control.\+py@{scripts/test\+\_\+control.\+py}}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classtest__control_1_1_eval}{test\+\_\+control.\+Eval}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacetest__control}{test\+\_\+control}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespacetest__control_ae158d671cba39de4c75b859124aeefb3}{test\+\_\+control.\+seed} = 42
+\item 
+string \hyperlink{namespacetest__control_ae0ffacf2431cf5da41b09805a26a445f}{test\+\_\+control.\+load\+\_\+path} = \textquotesingle{}/home/giuseppe/src/taxons/experiments/Maze\+\_\+\+A\+E\+\_\+\+Mixed/\{\}\textquotesingle{}
+\item 
+\hyperlink{namespacetest__control_aec18b6291ee0bb2177b997d322d8ffe3}{test\+\_\+control.\+params} = \hyperlink{classparameters_1_1_params}{parameters.\+Params}()
+\item 
+\hyperlink{namespacetest__control_a0267ecd99d77e4bcb609bd63f4bed1bb}{test\+\_\+control.\+env} = gym.\+make(params.\+env\+\_\+tag)
+\item 
+list \hyperlink{namespacetest__control_acab1d8f94fdfa116b9180b0d82693741}{test\+\_\+control.\+target\+\_\+pose} = \mbox{[}450, 500\mbox{]}
+\item 
+\hyperlink{namespacetest__control_a97883b305a39e99ddbe21071b7351b46}{test\+\_\+control.\+obs} = env.\+reset(desired\+\_\+ball\+\_\+pose=target\+\_\+pose)
+\item 
+\hyperlink{namespacetest__control_aebc61fa5fbcc4639b31cb9c4b9e33a17}{test\+\_\+control.\+target\+\_\+image} = env.\+render(mode=\textquotesingle{}rgb\+\_\+array\textquotesingle{})
+\item 
+\hyperlink{namespacetest__control_af4139c43eec64fc6687c74defc4c4fed}{test\+\_\+control.\+qpos} = np.\+zeros(15)
+\item 
+\hyperlink{namespacetest__control_acef30ea01ea2a970e96ecf849bedcfc7}{test\+\_\+control.\+qvel} = np.\+zeros(14)
+\item 
+\hyperlink{namespacetest__control_ae91bf3253d8443e730376135c1d71210}{test\+\_\+control.\+pose} = target\+\_\+pose+env.\+init\+Pos\mbox{[}-\/1\+:\mbox{]}
+\item 
+\hyperlink{namespacetest__control_ad1be37697cee4f1a376671df94d424bb}{test\+\_\+control.\+p} = fs.\+Posture($\ast$pose)
+\item 
+\hyperlink{namespacetest__control_a7585b10e37df81a5eb7b6df2329a1afd}{test\+\_\+control.\+device} = torch.\+device(\char`\"{}cuda\char`\"{} if torch.\+cuda.\+is\+\_\+available() else \char`\"{}cpu\char`\"{})
+\item 
+\hyperlink{namespacetest__control_ad93174840888f121d55f7d07f6ac1d4a}{test\+\_\+control.\+selector} = ae.\+Conv\+AE(device=device, encoding\+\_\+shape=params.\+feature\+\_\+size)
+\item 
+\hyperlink{namespacetest__control_aa591252ece9facc4ba1f1f7a66fbd939}{test\+\_\+control.\+agent\+\_\+type} = agents.\+F\+F\+Neural\+Agent
+\item 
+\hyperlink{namespacetest__control_a796fd07016d10db6914d0a5ccccb0732}{test\+\_\+control.\+pop} = population.\+Population(agent=agent\+\_\+type, pop\+\_\+size=0, shapes=params.\+agent\+\_\+shapes)
+\item 
+bool \hyperlink{namespacetest__control_a4451a5dcdc9ac8f0a6c49ed816f9e021}{test\+\_\+control.\+done} = False
+\item 
+int \hyperlink{namespacetest__control_a1bb0f0b642b4210d5e9d01cf8928da82}{test\+\_\+control.\+t} = 0
+\item 
+\hyperlink{namespacetest__control_aaa65dc5dc7921eddbe0be1c153c89872}{test\+\_\+control.\+agent\+\_\+input} = t
+\item 
+\hyperlink{namespacetest__control_afecd4367e5ef160ad3f6556a535290a9}{test\+\_\+control.\+action} = utils.\+action\+\_\+formatting(params.\+env\+\_\+tag, agent\mbox{[}\textquotesingle{}agent\textquotesingle{}\mbox{]}(agent\+\_\+input))
+\item 
+\hyperlink{namespacetest__control_a15ad2f6cbc524b2b914dfdd11a2b76b6}{test\+\_\+control.\+reward}
+\item 
+\hyperlink{namespacetest__control_ad1d33270a3ae0b4f0502c46c11f29385}{test\+\_\+control.\+info}
+\item 
+\hyperlink{namespacetest__control_adade4d639cc4b59b066d579a6c1c3ee1}{test\+\_\+control.\+CoM} = np.\+array(\mbox{[}env.\+env.\+data.\+qpos\mbox{[}\+:2\mbox{]}\mbox{]})
+\item 
+\hyperlink{namespacetest__control_a7b0da9f1ea8ad357ed139e89a50d7ca2}{test\+\_\+control.\+state} = env.\+render(mode=\textquotesingle{}rgb\+\_\+array\textquotesingle{})
+\item 
+\hyperlink{namespacetest__control_af52c7060bf842b062819b98ccc6a3ad1}{test\+\_\+control.\+surprise}
+\item 
+\hyperlink{namespacetest__control_a0e5fe494ac8929ac9bd895b84b5b25c8}{test\+\_\+control.\+bs\+\_\+point} = bs\+\_\+point.\+flatten().cpu().data.\+numpy()
+\item 
+\hyperlink{namespacetest__control_a127d50b0c4ee9b0c1af9af28c06195cb}{test\+\_\+control.\+y}
+\item 
+\hyperlink{namespacetest__control_a6407063ff49b106a8d24f1b31c76642f}{test\+\_\+control.\+goal} = torch.\+Tensor(np.\+ascontiguousarray(target\+\_\+image)).permute(2, 0, 1).unsqueeze(0).to(device)
+\item 
+\hyperlink{namespacetest__control_a362587b14304a2ba01f5dcaf55cd3108}{test\+\_\+control.\+reconstr}
+\item 
+\hyperlink{namespacetest__control_a3ac06242759c7bc7c53eb4fd0911716f}{test\+\_\+control.\+bs\+\_\+space} = np.\+stack(\mbox{[}a\mbox{[}0\mbox{]} for a in pop\mbox{[}\textquotesingle{}features\textquotesingle{}\mbox{]}.values\mbox{]})
+\item 
+\hyperlink{namespacetest__control_ae7ba3d5b0863e8d7241a4d190204dfb3}{test\+\_\+control.\+diff} = np.\+atleast\+\_\+2d(bs\+\_\+space -\/ bs\+\_\+point)
+\item 
+\hyperlink{namespacetest__control_a3c7930fc7d7c4ba4202e223169518470}{test\+\_\+control.\+dists} = np.\+sqrt(np.\+sum(diff $\ast$ diff, axis=1))
+\item 
+\hyperlink{namespacetest__control_a29317a85baaaf8e8367cc8f7fc680056}{test\+\_\+control.\+closest\+\_\+agent} = np.\+argmin(dists)
+\item 
+\hyperlink{namespacetest__control_ad90c367e13c5e1918cc5f9e7284f32fc}{test\+\_\+control.\+selected} = pop\mbox{[}closest\+\_\+agent\mbox{]}
+\item 
+list \hyperlink{namespacetest__control_a459ed214c974c2c8877f3c4e4bf4e49d}{test\+\_\+control.\+images} = \mbox{[}$\,$\mbox{]}
+\item 
+list \hyperlink{namespacetest__control_ae4a1dc5d454ea3ba8fca7087dc935102}{test\+\_\+control.\+saved\+\_\+balls\+\_\+pose} = \mbox{[}$\,$\mbox{]}
+\item 
+list \hyperlink{namespacetest__control_af91b5208bf862f52fa346e064e8bff3d}{test\+\_\+control.\+saved\+\_\+joints\+\_\+pose} = \mbox{[}$\,$\mbox{]}
+\item 
+list \hyperlink{namespacetest__control_a0dd291c941a2e023ad7a11a1be4527ad}{test\+\_\+control.\+saved\+\_\+robot\+\_\+pose} = \mbox{[}$\,$\mbox{]}
+\item 
+\hyperlink{namespacetest__control_aad180e26c96bea69ed692e273ad9e6d6}{test\+\_\+control.\+f\+\_\+pose} = CoM
+\item 
+\hyperlink{namespacetest__control_a53dd4677c9659d292016e7e010417a2f}{test\+\_\+control.\+S\+H\+O\+W\+\_\+\+A\+R\+M\+\_\+\+I\+N\+\_\+\+A\+R\+R\+AY}
+\item 
+\hyperlink{namespacetest__control_a2f3c84b9e8a2baaf30017976ca5c2edf}{test\+\_\+control.\+point\+\_\+pose}
+\item 
+\hyperlink{namespacetest__control_a3d0d280421fdf63f3fae4fbfd5c37a8b}{test\+\_\+control.\+final\+\_\+distance} = np.\+sqrt(np.\+sum((target\+\_\+pose -\/ f\+\_\+pose) $\ast$$\ast$ 2))
+\end{DoxyCompactItemize}

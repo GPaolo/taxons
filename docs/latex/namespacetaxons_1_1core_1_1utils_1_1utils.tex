@@ -1,0 +1,113 @@
+\hypertarget{namespacetaxons_1_1core_1_1utils_1_1utils}{}\section{taxons.\+core.\+utils.\+utils Namespace Reference}
+\label{namespacetaxons_1_1core_1_1utils_1_1utils}\index{taxons.\+core.\+utils.\+utils@{taxons.\+core.\+utils.\+utils}}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classtaxons_1_1core_1_1utils_1_1utils_1_1_logger}{Logger}
+\item 
+class \hyperlink{classtaxons_1_1core_1_1utils_1_1utils_1_1_l_r_scheduler}{L\+R\+Scheduler}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacetaxons_1_1core_1_1utils_1_1utils_af0b38389a6302a0fe06869a5a5ffe086}{action\+\_\+formatting} (env\+\_\+tag, action)
+\item 
+def \hyperlink{namespacetaxons_1_1core_1_1utils_1_1utils_a629ccb54bab5ae9cee4f016017b7b9d3}{extact\+\_\+hd\+\_\+bs} (env, obs, reward=None, done=None, info=None)
+\item 
+def \hyperlink{namespacetaxons_1_1core_1_1utils_1_1utils_a1a70d5f1e4d5e2cb6ec8951bbdff0294}{get\+\_\+projectpath} ()
+\item 
+def \hyperlink{namespacetaxons_1_1core_1_1utils_1_1utils_a2cb425a7fa80aa77e4c25fcd62838983}{load\+\_\+maze\+\_\+image} ()
+\item 
+def \hyperlink{namespacetaxons_1_1core_1_1utils_1_1utils_a0e8cd889f76b244430f15bd6bd20f183}{show} (bs\+\_\+points, filepath, name=None, info=None, upper\+\_\+limit=1.\+35, lower\+\_\+limit=-\/1.\+35)
+\item 
+def \hyperlink{namespacetaxons_1_1core_1_1utils_1_1utils_a41d33b1359a91d1b135117de312074b5}{split\+\_\+array} (a, batch\+\_\+size=32, shuffle=True)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}!action\+\_\+formatting@{action\+\_\+formatting}}
+\index{action\+\_\+formatting@{action\+\_\+formatting}!taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}}
+\subsubsection[{\texorpdfstring{action\+\_\+formatting(env\+\_\+tag, action)}{action_formatting(env_tag, action)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+utils.\+action\+\_\+formatting (
+\begin{DoxyParamCaption}
+\item[{}]{env\+\_\+tag, }
+\item[{}]{action}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetaxons_1_1core_1_1utils_1_1utils_af0b38389a6302a0fe06869a5a5ffe086}{}\label{namespacetaxons_1_1core_1_1utils_1_1utils_af0b38389a6302a0fe06869a5a5ffe086}
+\begin{DoxyVerb}This function helps reformat the actions according to the environment
+:param env_tag: Environment name
+:param action: Action to reformat
+:return: The formatted action
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}!extact\+\_\+hd\+\_\+bs@{extact\+\_\+hd\+\_\+bs}}
+\index{extact\+\_\+hd\+\_\+bs@{extact\+\_\+hd\+\_\+bs}!taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}}
+\subsubsection[{\texorpdfstring{extact\+\_\+hd\+\_\+bs(env, obs, reward=\+None, done=\+None, info=\+None)}{extact_hd_bs(env, obs, reward=None, done=None, info=None)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+utils.\+extact\+\_\+hd\+\_\+bs (
+\begin{DoxyParamCaption}
+\item[{}]{env, }
+\item[{}]{obs, }
+\item[{}]{reward = {\ttfamily None}, }
+\item[{}]{done = {\ttfamily None}, }
+\item[{}]{info = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetaxons_1_1core_1_1utils_1_1utils_a629ccb54bab5ae9cee4f016017b7b9d3}{}\label{namespacetaxons_1_1core_1_1utils_1_1utils_a629ccb54bab5ae9cee4f016017b7b9d3}
+\begin{DoxyVerb}  This function helps extract the hand designed BS used to compare the approaches
+  :param env_tag: Environment name
+  :param obs: Observation to reformat
+  :return: The extracted ground truth BS
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}!get\+\_\+projectpath@{get\+\_\+projectpath}}
+\index{get\+\_\+projectpath@{get\+\_\+projectpath}!taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}}
+\subsubsection[{\texorpdfstring{get\+\_\+projectpath()}{get_projectpath()}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+utils.\+get\+\_\+projectpath (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetaxons_1_1core_1_1utils_1_1utils_a1a70d5f1e4d5e2cb6ec8951bbdff0294}{}\label{namespacetaxons_1_1core_1_1utils_1_1utils_a1a70d5f1e4d5e2cb6ec8951bbdff0294}
+\begin{DoxyVerb}Finds the projectpact
+:return: Absolute path of the project
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}!load\+\_\+maze\+\_\+image@{load\+\_\+maze\+\_\+image}}
+\index{load\+\_\+maze\+\_\+image@{load\+\_\+maze\+\_\+image}!taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}}
+\subsubsection[{\texorpdfstring{load\+\_\+maze\+\_\+image()}{load_maze_image()}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+utils.\+load\+\_\+maze\+\_\+image (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetaxons_1_1core_1_1utils_1_1utils_a2cb425a7fa80aa77e4c25fcd62838983}{}\label{namespacetaxons_1_1core_1_1utils_1_1utils_a2cb425a7fa80aa77e4c25fcd62838983}
+\begin{DoxyVerb}Loads the image of the maze for the Fastsim simulator
+:return: The image of the maze as numpy array
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}!show@{show}}
+\index{show@{show}!taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}}
+\subsubsection[{\texorpdfstring{show(bs\+\_\+points, filepath, name=\+None, info=\+None, upper\+\_\+limit=1.\+35, lower\+\_\+limit=-\/1.\+35)}{show(bs_points, filepath, name=None, info=None, upper_limit=1.35, lower_limit=-1.35)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+utils.\+show (
+\begin{DoxyParamCaption}
+\item[{}]{bs\+\_\+points, }
+\item[{}]{filepath, }
+\item[{}]{name = {\ttfamily None}, }
+\item[{}]{info = {\ttfamily None}, }
+\item[{}]{upper\+\_\+limit = {\ttfamily 1.35}, }
+\item[{}]{lower\+\_\+limit = {\ttfamily -\/1.35}}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetaxons_1_1core_1_1utils_1_1utils_a0e8cd889f76b244430f15bd6bd20f183}{}\label{namespacetaxons_1_1core_1_1utils_1_1utils_a0e8cd889f76b244430f15bd6bd20f183}
+\begin{DoxyVerb}Shows the coverage of the found solutions in the ground truth space
+:param bs_points: BS points in the ground truth space
+:param filepath: Path where to save the image
+:param name: Name of the plot
+:param info: Info about the data
+:param upper_limit: Upper limit of the graph
+:param lower_limit: Bottom limit of the graph
+:return: The coverage value
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}!split\+\_\+array@{split\+\_\+array}}
+\index{split\+\_\+array@{split\+\_\+array}!taxons\+::core\+::utils\+::utils@{taxons\+::core\+::utils\+::utils}}
+\subsubsection[{\texorpdfstring{split\+\_\+array(a, batch\+\_\+size=32, shuffle=\+True)}{split_array(a, batch_size=32, shuffle=True)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+utils.\+split\+\_\+array (
+\begin{DoxyParamCaption}
+\item[{}]{a, }
+\item[{}]{batch\+\_\+size = {\ttfamily 32}, }
+\item[{}]{shuffle = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacetaxons_1_1core_1_1utils_1_1utils_a41d33b1359a91d1b135117de312074b5}{}\label{namespacetaxons_1_1core_1_1utils_1_1utils_a41d33b1359a91d1b135117de312074b5}
+\begin{DoxyVerb}Splits a data array in arrays of the given batch size
+:param a: Array to split
+:param batch_size: Batch size of new arrays
+:param shuffle: Flag to shuffle the array
+:return: A list of arrays of batch_size
+\end{DoxyVerb}
+ 

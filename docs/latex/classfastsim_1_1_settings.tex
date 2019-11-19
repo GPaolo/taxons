@@ -1,0 +1,101 @@
+\hypertarget{classfastsim_1_1_settings}{}\section{fastsim\+:\+:Settings Class Reference}
+\label{classfastsim_1_1_settings}\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+
+
+{\ttfamily \#include $<$settings.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classfastsim_1_1_settings_a6c09cdd2d888b82daa15107bf5ba0813}{Settings} (const std\+::string \&xml\+\_\+file)
+\item 
+std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \hyperlink{classfastsim_1_1_settings_a325ee1931c4f732a364025ae44d3bb77}{map} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_robot}{Robot} $>$ \hyperlink{classfastsim_1_1_settings_a46cc8a38e569ebaf7ba774824c2e35ef}{robot} ()
+\item 
+bool \hyperlink{classfastsim_1_1_settings_a7a177a4ccf723c1e46773864272fbad0}{display} () const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename R $>$ }\\R \hyperlink{classfastsim_1_1_settings_af48f04ccfcdec0d593fb4f72630acffa}{\+\_\+get\+\_\+a} (const boost\+::property\+\_\+tree\+::ptree \&v, const char $\ast$a) const 
+\item 
+bool \hyperlink{classfastsim_1_1_settings_ac092452e3980d440df8a7fcfbbe80665}{\+\_\+get\+\_\+a\+\_\+bool} (const boost\+::property\+\_\+tree\+::ptree \&v, const char $\ast$a) const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \hyperlink{classfastsim_1_1_settings_a005d49dd8065e48c8db46e76cad998f8}{\+\_\+map}
+\item 
+std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_robot}{Robot} $>$ \hyperlink{classfastsim_1_1_settings_aad11d2d2a9a48ef415efd0b458e6f81a}{\+\_\+robot}
+\item 
+bool \hyperlink{classfastsim_1_1_settings_a4d8ab7ae7af20ff4a63c4b6330b3ade2}{\+\_\+display}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!Settings@{Settings}}
+\index{Settings@{Settings}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{Settings(const std\+::string \&xml\+\_\+file)}{Settings(const std::string &xml_file)}}]{\setlength{\rightskip}{0pt plus 5cm}fastsim\+::\+Settings\+::\+Settings (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{xml\+\_\+file}
+\end{DoxyParamCaption}
+)}\hypertarget{classfastsim_1_1_settings_a6c09cdd2d888b82daa15107bf5ba0813}{}\label{classfastsim_1_1_settings_a6c09cdd2d888b82daa15107bf5ba0813}
+
+
+\subsection{Member Function Documentation}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!\+\_\+get\+\_\+a@{\+\_\+get\+\_\+a}}
+\index{\+\_\+get\+\_\+a@{\+\_\+get\+\_\+a}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{\+\_\+get\+\_\+a(const boost\+::property\+\_\+tree\+::ptree \&v, const char $\ast$a) const }{_get_a(const boost::property_tree::ptree &v, const char *a) const }}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename R $>$ R fastsim\+::\+Settings\+::\+\_\+get\+\_\+a (
+\begin{DoxyParamCaption}
+\item[{const boost\+::property\+\_\+tree\+::ptree \&}]{v, }
+\item[{const char $\ast$}]{a}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}\hypertarget{classfastsim_1_1_settings_af48f04ccfcdec0d593fb4f72630acffa}{}\label{classfastsim_1_1_settings_af48f04ccfcdec0d593fb4f72630acffa}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!\+\_\+get\+\_\+a\+\_\+bool@{\+\_\+get\+\_\+a\+\_\+bool}}
+\index{\+\_\+get\+\_\+a\+\_\+bool@{\+\_\+get\+\_\+a\+\_\+bool}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{\+\_\+get\+\_\+a\+\_\+bool(const boost\+::property\+\_\+tree\+::ptree \&v, const char $\ast$a) const }{_get_a_bool(const boost::property_tree::ptree &v, const char *a) const }}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Settings\+::\+\_\+get\+\_\+a\+\_\+bool (
+\begin{DoxyParamCaption}
+\item[{const boost\+::property\+\_\+tree\+::ptree \&}]{v, }
+\item[{const char $\ast$}]{a}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}\hypertarget{classfastsim_1_1_settings_ac092452e3980d440df8a7fcfbbe80665}{}\label{classfastsim_1_1_settings_ac092452e3980d440df8a7fcfbbe80665}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!display@{display}}
+\index{display@{display}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{display() const }{display() const }}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Settings\+::display (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_settings_a7a177a4ccf723c1e46773864272fbad0}{}\label{classfastsim_1_1_settings_a7a177a4ccf723c1e46773864272fbad0}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!map@{map}}
+\index{map@{map}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{map()}{map()}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::shared\+\_\+ptr$<${\bf Map}$>$ fastsim\+::\+Settings\+::map (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_settings_a325ee1931c4f732a364025ae44d3bb77}{}\label{classfastsim_1_1_settings_a325ee1931c4f732a364025ae44d3bb77}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!robot@{robot}}
+\index{robot@{robot}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{robot()}{robot()}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::shared\+\_\+ptr$<${\bf Robot}$>$ fastsim\+::\+Settings\+::robot (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_settings_a46cc8a38e569ebaf7ba774824c2e35ef}{}\label{classfastsim_1_1_settings_a46cc8a38e569ebaf7ba774824c2e35ef}
+
+
+\subsection{Member Data Documentation}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!\+\_\+display@{\+\_\+display}}
+\index{\+\_\+display@{\+\_\+display}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{\+\_\+display}{_display}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Settings\+::\+\_\+display\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_settings_a4d8ab7ae7af20ff4a63c4b6330b3ade2}{}\label{classfastsim_1_1_settings_a4d8ab7ae7af20ff4a63c4b6330b3ade2}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!\+\_\+map@{\+\_\+map}}
+\index{\+\_\+map@{\+\_\+map}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{\+\_\+map}{_map}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::shared\+\_\+ptr$<${\bf Map}$>$ fastsim\+::\+Settings\+::\+\_\+map\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_settings_a005d49dd8065e48c8db46e76cad998f8}{}\label{classfastsim_1_1_settings_a005d49dd8065e48c8db46e76cad998f8}
+\index{fastsim\+::\+Settings@{fastsim\+::\+Settings}!\+\_\+robot@{\+\_\+robot}}
+\index{\+\_\+robot@{\+\_\+robot}!fastsim\+::\+Settings@{fastsim\+::\+Settings}}
+\subsubsection[{\texorpdfstring{\+\_\+robot}{_robot}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::shared\+\_\+ptr$<${\bf Robot}$>$ fastsim\+::\+Settings\+::\+\_\+robot\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_settings_aad11d2d2a9a48ef415efd0b458e6f81a}{}\label{classfastsim_1_1_settings_aad11d2d2a9a48ef415efd0b458e6f81a}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+external/pyfastsim/libfastsim/src/\hyperlink{settings_8hpp}{settings.\+hpp}\item 
+external/pyfastsim/libfastsim/src/\hyperlink{settings_8cpp}{settings.\+cpp}\end{DoxyCompactItemize}

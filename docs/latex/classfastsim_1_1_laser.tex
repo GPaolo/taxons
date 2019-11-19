@@ -1,0 +1,204 @@
+\hypertarget{classfastsim_1_1_laser}{}\section{fastsim\+:\+:Laser Class Reference}
+\label{classfastsim_1_1_laser}\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+
+
+{\ttfamily \#include $<$laser.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classfastsim_1_1_laser_a992451fa3ee661953fa5b265b9bf7841}{Laser} (float angle, float range, float gap\+\_\+dist=0.\+0f, float gap\+\_\+angle=0.\+0f)
+\item 
+float \hyperlink{classfastsim_1_1_laser_aeecf08b19398344d13551d36c5a99873}{update} (const \hyperlink{classfastsim_1_1_posture}{Posture} \&pos, const std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \&map)
+\item 
+float \hyperlink{classfastsim_1_1_laser_aee7bf709a5d80837df279df42ad2c7d1}{get\+\_\+dist} () const 
+\item 
+float \hyperlink{classfastsim_1_1_laser_a6a6ec656d9b235bff9da167281fb0033}{get\+\_\+angle} () const 
+\item 
+float \hyperlink{classfastsim_1_1_laser_a87cd6b614dec64ea973ca4e5cb6ac2ba}{get\+\_\+range} () const 
+\item 
+float \hyperlink{classfastsim_1_1_laser_a146e23d0cd9b93f1a49768632dcded6b}{get\+\_\+gap\+\_\+dist} () const 
+\item 
+float \hyperlink{classfastsim_1_1_laser_a24466d67ea9a818a3de58c7087cc7158}{get\+\_\+gap\+\_\+angle} () const 
+\item 
+float \hyperlink{classfastsim_1_1_laser_a0eb83935e42fecdbf874ca5e92c1a402}{get\+\_\+x} () const 
+\item 
+float \hyperlink{classfastsim_1_1_laser_af035c632d3676973582d2279f4abca5f}{get\+\_\+y} () const 
+\item 
+int \hyperlink{classfastsim_1_1_laser_aae44a5cc6ee6d5f5f70647a8cf7a6278}{get\+\_\+x\+\_\+pixel} () const 
+\item 
+int \hyperlink{classfastsim_1_1_laser_a9adbee57db76feb1d96cbcea2f957da4}{get\+\_\+y\+\_\+pixel} () const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classfastsim_1_1_laser_ac52f570ada4b3e29c234ddf57a9bfb25}{\+\_\+try\+\_\+pixel} (const std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \&m, int x, int y)
+\item 
+bool \hyperlink{classfastsim_1_1_laser_a6b11224a82236f9503fa828634230bd5}{\+\_\+line\+\_\+inter} (const std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \&m, int y1, int x1, int y2, int x2, int \&x\+\_\+res, int \&y\+\_\+res)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+float \hyperlink{classfastsim_1_1_laser_a7e93560d02b262348821b19544257e37}{\+\_\+angle}
+\item 
+float \hyperlink{classfastsim_1_1_laser_ab5815631c5c18cab82ac98ba65ba83a2}{\+\_\+range}
+\item 
+float \hyperlink{classfastsim_1_1_laser_af5ba6001e76038df3953071a9c271b51}{\+\_\+gap\+\_\+dist}
+\item 
+float \hyperlink{classfastsim_1_1_laser_a7f36e2fabf7de51172253e096623b836}{\+\_\+gap\+\_\+angle}
+\item 
+float \hyperlink{classfastsim_1_1_laser_a5a6a79ca9ec93cdc7940c9168ad7dc38}{\+\_\+x}
+\item 
+float \hyperlink{classfastsim_1_1_laser_aee8f35be16f0de5bb36812d2508e7d36}{\+\_\+y}
+\item 
+int \hyperlink{classfastsim_1_1_laser_ad35031c338de0e0312b9fdd5356aaca9}{\+\_\+x\+\_\+pixel}
+\item 
+int \hyperlink{classfastsim_1_1_laser_a2e07a5246699632a0de91cb3ed6932d9}{\+\_\+y\+\_\+pixel}
+\item 
+float \hyperlink{classfastsim_1_1_laser_a3c06fa44047949d1ead472df4a249ea6}{\+\_\+dist}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!Laser@{Laser}}
+\index{Laser@{Laser}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{Laser(float angle, float range, float gap\+\_\+dist=0.\+0f, float gap\+\_\+angle=0.\+0f)}{Laser(float angle, float range, float gap_dist=0.0f, float gap_angle=0.0f)}}]{\setlength{\rightskip}{0pt plus 5cm}fastsim\+::\+Laser\+::\+Laser (
+\begin{DoxyParamCaption}
+\item[{float}]{angle, }
+\item[{float}]{range, }
+\item[{float}]{gap\+\_\+dist = {\ttfamily 0.0f}, }
+\item[{float}]{gap\+\_\+angle = {\ttfamily 0.0f}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_a992451fa3ee661953fa5b265b9bf7841}{}\label{classfastsim_1_1_laser_a992451fa3ee661953fa5b265b9bf7841}
+
+
+\subsection{Member Function Documentation}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+line\+\_\+inter@{\+\_\+line\+\_\+inter}}
+\index{\+\_\+line\+\_\+inter@{\+\_\+line\+\_\+inter}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+line\+\_\+inter(const std\+::shared\+\_\+ptr$<$ Map $>$ \&m, int y1, int x1, int y2, int x2, int \&x\+\_\+res, int \&y\+\_\+res)}{_line_inter(const std::shared_ptr< Map > &m, int y1, int x1, int y2, int x2, int &x_res, int &y_res)}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Laser\+::\+\_\+line\+\_\+inter (
+\begin{DoxyParamCaption}
+\item[{const std\+::shared\+\_\+ptr$<$ {\bf Map} $>$ \&}]{m, }
+\item[{int}]{y1, }
+\item[{int}]{x1, }
+\item[{int}]{y2, }
+\item[{int}]{x2, }
+\item[{int \&}]{x\+\_\+res, }
+\item[{int \&}]{y\+\_\+res}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_a6b11224a82236f9503fa828634230bd5}{}\label{classfastsim_1_1_laser_a6b11224a82236f9503fa828634230bd5}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+try\+\_\+pixel@{\+\_\+try\+\_\+pixel}}
+\index{\+\_\+try\+\_\+pixel@{\+\_\+try\+\_\+pixel}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+try\+\_\+pixel(const std\+::shared\+\_\+ptr$<$ Map $>$ \&m, int x, int y)}{_try_pixel(const std::shared_ptr< Map > &m, int x, int y)}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Laser\+::\+\_\+try\+\_\+pixel (
+\begin{DoxyParamCaption}
+\item[{const std\+::shared\+\_\+ptr$<$ {\bf Map} $>$ \&}]{m, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_ac52f570ada4b3e29c234ddf57a9bfb25}{}\label{classfastsim_1_1_laser_ac52f570ada4b3e29c234ddf57a9bfb25}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+angle@{get\+\_\+angle}}
+\index{get\+\_\+angle@{get\+\_\+angle}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+angle() const }{get_angle() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::get\+\_\+angle (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_a6a6ec656d9b235bff9da167281fb0033}{}\label{classfastsim_1_1_laser_a6a6ec656d9b235bff9da167281fb0033}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+dist@{get\+\_\+dist}}
+\index{get\+\_\+dist@{get\+\_\+dist}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+dist() const }{get_dist() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::get\+\_\+dist (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_aee7bf709a5d80837df279df42ad2c7d1}{}\label{classfastsim_1_1_laser_aee7bf709a5d80837df279df42ad2c7d1}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+gap\+\_\+angle@{get\+\_\+gap\+\_\+angle}}
+\index{get\+\_\+gap\+\_\+angle@{get\+\_\+gap\+\_\+angle}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+gap\+\_\+angle() const }{get_gap_angle() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::get\+\_\+gap\+\_\+angle (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_a24466d67ea9a818a3de58c7087cc7158}{}\label{classfastsim_1_1_laser_a24466d67ea9a818a3de58c7087cc7158}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+gap\+\_\+dist@{get\+\_\+gap\+\_\+dist}}
+\index{get\+\_\+gap\+\_\+dist@{get\+\_\+gap\+\_\+dist}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+gap\+\_\+dist() const }{get_gap_dist() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::get\+\_\+gap\+\_\+dist (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_a146e23d0cd9b93f1a49768632dcded6b}{}\label{classfastsim_1_1_laser_a146e23d0cd9b93f1a49768632dcded6b}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+range@{get\+\_\+range}}
+\index{get\+\_\+range@{get\+\_\+range}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+range() const }{get_range() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::get\+\_\+range (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_a87cd6b614dec64ea973ca4e5cb6ac2ba}{}\label{classfastsim_1_1_laser_a87cd6b614dec64ea973ca4e5cb6ac2ba}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+x@{get\+\_\+x}}
+\index{get\+\_\+x@{get\+\_\+x}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+x() const }{get_x() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::get\+\_\+x (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_a0eb83935e42fecdbf874ca5e92c1a402}{}\label{classfastsim_1_1_laser_a0eb83935e42fecdbf874ca5e92c1a402}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+x\+\_\+pixel@{get\+\_\+x\+\_\+pixel}}
+\index{get\+\_\+x\+\_\+pixel@{get\+\_\+x\+\_\+pixel}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+x\+\_\+pixel() const }{get_x_pixel() const }}]{\setlength{\rightskip}{0pt plus 5cm}int fastsim\+::\+Laser\+::get\+\_\+x\+\_\+pixel (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_aae44a5cc6ee6d5f5f70647a8cf7a6278}{}\label{classfastsim_1_1_laser_aae44a5cc6ee6d5f5f70647a8cf7a6278}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+y@{get\+\_\+y}}
+\index{get\+\_\+y@{get\+\_\+y}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+y() const }{get_y() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::get\+\_\+y (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_af035c632d3676973582d2279f4abca5f}{}\label{classfastsim_1_1_laser_af035c632d3676973582d2279f4abca5f}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!get\+\_\+y\+\_\+pixel@{get\+\_\+y\+\_\+pixel}}
+\index{get\+\_\+y\+\_\+pixel@{get\+\_\+y\+\_\+pixel}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{get\+\_\+y\+\_\+pixel() const }{get_y_pixel() const }}]{\setlength{\rightskip}{0pt plus 5cm}int fastsim\+::\+Laser\+::get\+\_\+y\+\_\+pixel (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_laser_a9adbee57db76feb1d96cbcea2f957da4}{}\label{classfastsim_1_1_laser_a9adbee57db76feb1d96cbcea2f957da4}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!update@{update}}
+\index{update@{update}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{update(const Posture \&pos, const std\+::shared\+\_\+ptr$<$ Map $>$ \&map)}{update(const Posture &pos, const std::shared_ptr< Map > &map)}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::update (
+\begin{DoxyParamCaption}
+\item[{const {\bf Posture} \&}]{pos, }
+\item[{const std\+::shared\+\_\+ptr$<$ {\bf Map} $>$ \&}]{map}
+\end{DoxyParamCaption}
+)}\hypertarget{classfastsim_1_1_laser_aeecf08b19398344d13551d36c5a99873}{}\label{classfastsim_1_1_laser_aeecf08b19398344d13551d36c5a99873}
+
+
+\subsection{Member Data Documentation}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+angle@{\+\_\+angle}}
+\index{\+\_\+angle@{\+\_\+angle}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+angle}{_angle}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::\+\_\+angle\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_a7e93560d02b262348821b19544257e37}{}\label{classfastsim_1_1_laser_a7e93560d02b262348821b19544257e37}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+dist@{\+\_\+dist}}
+\index{\+\_\+dist@{\+\_\+dist}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+dist}{_dist}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::\+\_\+dist\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_a3c06fa44047949d1ead472df4a249ea6}{}\label{classfastsim_1_1_laser_a3c06fa44047949d1ead472df4a249ea6}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+gap\+\_\+angle@{\+\_\+gap\+\_\+angle}}
+\index{\+\_\+gap\+\_\+angle@{\+\_\+gap\+\_\+angle}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+gap\+\_\+angle}{_gap_angle}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::\+\_\+gap\+\_\+angle\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_a7f36e2fabf7de51172253e096623b836}{}\label{classfastsim_1_1_laser_a7f36e2fabf7de51172253e096623b836}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+gap\+\_\+dist@{\+\_\+gap\+\_\+dist}}
+\index{\+\_\+gap\+\_\+dist@{\+\_\+gap\+\_\+dist}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+gap\+\_\+dist}{_gap_dist}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::\+\_\+gap\+\_\+dist\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_af5ba6001e76038df3953071a9c271b51}{}\label{classfastsim_1_1_laser_af5ba6001e76038df3953071a9c271b51}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+range@{\+\_\+range}}
+\index{\+\_\+range@{\+\_\+range}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+range}{_range}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::\+\_\+range\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_ab5815631c5c18cab82ac98ba65ba83a2}{}\label{classfastsim_1_1_laser_ab5815631c5c18cab82ac98ba65ba83a2}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+x@{\+\_\+x}}
+\index{\+\_\+x@{\+\_\+x}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+x}{_x}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::\+\_\+x\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_a5a6a79ca9ec93cdc7940c9168ad7dc38}{}\label{classfastsim_1_1_laser_a5a6a79ca9ec93cdc7940c9168ad7dc38}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+x\+\_\+pixel@{\+\_\+x\+\_\+pixel}}
+\index{\+\_\+x\+\_\+pixel@{\+\_\+x\+\_\+pixel}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+x\+\_\+pixel}{_x_pixel}}]{\setlength{\rightskip}{0pt plus 5cm}int fastsim\+::\+Laser\+::\+\_\+x\+\_\+pixel\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_ad35031c338de0e0312b9fdd5356aaca9}{}\label{classfastsim_1_1_laser_ad35031c338de0e0312b9fdd5356aaca9}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+y@{\+\_\+y}}
+\index{\+\_\+y@{\+\_\+y}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+y}{_y}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Laser\+::\+\_\+y\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_aee8f35be16f0de5bb36812d2508e7d36}{}\label{classfastsim_1_1_laser_aee8f35be16f0de5bb36812d2508e7d36}
+\index{fastsim\+::\+Laser@{fastsim\+::\+Laser}!\+\_\+y\+\_\+pixel@{\+\_\+y\+\_\+pixel}}
+\index{\+\_\+y\+\_\+pixel@{\+\_\+y\+\_\+pixel}!fastsim\+::\+Laser@{fastsim\+::\+Laser}}
+\subsubsection[{\texorpdfstring{\+\_\+y\+\_\+pixel}{_y_pixel}}]{\setlength{\rightskip}{0pt plus 5cm}int fastsim\+::\+Laser\+::\+\_\+y\+\_\+pixel\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_laser_a2e07a5246699632a0de91cb3ed6932d9}{}\label{classfastsim_1_1_laser_a2e07a5246699632a0de91cb3ed6932d9}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+external/pyfastsim/libfastsim/src/\hyperlink{laser_8hpp}{laser.\+hpp}\item 
+external/pyfastsim/libfastsim/src/\hyperlink{laser_8cpp}{laser.\+cpp}\end{DoxyCompactItemize}

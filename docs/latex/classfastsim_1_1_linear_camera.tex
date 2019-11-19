@@ -1,0 +1,84 @@
+\hypertarget{classfastsim_1_1_linear_camera}{}\section{fastsim\+:\+:Linear\+Camera Class Reference}
+\label{classfastsim_1_1_linear_camera}\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+
+
+{\ttfamily \#include $<$linear\+\_\+camera.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classfastsim_1_1_linear_camera_ac9accb315ca2a9230ebbe62f64f5c107}{Linear\+Camera} ()
+\item 
+\hyperlink{classfastsim_1_1_linear_camera_a1bd6db6703d4a4f99fe84c146ff3b97e}{Linear\+Camera} (float angular\+\_\+range, int nb\+\_\+pixels)
+\item 
+void \hyperlink{classfastsim_1_1_linear_camera_aecb7eb447e9b453642ea6684e69c528d}{update} (const \hyperlink{classfastsim_1_1_posture}{Posture} \&pos, const std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \&map)
+\item 
+const std\+::vector$<$ int $>$ \& \hyperlink{classfastsim_1_1_linear_camera_af75a35f016bd4cae12b30d28c8e0fcd8}{pixels} () const 
+\item 
+float \hyperlink{classfastsim_1_1_linear_camera_a94f5152d3ee7d3d6cfee102b4fec44bb}{get\+\_\+angular\+\_\+range} () const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+float \hyperlink{classfastsim_1_1_linear_camera_aaeead77c6003ac991eb68ea899daebaa}{\+\_\+angular\+\_\+range}
+\item 
+std\+::vector$<$ int $>$ \hyperlink{classfastsim_1_1_linear_camera_aa82ccbc534ad540de0928aefc5d1cf01}{\+\_\+pixels}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}!Linear\+Camera@{Linear\+Camera}}
+\index{Linear\+Camera@{Linear\+Camera}!fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+\subsubsection[{\texorpdfstring{Linear\+Camera()}{LinearCamera()}}]{\setlength{\rightskip}{0pt plus 5cm}fastsim\+::\+Linear\+Camera\+::\+Linear\+Camera (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_linear_camera_ac9accb315ca2a9230ebbe62f64f5c107}{}\label{classfastsim_1_1_linear_camera_ac9accb315ca2a9230ebbe62f64f5c107}
+\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}!Linear\+Camera@{Linear\+Camera}}
+\index{Linear\+Camera@{Linear\+Camera}!fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+\subsubsection[{\texorpdfstring{Linear\+Camera(float angular\+\_\+range, int nb\+\_\+pixels)}{LinearCamera(float angular_range, int nb_pixels)}}]{\setlength{\rightskip}{0pt plus 5cm}fastsim\+::\+Linear\+Camera\+::\+Linear\+Camera (
+\begin{DoxyParamCaption}
+\item[{float}]{angular\+\_\+range, }
+\item[{int}]{nb\+\_\+pixels}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_linear_camera_a1bd6db6703d4a4f99fe84c146ff3b97e}{}\label{classfastsim_1_1_linear_camera_a1bd6db6703d4a4f99fe84c146ff3b97e}
+
+
+\subsection{Member Function Documentation}
+\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}!get\+\_\+angular\+\_\+range@{get\+\_\+angular\+\_\+range}}
+\index{get\+\_\+angular\+\_\+range@{get\+\_\+angular\+\_\+range}!fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+\subsubsection[{\texorpdfstring{get\+\_\+angular\+\_\+range() const }{get_angular_range() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Linear\+Camera\+::get\+\_\+angular\+\_\+range (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_linear_camera_a94f5152d3ee7d3d6cfee102b4fec44bb}{}\label{classfastsim_1_1_linear_camera_a94f5152d3ee7d3d6cfee102b4fec44bb}
+\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}!pixels@{pixels}}
+\index{pixels@{pixels}!fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+\subsubsection[{\texorpdfstring{pixels() const }{pixels() const }}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<$int$>$\& fastsim\+::\+Linear\+Camera\+::pixels (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_linear_camera_af75a35f016bd4cae12b30d28c8e0fcd8}{}\label{classfastsim_1_1_linear_camera_af75a35f016bd4cae12b30d28c8e0fcd8}
+\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}!update@{update}}
+\index{update@{update}!fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+\subsubsection[{\texorpdfstring{update(const Posture \&pos, const std\+::shared\+\_\+ptr$<$ Map $>$ \&map)}{update(const Posture &pos, const std::shared_ptr< Map > &map)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Linear\+Camera\+::update (
+\begin{DoxyParamCaption}
+\item[{const {\bf Posture} \&}]{pos, }
+\item[{const std\+::shared\+\_\+ptr$<$ {\bf Map} $>$ \&}]{map}
+\end{DoxyParamCaption}
+)}\hypertarget{classfastsim_1_1_linear_camera_aecb7eb447e9b453642ea6684e69c528d}{}\label{classfastsim_1_1_linear_camera_aecb7eb447e9b453642ea6684e69c528d}
+
+
+\subsection{Member Data Documentation}
+\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}!\+\_\+angular\+\_\+range@{\+\_\+angular\+\_\+range}}
+\index{\+\_\+angular\+\_\+range@{\+\_\+angular\+\_\+range}!fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+\subsubsection[{\texorpdfstring{\+\_\+angular\+\_\+range}{_angular_range}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Linear\+Camera\+::\+\_\+angular\+\_\+range\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_linear_camera_aaeead77c6003ac991eb68ea899daebaa}{}\label{classfastsim_1_1_linear_camera_aaeead77c6003ac991eb68ea899daebaa}
+\index{fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}!\+\_\+pixels@{\+\_\+pixels}}
+\index{\+\_\+pixels@{\+\_\+pixels}!fastsim\+::\+Linear\+Camera@{fastsim\+::\+Linear\+Camera}}
+\subsubsection[{\texorpdfstring{\+\_\+pixels}{_pixels}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$int$>$ fastsim\+::\+Linear\+Camera\+::\+\_\+pixels\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_linear_camera_aa82ccbc534ad540de0928aefc5d1cf01}{}\label{classfastsim_1_1_linear_camera_aa82ccbc534ad540de0928aefc5d1cf01}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+external/pyfastsim/libfastsim/src/\hyperlink{linear__camera_8hpp}{linear\+\_\+camera.\+hpp}\item 
+external/pyfastsim/libfastsim/src/\hyperlink{linear__camera_8cpp}{linear\+\_\+camera.\+cpp}\end{DoxyCompactItemize}

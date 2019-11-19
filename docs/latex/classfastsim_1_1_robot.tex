@@ -1,0 +1,399 @@
+\hypertarget{classfastsim_1_1_robot}{}\section{fastsim\+:\+:Robot Class Reference}
+\label{classfastsim_1_1_robot}\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+
+
+{\ttfamily \#include $<$robot.\+hpp$>$}
+
+
+
+Collaboration diagram for fastsim\+:\+:Robot\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfastsim_1_1_robot__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structfastsim_1_1_robot_1_1_bounding_box}{Bounding\+Box}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classfastsim_1_1_robot_a86aa5cc648095704d1a925ebf17ed67d}{Robot} (float radius)
+\item 
+\hyperlink{classfastsim_1_1_robot_a6005063431a63ed6257a49245a6129f9}{Robot} (float radius, const \hyperlink{classfastsim_1_1_posture}{Posture} \&pos)
+\item 
+void \hyperlink{classfastsim_1_1_robot_a8f7d83b49391c427df939d44e842ca79}{reinit} ()
+\item 
+void \hyperlink{classfastsim_1_1_robot_a7be416fe089637594fd3f810a20ed42a}{move} (float v1, float v2, const std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \&m, bool sticky\+\_\+walls=true)
+\item 
+const \hyperlink{classfastsim_1_1_posture}{Posture} \& \hyperlink{classfastsim_1_1_robot_ae28a7d7dbbb1248086e634484e9ea184}{get\+\_\+pos} () const 
+\item 
+void \hyperlink{classfastsim_1_1_robot_a32f66a8d376565a1a6b41565f409aab4}{set\+\_\+pos} (const \hyperlink{classfastsim_1_1_posture}{Posture} \&pos)
+\item 
+float \hyperlink{classfastsim_1_1_robot_a13d799c21df39c79e03aa3d6406e3188}{get\+\_\+vx} () const 
+\item 
+float \hyperlink{classfastsim_1_1_robot_a2ba88c3bdec5ab399332e9f1ead10420}{get\+\_\+vy} () const 
+\item 
+float \hyperlink{classfastsim_1_1_robot_a4b4be51fb6b29b3deadd57579570a7bb}{get\+\_\+va} () const 
+\item 
+const \hyperlink{structfastsim_1_1_robot_1_1_bounding_box}{Bounding\+Box} \& \hyperlink{classfastsim_1_1_robot_a405fbb8a6c350659d4fc18dfed1bf674}{get\+\_\+bb} () const 
+\item 
+float \hyperlink{classfastsim_1_1_robot_ad9d99d7ab8cb32c3af2ec03eb025dc5c}{get\+\_\+radius} () const 
+\item 
+bool \hyperlink{classfastsim_1_1_robot_a64b3a51067d5f22947be2df03920448a}{get\+\_\+collision} () const 
+\item 
+bool \hyperlink{classfastsim_1_1_robot_a761ad491770318de8af76f87045636cd}{get\+\_\+left\+\_\+bumper} () const 
+\item 
+bool \hyperlink{classfastsim_1_1_robot_ae203ad2736bc4e5d08a2aba57260162c}{get\+\_\+right\+\_\+bumper} () const 
+\item 
+void \hyperlink{classfastsim_1_1_robot_a93935e30685df5ee1908a18359d4f930}{add\+\_\+laser} (const \hyperlink{classfastsim_1_1_laser}{Laser} \&l)
+\item 
+const std\+::vector$<$ \hyperlink{classfastsim_1_1_laser}{Laser} $>$ \& \hyperlink{classfastsim_1_1_robot_a51eecea5e6f06cbffee28f0e9dd8885e}{get\+\_\+lasers} () const 
+\item 
+void \hyperlink{classfastsim_1_1_robot_a86829438cca30f2aa5b1b25dc34df0f4}{add\+\_\+laser\+\_\+scanner} (const \hyperlink{classfastsim_1_1_laser_scanner}{Laser\+Scanner} \&l)
+\item 
+const std\+::vector$<$ \hyperlink{classfastsim_1_1_laser_scanner}{Laser\+Scanner} $>$ \& \hyperlink{classfastsim_1_1_robot_ae230665f6c3aad757b54eabbe3074151}{get\+\_\+laser\+\_\+scanners} () const 
+\item 
+void \hyperlink{classfastsim_1_1_robot_a6a1883d38470cbc0a79c7a5ba53b9ba7}{add\+\_\+radar} (const \hyperlink{classfastsim_1_1_radar}{Radar} \&r)
+\item 
+const std\+::vector$<$ \hyperlink{classfastsim_1_1_radar}{Radar} $>$ \& \hyperlink{classfastsim_1_1_robot_a71e40db8585914158a546969122cbb60}{get\+\_\+radars} () const 
+\item 
+void \hyperlink{classfastsim_1_1_robot_a6351f28c65abc9923829ea9e3b9d8253}{add\+\_\+light\+\_\+sensor} (const \hyperlink{classfastsim_1_1_light_sensor}{Light\+Sensor} \&l)
+\item 
+const std\+::vector$<$ \hyperlink{classfastsim_1_1_light_sensor}{Light\+Sensor} $>$ \& \hyperlink{classfastsim_1_1_robot_a048ccc075ab4854b30d62736bbaeedba}{get\+\_\+light\+\_\+sensors} () const 
+\item 
+void \hyperlink{classfastsim_1_1_robot_a15f4187030e934d5f2ab300604209eef}{set\+\_\+color} (unsigned int \hyperlink{classfastsim_1_1_robot_a00a3fdd9976553baedff150b00c055a6}{color})
+\item 
+unsigned int \hyperlink{classfastsim_1_1_robot_a00a3fdd9976553baedff150b00c055a6}{color} () const 
+\item 
+void \hyperlink{classfastsim_1_1_robot_a7d50eeef194787227f159f80ac74be51}{use\+\_\+camera} (const \hyperlink{classfastsim_1_1_linear_camera}{Linear\+Camera} \&c)
+\item 
+void \hyperlink{classfastsim_1_1_robot_ad9e472f1b38ca7d2df39143f401670ed}{use\+\_\+camera} ()
+\item 
+const \hyperlink{classfastsim_1_1_linear_camera}{Linear\+Camera} \& \hyperlink{classfastsim_1_1_robot_a447b3c5578f92c44b7d50553d2e1c28d}{get\+\_\+camera} () const 
+\item 
+bool \hyperlink{classfastsim_1_1_robot_ae818be55ce00d24b1bd45b12d2a834d2}{camera\+\_\+enabled} () const 
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classfastsim_1_1_robot_a96c60c51804db87d38ce66e4cb43cac4}{\+\_\+check\+\_\+collision} (const std\+::shared\+\_\+ptr$<$ \hyperlink{classfastsim_1_1_map}{Map} $>$ \&m)
+\item 
+void \hyperlink{classfastsim_1_1_robot_a4b5d102337a9df74d67c0f9d388e8a86}{\+\_\+update\+\_\+bb} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+float \hyperlink{classfastsim_1_1_robot_ac8e55bc8fdb6ecbce7830a412a4bf34e}{\+\_\+radius}
+\item 
+\hyperlink{classfastsim_1_1_posture}{Posture} \hyperlink{classfastsim_1_1_robot_aba7edc6f77474f77df5c6d1028bf9b16}{\+\_\+pos}
+\item 
+\hyperlink{structfastsim_1_1_robot_1_1_bounding_box}{Bounding\+Box} \hyperlink{classfastsim_1_1_robot_af36edc01e593407ab978a46ddf5ba826}{\+\_\+bb}
+\item 
+bool \hyperlink{classfastsim_1_1_robot_a9bdb045ad740d8790aa053ccc8324694}{\+\_\+left\+\_\+bumper}
+\item 
+bool \hyperlink{classfastsim_1_1_robot_a9def1271bb8f65998680ac0059263a2e}{\+\_\+right\+\_\+bumper}
+\item 
+std\+::vector$<$ \hyperlink{classfastsim_1_1_laser}{Laser} $>$ \hyperlink{classfastsim_1_1_robot_a4ace6b4e6c10e60d823aba7b2524649f}{\+\_\+lasers}
+\item 
+std\+::vector$<$ \hyperlink{classfastsim_1_1_radar}{Radar} $>$ \hyperlink{classfastsim_1_1_robot_a4f1ad7e0b518104cb6d12214ddc03730}{\+\_\+radars}
+\item 
+std\+::vector$<$ \hyperlink{classfastsim_1_1_light_sensor}{Light\+Sensor} $>$ \hyperlink{classfastsim_1_1_robot_a0998428cce1ba4cb37ae3c52b872fd92}{\+\_\+light\+\_\+sensors}
+\item 
+std\+::vector$<$ \hyperlink{classfastsim_1_1_laser_scanner}{Laser\+Scanner} $>$ \hyperlink{classfastsim_1_1_robot_a939bbd34745152e9e1d3afe2c9120f4d}{\+\_\+laser\+\_\+scanners}
+\item 
+\hyperlink{classfastsim_1_1_linear_camera}{Linear\+Camera} \hyperlink{classfastsim_1_1_robot_afb4408001af6a99ac11ff0ae6402582c}{\+\_\+camera}
+\item 
+bool \hyperlink{classfastsim_1_1_robot_a8c55febf6b863bd27258800d97ffb1ae}{\+\_\+use\+\_\+camera}
+\item 
+bool \hyperlink{classfastsim_1_1_robot_a3f0712b649c89ed5f3b028d40c555501}{\+\_\+collision}
+\item 
+unsigned int \hyperlink{classfastsim_1_1_robot_a7132480c7864f6b49bbe83458edfa270}{\+\_\+color}
+\item 
+float \hyperlink{classfastsim_1_1_robot_a91147570b2cf4518fdcffa9f80becd46}{\+\_\+vx}
+\item 
+float \hyperlink{classfastsim_1_1_robot_acd1281de279846f404508c409156b81d}{\+\_\+vy}
+\item 
+float \hyperlink{classfastsim_1_1_robot_abc9af3f2d17c288870d474e7a57dd953}{\+\_\+va}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!Robot@{Robot}}
+\index{Robot@{Robot}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{Robot(float radius)}{Robot(float radius)}}]{\setlength{\rightskip}{0pt plus 5cm}fastsim\+::\+Robot\+::\+Robot (
+\begin{DoxyParamCaption}
+\item[{float}]{radius}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a86aa5cc648095704d1a925ebf17ed67d}{}\label{classfastsim_1_1_robot_a86aa5cc648095704d1a925ebf17ed67d}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!Robot@{Robot}}
+\index{Robot@{Robot}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{Robot(float radius, const Posture \&pos)}{Robot(float radius, const Posture &pos)}}]{\setlength{\rightskip}{0pt plus 5cm}fastsim\+::\+Robot\+::\+Robot (
+\begin{DoxyParamCaption}
+\item[{float}]{radius, }
+\item[{const {\bf Posture} \&}]{pos}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a6005063431a63ed6257a49245a6129f9}{}\label{classfastsim_1_1_robot_a6005063431a63ed6257a49245a6129f9}
+
+
+\subsection{Member Function Documentation}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+check\+\_\+collision@{\+\_\+check\+\_\+collision}}
+\index{\+\_\+check\+\_\+collision@{\+\_\+check\+\_\+collision}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+check\+\_\+collision(const std\+::shared\+\_\+ptr$<$ Map $>$ \&m)}{_check_collision(const std::shared_ptr< Map > &m)}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::\+\_\+check\+\_\+collision (
+\begin{DoxyParamCaption}
+\item[{const std\+::shared\+\_\+ptr$<$ {\bf Map} $>$ \&}]{m}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a96c60c51804db87d38ce66e4cb43cac4}{}\label{classfastsim_1_1_robot_a96c60c51804db87d38ce66e4cb43cac4}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+update\+\_\+bb@{\+\_\+update\+\_\+bb}}
+\index{\+\_\+update\+\_\+bb@{\+\_\+update\+\_\+bb}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+update\+\_\+bb()}{_update_bb()}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::\+\_\+update\+\_\+bb (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a4b5d102337a9df74d67c0f9d388e8a86}{}\label{classfastsim_1_1_robot_a4b5d102337a9df74d67c0f9d388e8a86}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!add\+\_\+laser@{add\+\_\+laser}}
+\index{add\+\_\+laser@{add\+\_\+laser}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{add\+\_\+laser(const Laser \&l)}{add_laser(const Laser &l)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::add\+\_\+laser (
+\begin{DoxyParamCaption}
+\item[{const {\bf Laser} \&}]{l}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a93935e30685df5ee1908a18359d4f930}{}\label{classfastsim_1_1_robot_a93935e30685df5ee1908a18359d4f930}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!add\+\_\+laser\+\_\+scanner@{add\+\_\+laser\+\_\+scanner}}
+\index{add\+\_\+laser\+\_\+scanner@{add\+\_\+laser\+\_\+scanner}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{add\+\_\+laser\+\_\+scanner(const Laser\+Scanner \&l)}{add_laser_scanner(const LaserScanner &l)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::add\+\_\+laser\+\_\+scanner (
+\begin{DoxyParamCaption}
+\item[{const {\bf Laser\+Scanner} \&}]{l}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a86829438cca30f2aa5b1b25dc34df0f4}{}\label{classfastsim_1_1_robot_a86829438cca30f2aa5b1b25dc34df0f4}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!add\+\_\+light\+\_\+sensor@{add\+\_\+light\+\_\+sensor}}
+\index{add\+\_\+light\+\_\+sensor@{add\+\_\+light\+\_\+sensor}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{add\+\_\+light\+\_\+sensor(const Light\+Sensor \&l)}{add_light_sensor(const LightSensor &l)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::add\+\_\+light\+\_\+sensor (
+\begin{DoxyParamCaption}
+\item[{const {\bf Light\+Sensor} \&}]{l}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a6351f28c65abc9923829ea9e3b9d8253}{}\label{classfastsim_1_1_robot_a6351f28c65abc9923829ea9e3b9d8253}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!add\+\_\+radar@{add\+\_\+radar}}
+\index{add\+\_\+radar@{add\+\_\+radar}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{add\+\_\+radar(const Radar \&r)}{add_radar(const Radar &r)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::add\+\_\+radar (
+\begin{DoxyParamCaption}
+\item[{const {\bf Radar} \&}]{r}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a6a1883d38470cbc0a79c7a5ba53b9ba7}{}\label{classfastsim_1_1_robot_a6a1883d38470cbc0a79c7a5ba53b9ba7}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!camera\+\_\+enabled@{camera\+\_\+enabled}}
+\index{camera\+\_\+enabled@{camera\+\_\+enabled}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{camera\+\_\+enabled() const }{camera_enabled() const }}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::camera\+\_\+enabled (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_ae818be55ce00d24b1bd45b12d2a834d2}{}\label{classfastsim_1_1_robot_ae818be55ce00d24b1bd45b12d2a834d2}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!color@{color}}
+\index{color@{color}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{color() const }{color() const }}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int fastsim\+::\+Robot\+::color (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a00a3fdd9976553baedff150b00c055a6}{}\label{classfastsim_1_1_robot_a00a3fdd9976553baedff150b00c055a6}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+bb@{get\+\_\+bb}}
+\index{get\+\_\+bb@{get\+\_\+bb}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+bb() const }{get_bb() const }}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Bounding\+Box}\& fastsim\+::\+Robot\+::get\+\_\+bb (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a405fbb8a6c350659d4fc18dfed1bf674}{}\label{classfastsim_1_1_robot_a405fbb8a6c350659d4fc18dfed1bf674}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+camera@{get\+\_\+camera}}
+\index{get\+\_\+camera@{get\+\_\+camera}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+camera() const }{get_camera() const }}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Linear\+Camera}\& fastsim\+::\+Robot\+::get\+\_\+camera (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a447b3c5578f92c44b7d50553d2e1c28d}{}\label{classfastsim_1_1_robot_a447b3c5578f92c44b7d50553d2e1c28d}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+collision@{get\+\_\+collision}}
+\index{get\+\_\+collision@{get\+\_\+collision}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+collision() const }{get_collision() const }}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::get\+\_\+collision (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a64b3a51067d5f22947be2df03920448a}{}\label{classfastsim_1_1_robot_a64b3a51067d5f22947be2df03920448a}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+laser\+\_\+scanners@{get\+\_\+laser\+\_\+scanners}}
+\index{get\+\_\+laser\+\_\+scanners@{get\+\_\+laser\+\_\+scanners}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+laser\+\_\+scanners() const }{get_laser_scanners() const }}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<${\bf Laser\+Scanner}$>$\& fastsim\+::\+Robot\+::get\+\_\+laser\+\_\+scanners (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_ae230665f6c3aad757b54eabbe3074151}{}\label{classfastsim_1_1_robot_ae230665f6c3aad757b54eabbe3074151}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+lasers@{get\+\_\+lasers}}
+\index{get\+\_\+lasers@{get\+\_\+lasers}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+lasers() const }{get_lasers() const }}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<${\bf Laser}$>$\& fastsim\+::\+Robot\+::get\+\_\+lasers (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a51eecea5e6f06cbffee28f0e9dd8885e}{}\label{classfastsim_1_1_robot_a51eecea5e6f06cbffee28f0e9dd8885e}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+left\+\_\+bumper@{get\+\_\+left\+\_\+bumper}}
+\index{get\+\_\+left\+\_\+bumper@{get\+\_\+left\+\_\+bumper}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+left\+\_\+bumper() const }{get_left_bumper() const }}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::get\+\_\+left\+\_\+bumper (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a761ad491770318de8af76f87045636cd}{}\label{classfastsim_1_1_robot_a761ad491770318de8af76f87045636cd}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+light\+\_\+sensors@{get\+\_\+light\+\_\+sensors}}
+\index{get\+\_\+light\+\_\+sensors@{get\+\_\+light\+\_\+sensors}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+light\+\_\+sensors() const }{get_light_sensors() const }}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<${\bf Light\+Sensor}$>$\& fastsim\+::\+Robot\+::get\+\_\+light\+\_\+sensors (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a048ccc075ab4854b30d62736bbaeedba}{}\label{classfastsim_1_1_robot_a048ccc075ab4854b30d62736bbaeedba}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+pos@{get\+\_\+pos}}
+\index{get\+\_\+pos@{get\+\_\+pos}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+pos() const }{get_pos() const }}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Posture}\& fastsim\+::\+Robot\+::get\+\_\+pos (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_ae28a7d7dbbb1248086e634484e9ea184}{}\label{classfastsim_1_1_robot_ae28a7d7dbbb1248086e634484e9ea184}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+radars@{get\+\_\+radars}}
+\index{get\+\_\+radars@{get\+\_\+radars}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+radars() const }{get_radars() const }}]{\setlength{\rightskip}{0pt plus 5cm}const std\+::vector$<${\bf Radar}$>$\& fastsim\+::\+Robot\+::get\+\_\+radars (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a71e40db8585914158a546969122cbb60}{}\label{classfastsim_1_1_robot_a71e40db8585914158a546969122cbb60}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+radius@{get\+\_\+radius}}
+\index{get\+\_\+radius@{get\+\_\+radius}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+radius() const }{get_radius() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::get\+\_\+radius (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_ad9d99d7ab8cb32c3af2ec03eb025dc5c}{}\label{classfastsim_1_1_robot_ad9d99d7ab8cb32c3af2ec03eb025dc5c}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+right\+\_\+bumper@{get\+\_\+right\+\_\+bumper}}
+\index{get\+\_\+right\+\_\+bumper@{get\+\_\+right\+\_\+bumper}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+right\+\_\+bumper() const }{get_right_bumper() const }}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::get\+\_\+right\+\_\+bumper (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_ae203ad2736bc4e5d08a2aba57260162c}{}\label{classfastsim_1_1_robot_ae203ad2736bc4e5d08a2aba57260162c}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+va@{get\+\_\+va}}
+\index{get\+\_\+va@{get\+\_\+va}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+va() const }{get_va() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::get\+\_\+va (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a4b4be51fb6b29b3deadd57579570a7bb}{}\label{classfastsim_1_1_robot_a4b4be51fb6b29b3deadd57579570a7bb}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+vx@{get\+\_\+vx}}
+\index{get\+\_\+vx@{get\+\_\+vx}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+vx() const }{get_vx() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::get\+\_\+vx (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a13d799c21df39c79e03aa3d6406e3188}{}\label{classfastsim_1_1_robot_a13d799c21df39c79e03aa3d6406e3188}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!get\+\_\+vy@{get\+\_\+vy}}
+\index{get\+\_\+vy@{get\+\_\+vy}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{get\+\_\+vy() const }{get_vy() const }}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::get\+\_\+vy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a2ba88c3bdec5ab399332e9f1ead10420}{}\label{classfastsim_1_1_robot_a2ba88c3bdec5ab399332e9f1ead10420}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!move@{move}}
+\index{move@{move}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{move(float v1, float v2, const std\+::shared\+\_\+ptr$<$ Map $>$ \&m, bool sticky\+\_\+walls=true)}{move(float v1, float v2, const std::shared_ptr< Map > &m, bool sticky_walls=true)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::move (
+\begin{DoxyParamCaption}
+\item[{float}]{v1, }
+\item[{float}]{v2, }
+\item[{const std\+::shared\+\_\+ptr$<$ {\bf Map} $>$ \&}]{m, }
+\item[{bool}]{sticky\+\_\+walls = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}\hypertarget{classfastsim_1_1_robot_a7be416fe089637594fd3f810a20ed42a}{}\label{classfastsim_1_1_robot_a7be416fe089637594fd3f810a20ed42a}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!reinit@{reinit}}
+\index{reinit@{reinit}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{reinit()}{reinit()}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::reinit (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a8f7d83b49391c427df939d44e842ca79}{}\label{classfastsim_1_1_robot_a8f7d83b49391c427df939d44e842ca79}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!set\+\_\+color@{set\+\_\+color}}
+\index{set\+\_\+color@{set\+\_\+color}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{set\+\_\+color(unsigned int color)}{set_color(unsigned int color)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::set\+\_\+color (
+\begin{DoxyParamCaption}
+\item[{unsigned int}]{color}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a15f4187030e934d5f2ab300604209eef}{}\label{classfastsim_1_1_robot_a15f4187030e934d5f2ab300604209eef}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!set\+\_\+pos@{set\+\_\+pos}}
+\index{set\+\_\+pos@{set\+\_\+pos}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{set\+\_\+pos(const Posture \&pos)}{set_pos(const Posture &pos)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::set\+\_\+pos (
+\begin{DoxyParamCaption}
+\item[{const {\bf Posture} \&}]{pos}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a32f66a8d376565a1a6b41565f409aab4}{}\label{classfastsim_1_1_robot_a32f66a8d376565a1a6b41565f409aab4}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!use\+\_\+camera@{use\+\_\+camera}}
+\index{use\+\_\+camera@{use\+\_\+camera}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{use\+\_\+camera(const Linear\+Camera \&c)}{use_camera(const LinearCamera &c)}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::use\+\_\+camera (
+\begin{DoxyParamCaption}
+\item[{const {\bf Linear\+Camera} \&}]{c}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_a7d50eeef194787227f159f80ac74be51}{}\label{classfastsim_1_1_robot_a7d50eeef194787227f159f80ac74be51}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!use\+\_\+camera@{use\+\_\+camera}}
+\index{use\+\_\+camera@{use\+\_\+camera}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{use\+\_\+camera()}{use_camera()}}]{\setlength{\rightskip}{0pt plus 5cm}void fastsim\+::\+Robot\+::use\+\_\+camera (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classfastsim_1_1_robot_ad9e472f1b38ca7d2df39143f401670ed}{}\label{classfastsim_1_1_robot_ad9e472f1b38ca7d2df39143f401670ed}
+
+
+\subsection{Member Data Documentation}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+bb@{\+\_\+bb}}
+\index{\+\_\+bb@{\+\_\+bb}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+bb}{_bb}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Bounding\+Box} fastsim\+::\+Robot\+::\+\_\+bb\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_af36edc01e593407ab978a46ddf5ba826}{}\label{classfastsim_1_1_robot_af36edc01e593407ab978a46ddf5ba826}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+camera@{\+\_\+camera}}
+\index{\+\_\+camera@{\+\_\+camera}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+camera}{_camera}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Linear\+Camera} fastsim\+::\+Robot\+::\+\_\+camera\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_afb4408001af6a99ac11ff0ae6402582c}{}\label{classfastsim_1_1_robot_afb4408001af6a99ac11ff0ae6402582c}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+collision@{\+\_\+collision}}
+\index{\+\_\+collision@{\+\_\+collision}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+collision}{_collision}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::\+\_\+collision\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a3f0712b649c89ed5f3b028d40c555501}{}\label{classfastsim_1_1_robot_a3f0712b649c89ed5f3b028d40c555501}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+color@{\+\_\+color}}
+\index{\+\_\+color@{\+\_\+color}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+color}{_color}}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int fastsim\+::\+Robot\+::\+\_\+color\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a7132480c7864f6b49bbe83458edfa270}{}\label{classfastsim_1_1_robot_a7132480c7864f6b49bbe83458edfa270}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+laser\+\_\+scanners@{\+\_\+laser\+\_\+scanners}}
+\index{\+\_\+laser\+\_\+scanners@{\+\_\+laser\+\_\+scanners}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+laser\+\_\+scanners}{_laser_scanners}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf Laser\+Scanner}$>$ fastsim\+::\+Robot\+::\+\_\+laser\+\_\+scanners\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a939bbd34745152e9e1d3afe2c9120f4d}{}\label{classfastsim_1_1_robot_a939bbd34745152e9e1d3afe2c9120f4d}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+lasers@{\+\_\+lasers}}
+\index{\+\_\+lasers@{\+\_\+lasers}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+lasers}{_lasers}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf Laser}$>$ fastsim\+::\+Robot\+::\+\_\+lasers\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a4ace6b4e6c10e60d823aba7b2524649f}{}\label{classfastsim_1_1_robot_a4ace6b4e6c10e60d823aba7b2524649f}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+left\+\_\+bumper@{\+\_\+left\+\_\+bumper}}
+\index{\+\_\+left\+\_\+bumper@{\+\_\+left\+\_\+bumper}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+left\+\_\+bumper}{_left_bumper}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::\+\_\+left\+\_\+bumper\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a9bdb045ad740d8790aa053ccc8324694}{}\label{classfastsim_1_1_robot_a9bdb045ad740d8790aa053ccc8324694}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+light\+\_\+sensors@{\+\_\+light\+\_\+sensors}}
+\index{\+\_\+light\+\_\+sensors@{\+\_\+light\+\_\+sensors}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+light\+\_\+sensors}{_light_sensors}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf Light\+Sensor}$>$ fastsim\+::\+Robot\+::\+\_\+light\+\_\+sensors\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a0998428cce1ba4cb37ae3c52b872fd92}{}\label{classfastsim_1_1_robot_a0998428cce1ba4cb37ae3c52b872fd92}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+pos@{\+\_\+pos}}
+\index{\+\_\+pos@{\+\_\+pos}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+pos}{_pos}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Posture} fastsim\+::\+Robot\+::\+\_\+pos\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_aba7edc6f77474f77df5c6d1028bf9b16}{}\label{classfastsim_1_1_robot_aba7edc6f77474f77df5c6d1028bf9b16}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+radars@{\+\_\+radars}}
+\index{\+\_\+radars@{\+\_\+radars}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+radars}{_radars}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf Radar}$>$ fastsim\+::\+Robot\+::\+\_\+radars\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a4f1ad7e0b518104cb6d12214ddc03730}{}\label{classfastsim_1_1_robot_a4f1ad7e0b518104cb6d12214ddc03730}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+radius@{\+\_\+radius}}
+\index{\+\_\+radius@{\+\_\+radius}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+radius}{_radius}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::\+\_\+radius\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_ac8e55bc8fdb6ecbce7830a412a4bf34e}{}\label{classfastsim_1_1_robot_ac8e55bc8fdb6ecbce7830a412a4bf34e}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+right\+\_\+bumper@{\+\_\+right\+\_\+bumper}}
+\index{\+\_\+right\+\_\+bumper@{\+\_\+right\+\_\+bumper}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+right\+\_\+bumper}{_right_bumper}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::\+\_\+right\+\_\+bumper\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a9def1271bb8f65998680ac0059263a2e}{}\label{classfastsim_1_1_robot_a9def1271bb8f65998680ac0059263a2e}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+use\+\_\+camera@{\+\_\+use\+\_\+camera}}
+\index{\+\_\+use\+\_\+camera@{\+\_\+use\+\_\+camera}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+use\+\_\+camera}{_use_camera}}]{\setlength{\rightskip}{0pt plus 5cm}bool fastsim\+::\+Robot\+::\+\_\+use\+\_\+camera\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a8c55febf6b863bd27258800d97ffb1ae}{}\label{classfastsim_1_1_robot_a8c55febf6b863bd27258800d97ffb1ae}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+va@{\+\_\+va}}
+\index{\+\_\+va@{\+\_\+va}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+va}{_va}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::\+\_\+va\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_abc9af3f2d17c288870d474e7a57dd953}{}\label{classfastsim_1_1_robot_abc9af3f2d17c288870d474e7a57dd953}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+vx@{\+\_\+vx}}
+\index{\+\_\+vx@{\+\_\+vx}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+vx}{_vx}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::\+\_\+vx\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_a91147570b2cf4518fdcffa9f80becd46}{}\label{classfastsim_1_1_robot_a91147570b2cf4518fdcffa9f80becd46}
+\index{fastsim\+::\+Robot@{fastsim\+::\+Robot}!\+\_\+vy@{\+\_\+vy}}
+\index{\+\_\+vy@{\+\_\+vy}!fastsim\+::\+Robot@{fastsim\+::\+Robot}}
+\subsubsection[{\texorpdfstring{\+\_\+vy}{_vy}}]{\setlength{\rightskip}{0pt plus 5cm}float fastsim\+::\+Robot\+::\+\_\+vy\hspace{0.3cm}{\ttfamily [protected]}}\hypertarget{classfastsim_1_1_robot_acd1281de279846f404508c409156b81d}{}\label{classfastsim_1_1_robot_acd1281de279846f404508c409156b81d}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+external/pyfastsim/libfastsim/src/\hyperlink{robot_8hpp}{robot.\+hpp}\item 
+external/pyfastsim/libfastsim/src/\hyperlink{robot_8cpp}{robot.\+cpp}\end{DoxyCompactItemize}

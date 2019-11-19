@@ -1,0 +1,142 @@
+\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e}{}\section{taxons.\+core.\+metrics.\+ae.\+B\+V\+AE Class Reference}
+\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e}\index{taxons.\+core.\+metrics.\+ae.\+B\+V\+AE@{taxons.\+core.\+metrics.\+ae.\+B\+V\+AE}}
+
+
+Inheritance diagram for taxons.\+core.\+metrics.\+ae.\+B\+V\+AE\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for taxons.\+core.\+metrics.\+ae.\+B\+V\+AE\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a4d51e23a0e6d7c5bec993a72da579102}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_base_a_e_a0918ab6177121c975f5477529c228968}{device}=None, \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_base_a_e_a60c6445fef7c1ca698e195f877bfbba5}{learning\+\_\+rate}=0.\+001, \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_base_a_e_a04b605a2cfadf2715f833bce1260f77c}{lr\+\_\+scale}=None, kwargs)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_ab5a3f2868a56a149c9408e76f05f0bd6}{reparametrize} (self, mu, logvar)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_afa7d811264780fd66903b562eee6dae1}{forward} (self, x)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a123bca1318a2d98864f216bbe59fa937}{kl\+\_\+divergence} (self, mu, logvar)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a2041b1ff428ecd22fd43c7dc2b2496fe}{training\+\_\+step} (self, x)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a96e637c04b2836c80c082c0b5cea6bc7}{beta}
+\item 
+\hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a4466c434a224f88d518c194bcdb87a3a}{encoder}
+\item 
+\hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_afab0746bbe6ff3bac9e578e867c5f8d5}{decoder}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}Beta-VAE implementation taken from https://github.com/1Konny/Beta-VAE/blob/master/model.py
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+(self, device=\+None, learning\+\_\+rate=0.\+001, lr\+\_\+scale=\+None, kwargs)}{__init__(self, device=None, learning_rate=0.001, lr_scale=None, kwargs)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{device = {\ttfamily None}, }
+\item[{}]{learning\+\_\+rate = {\ttfamily 0.001}, }
+\item[{}]{lr\+\_\+scale = {\ttfamily None}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a4d51e23a0e6d7c5bec993a72da579102}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a4d51e23a0e6d7c5bec993a72da579102}
+\begin{DoxyVerb}Constructor
+:param device: Device on which run the computation
+:param learning_rate:
+:param lr_scale: Learning rate scale for the lr scheduler
+:param kwargs:
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!forward@{forward}}
+\index{forward@{forward}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{forward(self, x)}{forward(self, x)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+forward (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_afa7d811264780fd66903b562eee6dae1}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_afa7d811264780fd66903b562eee6dae1}
+\begin{DoxyVerb}Forward pass of the network
+:param x: Input
+:return: If training: Rec_error, features, reconstructed image, mu, logvar
+     If not training: rec error, features, reconstructed image
+\end{DoxyVerb}
+ \index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!kl\+\_\+divergence@{kl\+\_\+divergence}}
+\index{kl\+\_\+divergence@{kl\+\_\+divergence}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{kl\+\_\+divergence(self, mu, logvar)}{kl_divergence(self, mu, logvar)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+kl\+\_\+divergence (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mu, }
+\item[{}]{logvar}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a123bca1318a2d98864f216bbe59fa937}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a123bca1318a2d98864f216bbe59fa937}
+\begin{DoxyVerb}Calculate KL divergence
+:param mu:
+:param logvar:
+:return: total kld, dimension wise kld, mean kld
+\end{DoxyVerb}
+ \index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!reparametrize@{reparametrize}}
+\index{reparametrize@{reparametrize}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{reparametrize(self, mu, logvar)}{reparametrize(self, mu, logvar)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+reparametrize (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mu, }
+\item[{}]{logvar}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_ab5a3f2868a56a149c9408e76f05f0bd6}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_ab5a3f2868a56a149c9408e76f05f0bd6}
+\begin{DoxyVerb}Reparametrize the mu and logvar to obtain the features
+:param mu:
+:param logvar:
+:return: mu + std * eps
+\end{DoxyVerb}
+ \index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!training\+\_\+step@{training\+\_\+step}}
+\index{training\+\_\+step@{training\+\_\+step}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{training\+\_\+step(self, x)}{training_step(self, x)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+training\+\_\+step (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a2041b1ff428ecd22fd43c7dc2b2496fe}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a2041b1ff428ecd22fd43c7dc2b2496fe}
+\begin{DoxyVerb}Performs training step
+:param x: Input
+:return: loss, features, reconstructed image
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!beta@{beta}}
+\index{beta@{beta}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{beta}{beta}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+beta}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a96e637c04b2836c80c082c0b5cea6bc7}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a96e637c04b2836c80c082c0b5cea6bc7}
+\index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!decoder@{decoder}}
+\index{decoder@{decoder}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{decoder}{decoder}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+decoder}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_afab0746bbe6ff3bac9e578e867c5f8d5}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_afab0746bbe6ff3bac9e578e867c5f8d5}
+\index{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}!encoder@{encoder}}
+\index{encoder@{encoder}!taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE@{taxons\+::core\+::metrics\+::ae\+::\+B\+V\+AE}}
+\subsubsection[{\texorpdfstring{encoder}{encoder}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+metrics.\+ae.\+B\+V\+A\+E.\+encoder}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a4466c434a224f88d518c194bcdb87a3a}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_b_v_a_e_a4466c434a224f88d518c194bcdb87a3a}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/metrics/\hyperlink{ae_8py}{ae.\+py}\end{DoxyCompactItemize}

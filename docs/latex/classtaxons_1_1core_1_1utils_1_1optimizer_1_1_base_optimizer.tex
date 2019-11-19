@@ -1,0 +1,148 @@
+\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer}{}\section{taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer Class Reference}
+\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer}\index{taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer@{taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer}}
+
+
+Inheritance diagram for taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af572aca4ea4e40ded6fb4f3c58900d12}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a213838c61093bc7961599d3136c82684}{pop}, \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_ab51af6ad9db1fb2bacc2cae83af7ebc3}{mutation\+\_\+rate}=.\+9, \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a7e90d0bae2521b4b6294ecf4eeda08f6}{archive}=None, \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a2c9d6c07d6bd3d950a772d6c8c95d598}{metric\+\_\+update\+\_\+interval}=30)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a484eac95056cc6e43c928f13c963fcc6}{measure\+\_\+novelty} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_abb720648f9a32923ad034b97402abb3e}{update\+\_\+archive\+\_\+surprise} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af0db4b11b21126b81619eee2e9a15ec2}{update\+\_\+archive\+\_\+novelty} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a1e737beddb5a4e32ae7997cf4e009578}{mutate\+\_\+pop} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_aeb8d423e1015ea6e4bbdce3858be725a}{step} (self, kwargs)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a213838c61093bc7961599d3136c82684}{pop}
+\item 
+\hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a7e90d0bae2521b4b6294ecf4eeda08f6}{archive}
+\item 
+\hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_ab51af6ad9db1fb2bacc2cae83af7ebc3}{mutation\+\_\+rate}
+\item 
+\hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af7d28357ce4633edc303e4880b569edb}{step\+\_\+count}
+\item 
+\hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a0e0d70c92c506ce72ccd3d99d1fd789b}{min\+\_\+surprise}
+\item 
+\hyperlink{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a2c9d6c07d6bd3d950a772d6c8c95d598}{metric\+\_\+update\+\_\+interval}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}Bsse optimizer class
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+(self, pop, mutation\+\_\+rate=.\+9, archive=\+None, metric\+\_\+update\+\_\+interval=30)}{__init__(self, pop, mutation_rate=.9, archive=None, metric_update_interval=30)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{pop, }
+\item[{}]{mutation\+\_\+rate = {\ttfamily .9}, }
+\item[{}]{archive = {\ttfamily None}, }
+\item[{}]{metric\+\_\+update\+\_\+interval = {\ttfamily 30}}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af572aca4ea4e40ded6fb4f3c58900d12}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af572aca4ea4e40ded6fb4f3c58900d12}
+
+
+\subsection{Member Function Documentation}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!measure\+\_\+novelty@{measure\+\_\+novelty}}
+\index{measure\+\_\+novelty@{measure\+\_\+novelty}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{measure\+\_\+novelty(self)}{measure_novelty(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+measure\+\_\+novelty (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a484eac95056cc6e43c928f13c963fcc6}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a484eac95056cc6e43c928f13c963fcc6}
+\begin{DoxyVerb}This function calculates the novelty of each agent in the population using the features descriptor.
+The novelty is calculated wrt to the population and the archive.
+:return:
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!mutate\+\_\+pop@{mutate\+\_\+pop}}
+\index{mutate\+\_\+pop@{mutate\+\_\+pop}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{mutate\+\_\+pop(self)}{mutate_pop(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+mutate\+\_\+pop (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a1e737beddb5a4e32ae7997cf4e009578}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a1e737beddb5a4e32ae7997cf4e009578}
+\begin{DoxyVerb}This function mutates the population
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!step@{step}}
+\index{step@{step}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{step(self, kwargs)}{step(self, kwargs)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+step (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_aeb8d423e1015ea6e4bbdce3858be725a}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_aeb8d423e1015ea6e4bbdce3858be725a}
+\begin{DoxyVerb}Optimizer step. Needs to be implemented by inheriting classes
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!update\+\_\+archive\+\_\+novelty@{update\+\_\+archive\+\_\+novelty}}
+\index{update\+\_\+archive\+\_\+novelty@{update\+\_\+archive\+\_\+novelty}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{update\+\_\+archive\+\_\+novelty(self)}{update_archive_novelty(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+update\+\_\+archive\+\_\+novelty (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af0db4b11b21126b81619eee2e9a15ec2}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af0db4b11b21126b81619eee2e9a15ec2}
+\begin{DoxyVerb}This function updates the archive adn the pop according to the novelty metric.
+\end{DoxyVerb}
+ \index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!update\+\_\+archive\+\_\+surprise@{update\+\_\+archive\+\_\+surprise}}
+\index{update\+\_\+archive\+\_\+surprise@{update\+\_\+archive\+\_\+surprise}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{update\+\_\+archive\+\_\+surprise(self)}{update_archive_surprise(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+update\+\_\+archive\+\_\+surprise (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_abb720648f9a32923ad034b97402abb3e}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_abb720648f9a32923ad034b97402abb3e}
+\begin{DoxyVerb}This function updates the archive and the pop according to the surprise metric.
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!archive@{archive}}
+\index{archive@{archive}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{archive}{archive}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+archive}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a7e90d0bae2521b4b6294ecf4eeda08f6}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a7e90d0bae2521b4b6294ecf4eeda08f6}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!metric\+\_\+update\+\_\+interval@{metric\+\_\+update\+\_\+interval}}
+\index{metric\+\_\+update\+\_\+interval@{metric\+\_\+update\+\_\+interval}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{metric\+\_\+update\+\_\+interval}{metric_update_interval}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+metric\+\_\+update\+\_\+interval}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a2c9d6c07d6bd3d950a772d6c8c95d598}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a2c9d6c07d6bd3d950a772d6c8c95d598}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!min\+\_\+surprise@{min\+\_\+surprise}}
+\index{min\+\_\+surprise@{min\+\_\+surprise}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{min\+\_\+surprise}{min_surprise}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+min\+\_\+surprise}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a0e0d70c92c506ce72ccd3d99d1fd789b}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a0e0d70c92c506ce72ccd3d99d1fd789b}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!mutation\+\_\+rate@{mutation\+\_\+rate}}
+\index{mutation\+\_\+rate@{mutation\+\_\+rate}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{mutation\+\_\+rate}{mutation_rate}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+mutation\+\_\+rate}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_ab51af6ad9db1fb2bacc2cae83af7ebc3}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_ab51af6ad9db1fb2bacc2cae83af7ebc3}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!pop@{pop}}
+\index{pop@{pop}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{pop}{pop}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+pop}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a213838c61093bc7961599d3136c82684}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_a213838c61093bc7961599d3136c82684}
+\index{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}!step\+\_\+count@{step\+\_\+count}}
+\index{step\+\_\+count@{step\+\_\+count}!taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer@{taxons\+::core\+::utils\+::optimizer\+::\+Base\+Optimizer}}
+\subsubsection[{\texorpdfstring{step\+\_\+count}{step_count}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+utils.\+optimizer.\+Base\+Optimizer.\+step\+\_\+count}\hypertarget{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af7d28357ce4633edc303e4880b569edb}{}\label{classtaxons_1_1core_1_1utils_1_1optimizer_1_1_base_optimizer_af7d28357ce4633edc303e4880b569edb}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/utils/\hyperlink{optimizer_8py}{optimizer.\+py}\end{DoxyCompactItemize}

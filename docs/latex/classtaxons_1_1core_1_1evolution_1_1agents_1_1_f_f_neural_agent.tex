@@ -1,0 +1,138 @@
+\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent}{}\section{taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent Class Reference}
+\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent}\index{taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent@{taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent}}
+
+
+Inheritance diagram for taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ad048864ff91e519ee4127ce011fdbdb9}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, shapes, mutation\+\_\+distr=None)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a0ed106916e4a7f92f117dd79a3c05faf}{evaluate} (self, t, obs)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ac5844281ca9599579b360d5879c18843}{sigmoid} (self, x)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a34bb5dfaf08d1576a0962eab55437dad}{mutate} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a573752f1ce310965576f8910fb9d6e73}{load\+\_\+genome} (self, params, agent\+\_\+name)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a80c9405db212739cbd1d87a22937fe32}{input\+\_\+shape}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_acb240f0be94cdcf367a52ad574ef73ba}{output\+\_\+shape}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ac411d0381853dcd7c5cab6e96c5118f0}{use\+\_\+bias}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a10abdcb12eb671dcf75eb57b9583059e}{action\+\_\+len}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This agent implements a small feedforward neural network agent.
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+(self, shapes, mutation\+\_\+distr=\+None)}{__init__(self, shapes, mutation_distr=None)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{shapes, }
+\item[{}]{mutation\+\_\+distr = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ad048864ff91e519ee4127ce011fdbdb9}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ad048864ff91e519ee4127ce011fdbdb9}
+\begin{DoxyVerb}Constructor
+:param mutation_distr: distribution used for mutation
+:param shapes: Dict containing
+      input_shape: shape of network input
+      output_shape: shape of network output
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!evaluate@{evaluate}}
+\index{evaluate@{evaluate}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{evaluate(self, t, obs)}{evaluate(self, t, obs)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+evaluate (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{t, }
+\item[{}]{obs}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a0ed106916e4a7f92f117dd79a3c05faf}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a0ed106916e4a7f92f117dd79a3c05faf}
+\begin{DoxyVerb}Evaluate agent.
+:param t: Time step
+:param obs: Observation
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!load\+\_\+genome@{load\+\_\+genome}}
+\index{load\+\_\+genome@{load\+\_\+genome}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{load\+\_\+genome(self, params, agent\+\_\+name)}{load_genome(self, params, agent_name)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+load\+\_\+genome (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{params, }
+\item[{}]{agent\+\_\+name}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a573752f1ce310965576f8910fb9d6e73}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a573752f1ce310965576f8910fb9d6e73}
+\begin{DoxyVerb}This loads the genome of the agent
+:param params: Genome to load
+:param agent_name: Name of the agent
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!mutate@{mutate}}
+\index{mutate@{mutate}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{mutate(self)}{mutate(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+mutate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a34bb5dfaf08d1576a0962eab55437dad}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a34bb5dfaf08d1576a0962eab55437dad}
+\begin{DoxyVerb}Mutates the genome of the agent. It does not return anything. The mutation is internal.
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!sigmoid@{sigmoid}}
+\index{sigmoid@{sigmoid}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{sigmoid(self, x)}{sigmoid(self, x)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+sigmoid (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ac5844281ca9599579b360d5879c18843}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ac5844281ca9599579b360d5879c18843}
+\begin{DoxyVerb}Sigmoid function
+:param x: Input
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!action\+\_\+len@{action\+\_\+len}}
+\index{action\+\_\+len@{action\+\_\+len}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{action\+\_\+len}{action_len}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+action\+\_\+len}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a10abdcb12eb671dcf75eb57b9583059e}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a10abdcb12eb671dcf75eb57b9583059e}
+\index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!input\+\_\+shape@{input\+\_\+shape}}
+\index{input\+\_\+shape@{input\+\_\+shape}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{input\+\_\+shape}{input_shape}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+input\+\_\+shape}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a80c9405db212739cbd1d87a22937fe32}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_a80c9405db212739cbd1d87a22937fe32}
+\index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!output\+\_\+shape@{output\+\_\+shape}}
+\index{output\+\_\+shape@{output\+\_\+shape}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{output\+\_\+shape}{output_shape}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+output\+\_\+shape}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_acb240f0be94cdcf367a52ad574ef73ba}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_acb240f0be94cdcf367a52ad574ef73ba}
+\index{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}!use\+\_\+bias@{use\+\_\+bias}}
+\index{use\+\_\+bias@{use\+\_\+bias}!taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+F\+F\+Neural\+Agent}}
+\subsubsection[{\texorpdfstring{use\+\_\+bias}{use_bias}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+F\+F\+Neural\+Agent.\+use\+\_\+bias}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ac411d0381853dcd7c5cab6e96c5118f0}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_f_f_neural_agent_ac411d0381853dcd7c5cab6e96c5118f0}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/evolution/\hyperlink{agents_8py}{agents.\+py}\end{DoxyCompactItemize}

@@ -1,0 +1,154 @@
+\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env}{}\section{taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env Class Reference}
+\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env}\index{taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env@{taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env}}
+
+
+Inheritance diagram for taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_ac530fa797628bd8c81d2de7e96cbc9a7}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_aac2d5d5e4b17abc83ed2534b429db790}{seed}=None, max\+\_\+steps=500)
+\item 
+def \hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_aac2d5d5e4b17abc83ed2534b429db790}{seed} (self, seed=None)
+\item 
+def \hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a094d8ca1846f8cd02a437772a21f44f8}{reset} (self, desired\+\_\+ball\+\_\+pose=None)
+\item 
+def \hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a9aec06d9a7910b796d372fb9bd93f9ee}{step} (self, action)
+\item 
+def \hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a90b8cb7902e807b3fef7272c640d68cc}{render} (self, mode=\textquotesingle{}human\textquotesingle{}, kwargs)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a4a1c8260de7230376cd855374033937c}{screen}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a54f53f6e892fcdbb5b765932374fc530}{params}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a6d670e52ddfbaaf3553d8323c4a86180}{physics\+\_\+eng}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a080c4cf436a62ab8dd3aacaea6adae3e}{observation\+\_\+space}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_aca17d35df853b794e5187c14760023fe}{action\+\_\+space}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_ad5b8c9811dd9a5c6c9eaa44f576f11b1}{steps}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a3759e742c0d0c4675b30c145da6de33c}{state}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a9aed5275af97b0fc8a116bb09ed7f811}{clock}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a2e6c94ce74451c211285b031c83909a6}{metadata}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}State is composed of:
+s = ([ball_x, ball_y], [joint0_angle, joint1_angle], [joint0_speed, joint1_speed])
+
+The values that these components can take are:
+ball_x, ball_y -> [-1.5, 1.5]
+joint0_angle -> [-pi/2, pi/2]
+joint1_angle -> [-pi, pi]
+joint0_speed, joint1_speed -> [-50, 50]
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+(self, seed=\+None, max\+\_\+steps=500)}{__init__(self, seed=None, max_steps=500)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{seed = {\ttfamily None}, }
+\item[{}]{max\+\_\+steps = {\ttfamily 500}}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_ac530fa797628bd8c81d2de7e96cbc9a7}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_ac530fa797628bd8c81d2de7e96cbc9a7}
+
+
+\subsection{Member Function Documentation}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!render@{render}}
+\index{render@{render}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{render(self, mode=\textquotesingle{}human\textquotesingle{}, kwargs)}{render(self, mode='human', kwargs)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+render (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mode = {\ttfamily \textquotesingle{}human\textquotesingle{}}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a90b8cb7902e807b3fef7272c640d68cc}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a90b8cb7902e807b3fef7272c640d68cc}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!reset@{reset}}
+\index{reset@{reset}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{reset(self, desired\+\_\+ball\+\_\+pose=\+None)}{reset(self, desired_ball_pose=None)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+reset (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{desired\+\_\+ball\+\_\+pose = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a094d8ca1846f8cd02a437772a21f44f8}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a094d8ca1846f8cd02a437772a21f44f8}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!seed@{seed}}
+\index{seed@{seed}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{seed(self, seed=\+None)}{seed(self, seed=None)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+seed (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{seed = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_aac2d5d5e4b17abc83ed2534b429db790}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_aac2d5d5e4b17abc83ed2534b429db790}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!step@{step}}
+\index{step@{step}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{step(self, action)}{step(self, action)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+step (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{action}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a9aec06d9a7910b796d372fb9bd93f9ee}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a9aec06d9a7910b796d372fb9bd93f9ee}
+
+
+\subsection{Member Data Documentation}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!action\+\_\+space@{action\+\_\+space}}
+\index{action\+\_\+space@{action\+\_\+space}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{action\+\_\+space}{action_space}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+action\+\_\+space}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_aca17d35df853b794e5187c14760023fe}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_aca17d35df853b794e5187c14760023fe}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!clock@{clock}}
+\index{clock@{clock}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{clock}{clock}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+clock}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a9aed5275af97b0fc8a116bb09ed7f811}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a9aed5275af97b0fc8a116bb09ed7f811}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!metadata@{metadata}}
+\index{metadata@{metadata}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{metadata}{metadata}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+metadata\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a2e6c94ce74451c211285b031c83909a6}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a2e6c94ce74451c211285b031c83909a6}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!observation\+\_\+space@{observation\+\_\+space}}
+\index{observation\+\_\+space@{observation\+\_\+space}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{observation\+\_\+space}{observation_space}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+observation\+\_\+space}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a080c4cf436a62ab8dd3aacaea6adae3e}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a080c4cf436a62ab8dd3aacaea6adae3e}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!params@{params}}
+\index{params@{params}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{params}{params}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+params}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a54f53f6e892fcdbb5b765932374fc530}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a54f53f6e892fcdbb5b765932374fc530}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!physics\+\_\+eng@{physics\+\_\+eng}}
+\index{physics\+\_\+eng@{physics\+\_\+eng}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{physics\+\_\+eng}{physics_eng}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+physics\+\_\+eng}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a6d670e52ddfbaaf3553d8323c4a86180}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a6d670e52ddfbaaf3553d8323c4a86180}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!screen@{screen}}
+\index{screen@{screen}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{screen}{screen}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+screen}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a4a1c8260de7230376cd855374033937c}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a4a1c8260de7230376cd855374033937c}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!state@{state}}
+\index{state@{state}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{state}{state}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+state}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a3759e742c0d0c4675b30c145da6de33c}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_a3759e742c0d0c4675b30c145da6de33c}
+\index{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}!steps@{steps}}
+\index{steps@{steps}!taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env@{taxons\+::gym\+\_\+billiard\+::envs\+::billiard\+\_\+env\+::\+Billiard\+Env}}
+\subsubsection[{\texorpdfstring{steps}{steps}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+gym\+\_\+billiard.\+envs.\+billiard\+\_\+env.\+Billiard\+Env.\+steps}\hypertarget{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_ad5b8c9811dd9a5c6c9eaa44f576f11b1}{}\label{classtaxons_1_1gym__billiard_1_1envs_1_1billiard__env_1_1_billiard_env_ad5b8c9811dd9a5c6c9eaa44f576f11b1}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+gym\+\_\+billiard/envs/\hyperlink{billiard__env_8py}{billiard\+\_\+env.\+py}\end{DoxyCompactItemize}

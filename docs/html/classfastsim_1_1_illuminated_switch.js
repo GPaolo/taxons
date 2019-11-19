@@ -1,0 +1,25 @@
+var classfastsim_1_1_illuminated_switch =
+[
+    [ "IlluminatedSwitch", "classfastsim_1_1_illuminated_switch.html#a09265b2492cbee9b58ffaf9e6146468c", null ],
+    [ "activate", "classfastsim_1_1_illuminated_switch.html#a095aae0976a4f99a2e2aaad0e94a6b40", null ],
+    [ "deactivate", "classfastsim_1_1_illuminated_switch.html#af13e4e31118b39d3d2c88356e149f0b7", null ],
+    [ "get_activated", "classfastsim_1_1_illuminated_switch.html#a62102183f5fede38f86f81aba22bba74", null ],
+    [ "get_color", "classfastsim_1_1_illuminated_switch.html#a11f9cc3bdd332e64254629b64bbb02c5", null ],
+    [ "get_off", "classfastsim_1_1_illuminated_switch.html#acb1748d43ed318adb448541f442b77e0", null ],
+    [ "get_on", "classfastsim_1_1_illuminated_switch.html#a183bcaac9da4aae75026625d6a82c76f", null ],
+    [ "get_radius", "classfastsim_1_1_illuminated_switch.html#a0c16bd6906af7871a2ddf412e1e7619c", null ],
+    [ "get_x", "classfastsim_1_1_illuminated_switch.html#a03e3bd5bbf721102c6c40e41304d809c", null ],
+    [ "get_y", "classfastsim_1_1_illuminated_switch.html#a44d7de67d0ae8399982ebd74169aabd8", null ],
+    [ "link", "classfastsim_1_1_illuminated_switch.html#a6996c7dd1af6369aef0da762dc98c8e8", null ],
+    [ "set_off", "classfastsim_1_1_illuminated_switch.html#a525fa3615e66cae45e6d80c390244e73", null ],
+    [ "set_on", "classfastsim_1_1_illuminated_switch.html#ac55c64344984625e197c8be77fb4ae9e", null ],
+    [ "set_pos", "classfastsim_1_1_illuminated_switch.html#a996b5177dd26cf086e0bd5428b86fbde", null ],
+    [ "try_to_activate", "classfastsim_1_1_illuminated_switch.html#ae5637b2dce02faac61b6dd9e21a8985d", null ],
+    [ "_activated", "classfastsim_1_1_illuminated_switch.html#ac886e81a15bbd6f9806da5154655cf9e", null ],
+    [ "_color", "classfastsim_1_1_illuminated_switch.html#ae24d4e006a7cbc37bf9e17d2e0768171", null ],
+    [ "_linked_lights", "classfastsim_1_1_illuminated_switch.html#adc857871c0d0f304d4d21655f54f4f0f", null ],
+    [ "_on", "classfastsim_1_1_illuminated_switch.html#a159fe2f58f156f5fceec14998739918d", null ],
+    [ "_radius", "classfastsim_1_1_illuminated_switch.html#ac204dfa0671fc1d860ab19371a15dcf9", null ],
+    [ "_x", "classfastsim_1_1_illuminated_switch.html#a5dca28e3c3202f405cae1d81fceb4e14", null ],
+    [ "_y", "classfastsim_1_1_illuminated_switch.html#af1f3ac22f8c8b938dcfa62efa2d322bd", null ]
+];

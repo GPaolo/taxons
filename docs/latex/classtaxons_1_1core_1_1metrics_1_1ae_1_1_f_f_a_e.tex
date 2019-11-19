@@ -1,0 +1,82 @@
+\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e}{}\section{taxons.\+core.\+metrics.\+ae.\+F\+F\+AE Class Reference}
+\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e}\index{taxons.\+core.\+metrics.\+ae.\+F\+F\+AE@{taxons.\+core.\+metrics.\+ae.\+F\+F\+AE}}
+
+
+Inheritance diagram for taxons.\+core.\+metrics.\+ae.\+F\+F\+AE\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for taxons.\+core.\+metrics.\+ae.\+F\+F\+AE\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a062c17d2f6195d462d3981b57e007724}{forward} (self, x)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a16441b370db28f55628beb64248a463e}{training\+\_\+step} (self, x)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a6a659ea23dceb6a01e2222fe8545e5fc}{encoder}
+\item 
+\hyperlink{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_aadcd88c7f653846a70830e6adbd98458}{decoder}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This class implements a FF autoencoder
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\index{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}!forward@{forward}}
+\index{forward@{forward}!taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}}
+\subsubsection[{\texorpdfstring{forward(self, x)}{forward(self, x)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+F\+F\+A\+E.\+forward (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a062c17d2f6195d462d3981b57e007724}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a062c17d2f6195d462d3981b57e007724}
+\begin{DoxyVerb}Performs forward pass of the net
+:param x: Input
+:return: rec_error, features, reconstructed image
+\end{DoxyVerb}
+ \index{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}!training\+\_\+step@{training\+\_\+step}}
+\index{training\+\_\+step@{training\+\_\+step}!taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}}
+\subsubsection[{\texorpdfstring{training\+\_\+step(self, x)}{training_step(self, x)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+metrics.\+ae.\+F\+F\+A\+E.\+training\+\_\+step (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a16441b370db28f55628beb64248a463e}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a16441b370db28f55628beb64248a463e}
+\begin{DoxyVerb}Performs one training step of the network
+:param x: Input
+:return: Loss, features, reconstructed image
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}!decoder@{decoder}}
+\index{decoder@{decoder}!taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}}
+\subsubsection[{\texorpdfstring{decoder}{decoder}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+metrics.\+ae.\+F\+F\+A\+E.\+decoder}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_aadcd88c7f653846a70830e6adbd98458}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_aadcd88c7f653846a70830e6adbd98458}
+\index{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}!encoder@{encoder}}
+\index{encoder@{encoder}!taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE@{taxons\+::core\+::metrics\+::ae\+::\+F\+F\+AE}}
+\subsubsection[{\texorpdfstring{encoder}{encoder}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+metrics.\+ae.\+F\+F\+A\+E.\+encoder}\hypertarget{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a6a659ea23dceb6a01e2222fe8545e5fc}{}\label{classtaxons_1_1core_1_1metrics_1_1ae_1_1_f_f_a_e_a6a659ea23dceb6a01e2222fe8545e5fc}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/metrics/\hyperlink{ae_8py}{ae.\+py}\end{DoxyCompactItemize}

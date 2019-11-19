@@ -1,0 +1,180 @@
+\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent}{}\section{taxons.\+core.\+evolution.\+agents.\+Base\+Agent Class Reference}
+\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent}\index{taxons.\+core.\+evolution.\+agents.\+Base\+Agent@{taxons.\+core.\+evolution.\+agents.\+Base\+Agent}}
+
+
+Inheritance diagram for taxons.\+core.\+evolution.\+agents.\+Base\+Agent\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for taxons.\+core.\+evolution.\+agents.\+Base\+Agent\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a542ecb86c03a0e294fb5da09a6781df4}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, mutation\+\_\+distr=None, kwargs)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a447d86fcc349f566f805abb94e827bdf}{evaluate} (self, args)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ac8ef2c8f9f07f64c510c93b974a9d5ec}{\+\_\+\+\_\+call\+\_\+\+\_\+} (self, args)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ac2bc34dba1220c78be6f78ff2dce627e}{genome} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_abccbcef76ef79f56c384cbf219fa4510}{action\+\_\+len} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_aa2291e7c2fe5444d4e9c7dd72679503c}{action\+\_\+len} (self, l)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a196f7721b03b5fcf9cd1c975269a1ab8}{mutate} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a57624da363ac47974b974607fcc82c6f}{copy} (self)
+\item 
+def \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_add268d06abacc75ce86cd91a80d5d570}{load\+\_\+genome} (self, \hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ac2bc34dba1220c78be6f78ff2dce627e}{genome}, agent\+\_\+name)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ae3a3e5cfaeab8d4d86264b4072c9f8d6}{sigma}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a7ca87986223b8c7c7b50d826bba34ac4}{mu}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a707cc21346d69f5312109cd219e2b860}{mutation\+\_\+operator}
+\item 
+\hyperlink{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a696898563e1c967fa7c541e5570a8d2e}{action\+\_\+len}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyVerb}This class defines the base agent from which other agents should inherit
+\end{DoxyVerb}
+ 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+(self, mutation\+\_\+distr=\+None, kwargs)}{__init__(self, mutation_distr=None, kwargs)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mutation\+\_\+distr = {\ttfamily None}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a542ecb86c03a0e294fb5da09a6781df4}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a542ecb86c03a0e294fb5da09a6781df4}
+\begin{DoxyVerb}Constructor
+:param mutation_distr: Distribution used to mutate the agent genome. If None, a normal distribution, with [0, 0.05] is used
+:param kwargs:
+\end{DoxyVerb}
+ 
+
+\subsection{Member Function Documentation}
+\index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!\+\_\+\+\_\+call\+\_\+\+\_\+@{\+\_\+\+\_\+call\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+call\+\_\+\+\_\+@{\+\_\+\+\_\+call\+\_\+\+\_\+}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{\+\_\+\+\_\+call\+\_\+\+\_\+(self, args)}{__call__(self, args)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+\_\+\+\_\+call\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ac8ef2c8f9f07f64c510c93b974a9d5ec}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ac8ef2c8f9f07f64c510c93b974a9d5ec}
+\begin{DoxyVerb}Call function
+:param x: Agent input
+:return: Value of the output
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!action\+\_\+len@{action\+\_\+len}}
+\index{action\+\_\+len@{action\+\_\+len}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{action\+\_\+len(self)}{action_len(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+action\+\_\+len (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_abccbcef76ef79f56c384cbf219fa4510}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_abccbcef76ef79f56c384cbf219fa4510}
+\begin{DoxyVerb}Length of the agent actions.
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!action\+\_\+len@{action\+\_\+len}}
+\index{action\+\_\+len@{action\+\_\+len}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{action\+\_\+len(self, l)}{action_len(self, l)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+action\+\_\+len (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{l}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_aa2291e7c2fe5444d4e9c7dd72679503c}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_aa2291e7c2fe5444d4e9c7dd72679503c}
+\index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!copy@{copy}}
+\index{copy@{copy}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{copy(self)}{copy(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+copy (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a57624da363ac47974b974607fcc82c6f}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a57624da363ac47974b974607fcc82c6f}
+\begin{DoxyVerb}Performs a deep copy of the agent
+:return: A copy of the agent
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!evaluate@{evaluate}}
+\index{evaluate@{evaluate}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{evaluate(self, args)}{evaluate(self, args)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+evaluate (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a447d86fcc349f566f805abb94e827bdf}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a447d86fcc349f566f805abb94e827bdf}
+\begin{DoxyVerb}Evaluate agent. Needs to be implemented by inheriting classes
+:param x: Input
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!genome@{genome}}
+\index{genome@{genome}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{genome(self)}{genome(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+genome (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ac2bc34dba1220c78be6f78ff2dce627e}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ac2bc34dba1220c78be6f78ff2dce627e}
+\begin{DoxyVerb}Genome of the agent in the shape of a list
+:return: The genome
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!load\+\_\+genome@{load\+\_\+genome}}
+\index{load\+\_\+genome@{load\+\_\+genome}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{load\+\_\+genome(self, genome, agent\+\_\+name)}{load_genome(self, genome, agent_name)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+load\+\_\+genome (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{genome, }
+\item[{}]{agent\+\_\+name}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_add268d06abacc75ce86cd91a80d5d570}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_add268d06abacc75ce86cd91a80d5d570}
+\begin{DoxyVerb}Loads a genome into the agent. Needs to be implemented by inheriting classes
+:param genome: Genome to load
+:param agent_name: Name of the agent
+\end{DoxyVerb}
+ \index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!mutate@{mutate}}
+\index{mutate@{mutate}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{mutate(self)}{mutate(self)}}]{\setlength{\rightskip}{0pt plus 5cm}def taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+mutate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a196f7721b03b5fcf9cd1c975269a1ab8}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a196f7721b03b5fcf9cd1c975269a1ab8}
+\begin{DoxyVerb}Mutate agent genome. Needs to be implemented by inheriting classes
+\end{DoxyVerb}
+ 
+
+\subsection{Member Data Documentation}
+\index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!action\+\_\+len@{action\+\_\+len}}
+\index{action\+\_\+len@{action\+\_\+len}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{action\+\_\+len}{action_len}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+action\+\_\+len}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a696898563e1c967fa7c541e5570a8d2e}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a696898563e1c967fa7c541e5570a8d2e}
+\index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!mu@{mu}}
+\index{mu@{mu}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{mu}{mu}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+mu}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a7ca87986223b8c7c7b50d826bba34ac4}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a7ca87986223b8c7c7b50d826bba34ac4}
+\index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!mutation\+\_\+operator@{mutation\+\_\+operator}}
+\index{mutation\+\_\+operator@{mutation\+\_\+operator}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{mutation\+\_\+operator}{mutation_operator}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+mutation\+\_\+operator}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a707cc21346d69f5312109cd219e2b860}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_a707cc21346d69f5312109cd219e2b860}
+\index{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}!sigma@{sigma}}
+\index{sigma@{sigma}!taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent@{taxons\+::core\+::evolution\+::agents\+::\+Base\+Agent}}
+\subsubsection[{\texorpdfstring{sigma}{sigma}}]{\setlength{\rightskip}{0pt plus 5cm}taxons.\+core.\+evolution.\+agents.\+Base\+Agent.\+sigma}\hypertarget{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ae3a3e5cfaeab8d4d86264b4072c9f8d6}{}\label{classtaxons_1_1core_1_1evolution_1_1agents_1_1_base_agent_ae3a3e5cfaeab8d4d86264b4072c9f8d6}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/evolution/\hyperlink{agents_8py}{agents.\+py}\end{DoxyCompactItemize}
